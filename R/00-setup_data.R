@@ -3,17 +3,26 @@
 #' @param counts a matrix of data that contains the counts where rows are each paired_guide target and columns are each sample
 #' @param pg_ids the pgRNA IDs: metadata associated with the pgRNA constructs that correspond to the rows of the counts data
 #' @param pg_metadata construct metadata
-#' @param sample_metadata metadata associated with the samples of the dataset that correspond to the columns of the counts data
+#' @param sample_metadata metadata associated with the samples of the dataset that correspond to the columns of the counts data.
+#' Should include a column that has replicate information as well as a column that contains timepoint information respectively (this will be used for log fold calculations). These columns should be factors.
 #' @return A special gimap_dataset to be used with the other functions in this package.
 #' @export
 #' @examples \dontrun{
-#' data <- example_data() %>%
+#'
+#' example_counts <- get_example_data("count") %>%
 #'   dplyr::select(c("Day00_RepA", "Day05_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC")) %>%
 #'   as.matrix()
 #'
-#' counts_data <- setup_data(data)
+#' gimap_dataset <- setup_data(counts = example_counts_data)
+#'
+#' # You can see what an example dataset looks like by pulling the example gimap_dataset:
+#' gimap_dataset <- get_example_data("gimap")
+#'
 #' }
-setup_data <- function(counts = NULL, pg_ids = NULL, pg_metadata = NULL, sample_metadata = NULL) {
+setup_data <- function(counts = NULL,
+                       pg_ids = NULL,
+                       pg_metadata = NULL,
+                       sample_metadata = NULL) {
   new_data <- gimap_data <- list(
     raw_counts = NULL,
     counts_per_sample = NULL,
@@ -27,9 +36,10 @@ setup_data <- function(counts = NULL, pg_ids = NULL, pg_metadata = NULL, sample_
       pg_metadata = NULL,
       sample_metadata = NULL
     ),
-    qc = list(
-      qc_filter = NULL
-    )
+    filtered_data = NULL,
+    annotation = NULL,
+    log_fc = NULL,
+    results = NULL
   )
 
   class(new_data) <- c("list", "gimap_dataset")
@@ -62,9 +72,9 @@ setup_data <- function(counts = NULL, pg_ids = NULL, pg_metadata = NULL, sample_
   new_data$counts_per_sample <- apply(counts, 2, sum)
 
   # Transform the data
-  new_data$transformed_data$count_norm <- apply(counts, 2, function(x) -log10((x+1)/sum(x)))
-  new_data$transformed_data$cpm <- apply(counts, 2, function(x) (x/sum(x))*1e6)
-  new_data$transformed_data$log2_cpm <- log2(new_data$transformed_data$cpm +1)
+  new_data$transformed_data$count_norm <- apply(counts, 2, function(x) -log10((x + 1) / sum(x)))
+  new_data$transformed_data$cpm <- apply(counts, 2, function(x) (x / sum(x)) * 1e6)
+  new_data$transformed_data$log2_cpm <- log2(new_data$transformed_data$cpm + 1)
 
   return(new_data)
 }

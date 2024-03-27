@@ -4,7 +4,7 @@
 #' @export
 #' @examples \dontrun{
 #'
-#' pg_data <- get_example_data()
+#' gimap_dataset <- get_example_data("gimap")
 #' }
 get_example_data <- function(which_data) {
   if (which_data == "count") {
@@ -23,8 +23,16 @@ get_example_data <- function(which_data) {
       full.names = TRUE
     )
     return(readr::read_csv(file, skip = 1))
+  } else if (which_data == "gimap") {
+    file <- list.files(
+      pattern = "gimap_dataset.RDS",
+      recursive = TRUE,
+      system.file("extdata", package = "gimap"),
+      full.names = TRUE
+    )
+    return(readr::read_rds(file))
   } else {
-    stop("Specification for `which_data` not understood; Need to use 'count' or 'meta'")
+    stop("Specification for `which_data` not understood; Need to use 'gimap', count', or 'meta'")
   }
 }
 
@@ -93,4 +101,55 @@ make_out_dir <- function(out_dir) {
     dir.create(file.path(out_dir, "plots", "pdf"), recursive = TRUE)
     print(paste("Output directory created at:", out_dir, sep = " "))
   }
+}
+
+#' Get file path to an default credentials RDS
+#' @export
+#' @return Returns the file path to folder where the example data is stored
+example_data_folder <- function() {
+  file <- list.files(
+    pattern = "example_data.md",
+    recursive = TRUE,
+    system.file("extdata", package = "metricminer"),
+    full.names = TRUE
+  )
+  dirname(file)
+}
+
+save_example_data <- function() {
+  example_data <- get_example_data("count")
+
+  example_pg_metadata <- get_example_data("meta")
+
+  example_counts <- example_data %>%
+    select(c("Day00_RepA", "Day05_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC")) %>%
+    as.matrix()
+
+  example_pg_id <- example_data %>%
+    dplyr::select("id")
+
+  example_pg_metadata <- example_data %>%
+    select(c("id", "seq_1", "seq_2"))
+
+  example_sample_metadata <- data.frame(
+    id = 1:5,
+    day = as.factor(c("Day00", "Day05", "Day22", "Day22", "Day22")),
+    rep = as.factor(c("RepA", "RepA", "RepA", "RepB", "RepC"))
+  )
+
+  gimap_dataset <- setup_data(
+    counts = example_counts,
+    pg_ids = example_pg_id,
+    pg_metadata = example_pg_metadata,
+    sample_metadata = example_sample_metadata
+  )
+
+  example_folder <- list.files(
+    pattern = "PP_pgPEN_HeLa_counts.txt",
+    recursive = TRUE,
+    system.file("extdata", package = "gimap"),
+    full.names = TRUE
+  )
+
+  saveRDS(gimap_dataset, file.path(dirname(example_folder), "gimap_dataset.RDS"))
 }
