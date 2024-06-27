@@ -36,7 +36,12 @@ setup_data <- function(counts = NULL,
       pg_metadata = NULL,
       sample_metadata = NULL
     ),
-    filtered_data = NULL,
+    filtered_data = list(
+      filter_step_run = FALSE, #adding a way to know if the filter step was run since it's optional
+      metadata_pg_ids = NULL,
+      pg_metadata = NULL,
+      transformed_log2_cpm = NULL
+    ),
     annotation = NULL,
     log_fc = NULL,
     results = NULL

@@ -29,7 +29,11 @@
 #' #or 
 #' gimap_dataset <- gimap_filter(gimap_dataset, filter_type = "low_plasmid_cpm_only")
 #' 
-#' # 
+#' # If you want to use multiple filters and more than one to flag a pgRNA construct before it's filtered out, use the `min_n_filters` argument
+#' gimap_dataset <- gimap_filter(gimap_ddataset, filter_type = "both", min_n_filters = 2)
+#' 
+#' # You can also specify which columns the filters will be applied to
+#' gimap_dataset <- gimap_filter(gimap_dataset, filter_type = "zero_count_only", filter_zerocount_target_col = c(1,2))
 #'
 #' }
 #'
@@ -56,11 +60,11 @@ gimap_filter <- function(.data = NULL,
   #This section calls the appropriate filtering functions and assigns results to the filter variables assigned NULL earlier (they will stay NULL if there filter wasn't selected to be run according to the input to the function)
   if (filter_type == "both"){
     zc_filter <- qc_filter_zerocounts(gimap_dataset, filter_zerocount_target_col = filter_zerocount_target_col)$filter
-    p_filter <- qc_filter_plasmid(gimap_dataset, cutoff = cutoff, filter_plasmid_target_col = filter_plasmid_target_col)$plasmid_filter
+    p_filter <- qc_filter_plasmid(gimap_dataset, cutoff = cutoff, filter_plasmid_target_col = filter_plasmid_target_col)$filter
   } else if (filter_type == "zero_count_only"){
     zc_filter <- qc_filter_zerocounts(gimap_dataset, filter_zerocount_target_col = filter_zerocount_target_col)$filter
   } else if(filter_type == "low_plasmid_cpm_only"){
-    p_filter <- qc_filter_plasmid(gimap_dataset, cutoff = cutoff, filter_plasmid_target_col = filter_plasmid_target_col)$plasmid_filter
+    p_filter <- qc_filter_plasmid(gimap_dataset, cutoff = cutoff, filter_plasmid_target_col = filter_plasmid_target_col)$filter
   }
   
   
@@ -71,10 +75,13 @@ gimap_filter <- function(.data = NULL,
   #then it finds the row sum (how many are filters flagged each construct e.g., number of TRUE in each row), 
   #and finally compares the row sum to the `min_n_filters` parameter to report TRUEs and FALSEs according to whether each construct is flagged by the minimum number of required filters
   #TRUE means it should be filtered, FALSE means it shouldn't be filtered
-  combined_filter <- rowSums(reduce(possible_filters, cbind)) >= min_n_filters 
+  combined_filter <- rowSums(reduce(possible_filters, cbind)) >= min_n_filters
+  #within `combined_filter` TRUE means that the filtering steps flagged the pgRNA construct for removal, therefore, we'll want to use the opposite FALSE values for the filtered data, keeping those that weren't flagged by filtering steps
   
-  
-  gimap_dataset$filtered <- NULL #TODO: Filtered version of the data can be stored here
+  gimap_dataset$filtered_data$filter_step_run <- TRUE #adding a way to know if the filter step was run since it's optional
+  gimap_dataset$filtered_data$metadata_pg_ids <- gimap_dataset$metadata$pg_ids[!combined_filter,]
+  gimap_dataset$filtered_data$pg_metadata <- gimap_dataset$metadata$pg_metadata[!combined_filter,]
+  gimap_dataset$filtered_data$transformed_log2_cpm <- gimap_dataset$transformed_data$log2_cpm[!combined_filter,]
 
   return(gimap_dataset)
 }
@@ -109,7 +116,8 @@ qc_filter_zerocounts <- function(gimap_dataset, filter_zerocount_target_col = NU
   zerocount_df <- data.frame("RawCount0" = c(FALSE, TRUE), n = c(sum(!counts_filter), sum(counts_filter))) %>%
     mutate(percent = round(((n/sum(n))*100),2))
 
-  return(list(filter = counts_filter, reportdf = zerocount_df))
+  return(list(filter = counts_filter, 
+              reportdf = zerocount_df))
 
 }
 
@@ -123,7 +131,7 @@ qc_filter_zerocounts <- function(gimap_dataset, filter_zerocount_target_col = NU
 #' @importFrom dplyr mutate across if_any
 #' @importFrom tidyr pivot_wider pivot_longer 
 #' @importFrom janitor clean_names
-#' @return a named list with the filter `plasmid_filter` specifying which pgRNAs have low plasmid log2 CPM (column of interest is `plasmid_cpm_filter`) and a report df `plasmid_filter_report` for the number and percent of pgRNA which have a low plasmid log2 CPM
+#' @return a named list with the filter `filter` specifying which pgRNAs have low plasmid log2 CPM (column of interest is `plasmid_cpm_filter`) and a report df `reportdf` for the number and percent of pgRNA which have a low plasmid log2 CPM
 #' @examples \dontrun{
 #'   gimap_dataset <- get_example_data("gimap")
 #' 
@@ -184,8 +192,8 @@ qc_filter_plasmid <- function(gimap_dataset, cutoff = NULL, filter_plasmid_targe
     mutate(percent = round(((n / sum(n)) * 100), 2)) #later step make a function for this in utils since it's used more than once
   
   return(list(
-    plasmid_filter = plasmid_cpm_filter,
-    plasmid_filter_report = plasmid_filter_df
+    filter = plasmid_cpm_filter,
+    reportdf = plasmid_filter_df
   ))
 
 }
