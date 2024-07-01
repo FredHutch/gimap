@@ -7,6 +7,7 @@
 #' @param filter_plasmid_target_col default is NULL, and if NULL, will select the first column only; this parameter specifically should be used to specify the plasmid column(s) that will be selected
 #' @param cutoff default is NULL, relates to the low_plasmid_cpm filter; the cutoff for low log2 CPM values for the plasmid time period; if not specified, The lower outlier (defined by taking the difference of the lower quartile and 1.5 * interquartile range) is used
 #' @param min_n_filters default is 1; this parameter defines at least how many/the minimum number of independent filters have to flag a pgRNA construct before the construct is filtered when using a combination of filters
+#' @param output_filter_report default is TRUE; if TRUE, will store a list of pgRNA construct IDs that are removed by filtering as well as the filter(s) that flagged it for removal
 #' You should decide on the appropriate filter based on the results of your QC report.
 #' @importFrom purrr reduce
 #' @returns a filtered version of the gimap_dataset returned in the $filtered_data section
@@ -44,7 +45,8 @@ gimap_filter <- function(.data = NULL,
                          cutoff = NULL,
                          filter_zerocount_target_col = NULL,
                          filter_plasmid_target_col = NULL,
-                         min_n_filters = 1) {
+                         min_n_filters = 1,
+                         output_filter_report = TRUE) {
 
   if (!is.null(.data)) gimap_dataset <- .data
 
@@ -75,14 +77,26 @@ gimap_filter <- function(.data = NULL,
   #then it finds the row sum (how many are filters flagged each construct e.g., number of TRUE in each row), 
   #and finally compares the row sum to the `min_n_filters` parameter to report TRUEs and FALSEs according to whether each construct is flagged by the minimum number of required filters
   #TRUE means it should be filtered, FALSE means it shouldn't be filtered
-  combined_filter <- rowSums(reduce(possible_filters, cbind)) >= min_n_filters
+  one_filter_df <- reduce(possible_filters, cbind) %>% 
+    `colnames<-`(c("FilterZeroCount", "FilterLowPlasmidCPM")) #*ADD any new filter's name here* as an additional column name; START with "Filter"
+  combined_filter <- rowSums(one_filter_df) >= min_n_filters
   #within `combined_filter` TRUE means that the filtering steps flagged the pgRNA construct for removal, therefore, we'll want to use the opposite FALSE values for the filtered data, keeping those that weren't flagged by filtering steps
   
   gimap_dataset$filtered_data$filter_step_run <- TRUE #adding a way to know if the filter step was run since it's optional
   gimap_dataset$filtered_data$metadata_pg_ids <- gimap_dataset$metadata$pg_ids[!combined_filter,]
-  gimap_dataset$filtered_data$pg_metadata <- gimap_dataset$metadata$pg_metadata[!combined_filter,]
   gimap_dataset$filtered_data$transformed_log2_cpm <- gimap_dataset$transformed_data$log2_cpm[!combined_filter,]
-
+  gimap_dataset$filtered_data$removed_pg_ids <- cbind(gimap_dataset$metadata$pg_ids[combined_filter,], one_filter_df[combined_filter,]) %>% #add the IDs as a column together with the TRUEs and FALSEs for each filter, focusing only on pgRNAs which are in some way flagged for removal
+                                                        pivot_longer(starts_with("Filter"), #pivot longer so that IDs are repeated and filter names are listed in a column and the last column (`boolVals`) are TRUEs and FALSEs
+                                                                     names_to = "filterName", 
+                                                                     values_to = "boolVals") %>% 
+                                                        filter(boolVals == TRUE) %>% #drop rows where boolVals is false, so this leaves only filters that flagged a pgRNA for removal
+                                                        select(id, filterName) %>% #drop the boolVals column because don't need it anymore
+                                                        group_by(id) %>% #group by the pgRNA constructs
+                                                        summarize(relevantFilters = toString(filterName)), #and make a column that comma separates the relevant filters
+  gimap_dataset$filtered_data$all_reps_zerocount_ids <- NULL #makes sense to define it here, but would have rerun code
+                                                      
+  
+                                                      
   return(gimap_dataset)
 }
 

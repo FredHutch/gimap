@@ -149,8 +149,8 @@ qc_constructs_countzero_bar <- function(gimap_dataset, filter_zerocount_target_c
                   values_to = "counts") %>%
       group_by(row) %>%
       summarize(numzero = sum(counts == 0),
-                max_diff = max(counts) - min(counts),
-                sec_diff = min(counts[counts > 0]) - min(counts)
+                max_diff = max(counts) - min(counts), #don't use this code outside of scratch visualizations
+                sec_diff = min(counts[counts > 0]) - min(counts) #don't use this code outside of scratch visualizations
                 ) %>%
       group_by(numzero) %>%
       summarize(count = n()) %>%
@@ -161,6 +161,8 @@ qc_constructs_countzero_bar <- function(gimap_dataset, filter_zerocount_target_c
       xlab("Number of replicates with a zero") +
       geom_text(aes(label = count, group = numzero), vjust = -0.5, size=2)
   )
+  
+  #would it be better to figure out how to record/output gimap_dataset$filtered_data$all_reps_zerocount_ids here?
 }
 
 #' Create a correlation heatmap for the pgRNA CPMs
