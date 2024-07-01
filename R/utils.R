@@ -40,7 +40,7 @@ get_example_data <- function(which_data) {
     )
     return(readr::read_tsv(file, show_col_types = FALSE))
   } else {
-    stop("Specification for `which_data` not understood; Need to use 'gimap', count', 'meta', or 'annotation' ")
+    stop("Specification for `which_data` not understood; Need to use 'gimap', 'count', 'meta', or 'annotation' ")
   }
 }
 
