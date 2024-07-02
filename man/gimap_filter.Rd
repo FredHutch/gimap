@@ -33,7 +33,6 @@ gimap_dataset <- gimap_filter(gimap_dataset)
 
 # To see filtered data
 gimap_dataset$filtered_data
-
 }
 
 }

@@ -22,6 +22,9 @@ This function uses pivot_longer to rearrange the data for plotting and then plot
 \examples{
 \dontrun{
 
+gimap_dataset <- get_example_data("gimap")
+qc_cdf(gimap_dataset)
+
 }
 
 }

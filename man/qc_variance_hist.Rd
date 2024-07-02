@@ -4,10 +4,16 @@
 \alias{qc_variance_hist}
 \title{Create a histogram for the variance within replicates for each pgRNA}
 \usage{
-qc_variance_hist(gimap_dataset, wide_ar = 0.75)
+qc_variance_hist(
+  gimap_dataset,
+  filter_replicates_target_col = NULL,
+  wide_ar = 0.75
+)
 }
 \arguments{
 \item{gimap_dataset}{The special gimap_dataset from the `setup_data` function which contains the transformed data}
+
+\item{filter_replicates_target_col}{default is NULL; Which sample columns are replicates whose variation you'd like to analyze; If NULL, the last 3 sample columns are used}
 
 \item{wide_ar}{aspect ratio, default is 0.75}
 }
