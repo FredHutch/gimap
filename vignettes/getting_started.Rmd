@@ -92,13 +92,19 @@ example_pg_metadata <- example_data %>%
   select(c("id", "seq_1", "seq_2"))
 ```
 
-Sample metadata is the information that describes the samples and is sorted the same way as the columns in the count data.
+Sample metadata is the information that describes the samples and is sorted the same order as the columns in the count data.
+
+You need to have two columns in the metadata you provide (they must be named exactly this).
+
+- `col_names` - Must match the colnames of the counts data being submitted
+- `timepoints` - A numeric variable that describes the timepoints for these data. 
+- `replicates` - A factor that describes which columns are replicates of each other. It doesn't matter what you name these except that this column is a factor that will be used for calculations. 
 
 ```{r}
 example_sample_metadata <- data.frame(
-  id = 1:5,
-  day = as.factor(c("Day00", "Day05", "Day22", "Day22", "Day22")),
-  rep = as.factor(c("RepA", "RepA", "RepA", "RepB", "RepC"))
+  col_names = c("Day00_RepA", "Day05_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC"),
+  timepoints = as.numeric(c("0", "5", "22", "22", "22")),
+  replicates = as.factor(c("RepA", "RepA", "RepA", "RepB", "RepC"))
 )
 ```
 
@@ -156,6 +162,15 @@ run_qc(gimap_dataset,
        output_file = "example_qc_report.Rmd",
        overwrite = TRUE,
        quiet = TRUE)
+```
+
+
+```{r}
+gimap_dataset <- gimap_dataset %>%
+  gimap_filter() %>%
+  gimap_annotate() %>%
+  gimap_normalize() %>%
+  calc_crispr()
 ```
 
 ```{r}

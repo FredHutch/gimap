@@ -34,10 +34,9 @@ example_counts <- get_example_data("count") \%>\%
   dplyr::select(c("Day00_RepA", "Day05_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC")) \%>\%
   as.matrix()
 
-gimap_dataset <- setup_data(counts = example_counts_data)
+gimap_dataset <- setup_data(counts = example_counts)
 
 # You can see what an example dataset looks like by pulling the example gimap_dataset:
 gimap_dataset <- get_example_data("gimap")
-
 }
 }
