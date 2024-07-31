@@ -99,7 +99,8 @@ calc_gi <- function(.data = NULL,
       rep,
       double_target_gi_score,
       single_target_gi_score_1,
-      single_target_gi_score_2
+      single_target_gi_score_2,
+      expected_crispr
     )
 
   # Store this

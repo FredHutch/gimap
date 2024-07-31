@@ -175,9 +175,7 @@ calc_crispr <- function(.data = NULL,
       pgRNA2_seq = gRNA2_seq,
       mean_double_control_crispr_1 = mean_double_control_crispr,
       mean_double_control_crispr_2
-    ) %>%
-    # TODO: What we dropping here? This needs investigation
-    dplyr::distinct()
+    )
 
   # Save at the target level
   gimap_dataset$crispr_score <- crispr_df
