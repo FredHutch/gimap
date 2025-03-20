@@ -13,7 +13,10 @@ One linear model and compare to separate linear models.
 
 ```{r}
 devtools::load_all()
+```
 
+
+```{r}
 gimap_dataset <- get_example_data("gimap") %>%
   gimap_filter() %>%
   gimap_annotate(cell_line = "HELA") %>%
