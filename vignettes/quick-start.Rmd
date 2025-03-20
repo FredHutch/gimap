@@ -102,10 +102,11 @@ It's ideal to run quality checks first. The `run_qc()` function will create a re
 
 ```{r eval = FALSE}
 run_qc(gimap_dataset,
-       output_file = "example_qc_report.Rmd",
-       overwrite = TRUE,
-       plots_dir = "plots",
-       quiet = TRUE)
+  output_file = "example_qc_report.Rmd",
+  overwrite = TRUE,
+  plots_dir = "plots",
+  quiet = TRUE
+)
 ```
 
 You can take a look at an [example QC report here](http://htmlpreview.github.io/?https://raw.githubusercontent.com/FredHutch/gimap/main/inst/example_qc_report.html).
@@ -167,8 +168,10 @@ We can pick out a specific pair to plot.
 
 ```{r eval = FALSE}
 # "TIAL1_TIA1" is top result so let's plot that
-plot_targets_bar(gimap_dataset, target1 = "TIAL1", target2 = "TIA1", 
-                 reps_to_drop = "Day05_RepA_early")
+plot_targets_bar(gimap_dataset,
+  target1 = "TIAL1", target2 = "TIA1",
+  reps_to_drop = "Day05_RepA_early"
+)
 ```
 
 ## Saving data to a file

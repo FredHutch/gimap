@@ -35,7 +35,7 @@ plot_exp_v_obs_scatter <- function(gimap_dataset, facet_rep = FALSE, reps_to_dro
     )
   }
 
-  if (is.null(gimap_dataset$overall_results)) {
+  if (is.null(gimap_dataset$linear_model)) {
     stop(
       "This function only works with",
       "gimap_dataset objects which have had gi calculated with calc_gi()"
@@ -57,20 +57,14 @@ plot_exp_v_obs_scatter <- function(gimap_dataset, facet_rep = FALSE, reps_to_dro
 
   if (reps_to_drop != "") {
     regression_data <- regression_data %>% # get only single targeting
-     filter(!(rep %in% reps_to_drop))
-  }
-
-  if (expected_col == "mean_expected_cs") {
-    model <- lm(mean_observed_cs ~ mean_expected_cs, data = regression_data)
-  } else if (expected_col == "mean_expected_lfc") {
-    model <- lm(mean_observed_lfc ~ mean_expected_lfc, data = regression_data)
+      filter(!(rep %in% reps_to_drop))
   }
 
   gplot_data <- gimap_dataset$gi_scores
 
   if (reps_to_drop != "") {
-  gplot_data <- gplot_data %>%
-    filter(!(rep %in% reps_to_drop))
+    gplot_data <- gplot_data %>%
+      filter(!(rep %in% reps_to_drop))
   }
 
   gplot <- gplot_data %>%
@@ -92,17 +86,19 @@ plot_exp_v_obs_scatter <- function(gimap_dataset, facet_rep = FALSE, reps_to_dro
     theme_classic() +
     theme(legend.title = element_blank()) +
     geom_abline(
-      slope = model$coefficients[[expected_col]],
-      intercept = model$coefficients[["(Intercept)"]]
+      slope = gimap_dataset$linear_model$coefficients[["expected_single_crispr"]],
+      intercept = gimap_dataset$linear_model$coefficients[["(Intercept)"]]
     ) +
     geom_abline(
-      slope = model$coefficients[[expected_col]],
-      intercept = model$coefficients[["(Intercept)"]] + quantile(model$residuals)["75%"],
+      slope = gimap_dataset$linear_model$coefficients[["expected_single_crispr"]],
+      intercept = gimap_dataset$linear_model$coefficients[["(Intercept)"]] +
+        quantile(gimap_dataset$linear_model$residuals)["75%"],
       linetype = 3
     ) +
     geom_abline(
-      slope = model$coefficients[[expected_col]],
-      intercept = model$coefficients[["(Intercept)"]] + quantile(model$residuals)["25%"],
+      slope = gimap_dataset$linear_model$coefficients[["expected_single_crispr"]],
+      intercept = gimap_dataset$linear_model$coefficients[["(Intercept)"]] +
+        quantile(gimap_dataset$linear_model$residuals)["25%"],
       linetype = 3
     )
 
@@ -155,7 +151,7 @@ plot_rank_scatter <- function(gimap_dataset, reps_to_drop = "") {
     )
   }
 
-  if (is.null(gimap_dataset$overall_results)) {
+  if (is.null(gimap_dataset$linear_model)) {
     stop(
       "This function only works with",
       "gimap_dataset objects which have had gi calculated with calc_gi()"
@@ -170,19 +166,20 @@ plot_rank_scatter <- function(gimap_dataset, reps_to_drop = "") {
   }
 
   gplot <- plot_data %>%
-      filter(target_type == "gene_gene") %>%
-      mutate(Rank = dense_rank(mean_gi_score)) %>%
-      ggplot(aes(
-        x = Rank,
-        y = mean_gi_score
-      )) +
-      geom_point(size = 1, alpha = 0.7) +
-      theme_classic() +
-      theme(legend.title = element_blank()) +
-      ylab("GI score") +
-      geom_hline(yintercept = 0) +
-      geom_hline(yintercept = -0.5, linetype = "dashed") +
-      geom_hline(yintercept = 0.25, linetype = "dashed")
+    dplyr::ungroup() %>%
+    filter(target_type == "gene_gene") %>%
+    mutate(Rank = percent_rank(gi_score)) %>%
+    ggplot(aes(
+      x = Rank,
+      y = gi_score
+    )) +
+    geom_point(size = 1, alpha = 0.7) +
+    theme_classic() +
+    theme(legend.title = element_blank()) +
+    ylab("GI score") +
+    geom_hline(yintercept = 0) +
+    geom_hline(yintercept = -0.5, linetype = "dashed") +
+    geom_hline(yintercept = 0.25, linetype = "dashed")
 
   return(gplot)
 }
@@ -221,7 +218,7 @@ plot_volcano <- function(gimap_dataset, facet_rep = FALSE, reps_to_drop = "") {
     )
   }
 
-  if (is.null(gimap_dataset$overall_results)) {
+  if (is.null(gimap_dataset$linear_model)) {
     stop(
       "This function only works with",
       "gimap_dataset objects which have had gi calculated with calc_gi()"
@@ -240,13 +237,13 @@ plot_volcano <- function(gimap_dataset, facet_rep = FALSE, reps_to_drop = "") {
     mutate(
       logfdr = -log10(fdr),
       pointColor = case_when(logfdr < 1 ~ "darkgrey",
-        ((mean_gi_score < -0.5) & (logfdr > 1)) ~ "dodgerblue3",
-        ((mean_gi_score > 0.25) & (logfdr > 1)) ~ "darkred",
+        ((gi_score < -0.5) & (logfdr > 1)) ~ "dodgerblue3",
+        ((gi_score > 0.25) & (logfdr > 1)) ~ "darkred",
         .default = "black"
       )
     ) %>%
     ggplot(aes(
-      x = mean_gi_score,
+      x = gi_score,
       y = logfdr,
       color = pointColor
     )) +
@@ -310,7 +307,7 @@ plot_targets_bar <- function(gimap_dataset, target1, target2, reps_to_drop = "")
     )
   }
 
-  if (is.null(gimap_dataset$overall_results)) {
+  if (is.null(gimap_dataset$linear_model)) {
     stop(
       "This function only works with",
       "gimap_dataset objects which have had gi calculated with calc_gi()"
@@ -329,10 +326,12 @@ plot_targets_bar <- function(gimap_dataset, target1, target2, reps_to_drop = "")
       filter(!(rep %in% reps_to_drop))
   }
 
-  gplot_data <- gplot_data %>% dplyr::right_join(
-    gimap_dataset$crispr_score$means_by_rep %>%
-      dplyr::select(rep, pgRNA_target, mean_score, seq),
-    by = "pgRNA_target") %>%
+  gplot_data <- gplot_data %>%
+    dplyr::right_join(
+      gimap_dataset$crispr_score$means_by_rep %>%
+        dplyr::select(rep, pgRNA_target, mean_score, seq),
+      by = "pgRNA_target"
+    ) %>%
     filter((grepl(target1, pgRNA_target)) | (grepl(target2, pgRNA_target))) %>%
     dplyr::group_by(rep, pgRNA_target, target_type) %>%
     dplyr::summarize(mean_score = mean(mean_score)) %>%

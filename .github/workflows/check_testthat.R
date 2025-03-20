@@ -8,8 +8,10 @@ library(magrittr)
 # Find .git root directory
 root_dir <- rprojroot::find_root(rprojroot::has_dir(".git"))
 
-out_file <- list.files(pattern = "testthat.Rout$|Rout.fail$", file.path(root_dir, "check"),
- recursive = TRUE, full.names = TRUE)
+out_file <- list.files(
+  pattern = "testthat.Rout$|Rout.fail$", file.path(root_dir, "check"),
+  recursive = TRUE, full.names = TRUE
+)
 
 check_content <- readLines(out_file)
 test_result <- grep("\\[ FAIL", check_content, value = TRUE)[1]

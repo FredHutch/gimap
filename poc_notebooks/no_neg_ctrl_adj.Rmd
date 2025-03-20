@@ -67,61 +67,65 @@ gimap_dataset_no_nts <- setup_data(
 ## Set up comparison sets
 
 ```{r}
- gimap_dataset <- gimap_dataset %>%
-   gimap_filter() %>%
-   gimap_annotate(cell_line = "HELA") %>%
-   gimap_normalize(
-     timepoints = "day",
-     missing_ids_file =  tempfile()
-   ) %>%
-   calc_gi()
+gimap_dataset <- gimap_dataset %>%
+  gimap_filter() %>%
+  gimap_annotate(cell_line = "HELA") %>%
+  gimap_normalize(
+    timepoints = "day",
+    missing_ids_file = tempfile()
+  ) %>%
+  calc_gi()
 
- gimap_dataset_lfc <- gimap_dataset_no_nts %>%
-   gimap_filter() %>%
-   gimap_annotate(cell_line = "HELA") %>%
-   gimap_normalize(
-     timepoints = "day",
-     missing_ids_file =  tempfile(), 
-     adj_method = "no_adjustment"
-   ) %>%
-   calc_gi(use_lfc = TRUE)
+gimap_dataset_lfc <- gimap_dataset_no_nts %>%
+  gimap_filter() %>%
+  gimap_annotate(cell_line = "HELA") %>%
+  gimap_normalize(
+    timepoints = "day",
+    missing_ids_file =  tempfile(),
+    adj_method = "no_adjustment"
+  ) %>%
+  calc_gi(use_lfc = TRUE)
+```
+ 
+ 
+```{r}
+plot_exp_v_obs_scatter(gimap_dataset,
+  facet_rep = FALSE,
+  reps_to_drop = "Day05_RepA_early"
+)
 
+plot_exp_v_obs_scatter(gimap_dataset_lfc,
+  facet_rep = FALSE,
+  reps_to_drop = "Day05_RepA_early"
+)
 ```
  
  
 ```{r}
- plot_exp_v_obs_scatter(gimap_dataset, 
-                        facet_rep = FALSE, 
-                        reps_to_drop = "Day05_RepA_early")
+plot_rank_scatter(gimap_dataset,
+  reps_to_drop = "Day05_RepA_early"
+)
 
- plot_exp_v_obs_scatter(gimap_dataset_lfc,
-                        facet_rep = FALSE,
-                        reps_to_drop = "Day05_RepA_early")
-```
- 
- 
-```{r}
- plot_rank_scatter(gimap_dataset, 
-                   reps_to_drop = "Day05_RepA_early")
- 
- plot_rank_scatter(gimap_dataset_lfc, 
-                   reps_to_drop = "Day05_RepA_early")
+plot_rank_scatter(gimap_dataset_lfc,
+  reps_to_drop = "Day05_RepA_early"
+)
 ```
  
 ```{r}
- plot_volcano(gimap_dataset, reps_to_drop = "Day05_RepA_early")
- plot_volcano(gimap_dataset_lfc, reps_to_drop = "Day05_RepA_early")
+plot_volcano(gimap_dataset, reps_to_drop = "Day05_RepA_early")
+plot_volcano(gimap_dataset_lfc, reps_to_drop = "Day05_RepA_early")
 ```
 ```{r}
-joined_df <- 
-  dplyr::inner_join(gimap_dataset$gi_scores, 
-                  gimap_dataset_lfc$gi_scores, 
-                  by =c("rep", "pgRNA_target"), 
-                  suffix = c("_crispr", "_lfc")) %>% 
+joined_df <-
+  dplyr::inner_join(gimap_dataset$gi_scores,
+    gimap_dataset_lfc$gi_scores,
+    by = c("rep", "pgRNA_target"),
+    suffix = c("_crispr", "_lfc")
+  ) %>%
   dplyr::filter(rep != "Day05_RepA_early")
 
 
-ggplot(joined_df, aes(mean_gi_score_crispr, mean_gi_score_lfc)) + 
-  ggplot2::geom_point() + 
+ggplot(joined_df, aes(mean_gi_score_crispr, mean_gi_score_lfc)) +
+  ggplot2::geom_point() +
   ggplot2::facet_wrap(~rep)
 ```

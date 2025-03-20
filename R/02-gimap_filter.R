@@ -64,17 +64,17 @@
 #' # If you want to use multiple filters and more than one to flag a pgRNA
 #' # construct before it's filtered out, use the `min_n_filters` argument
 #' gimap_dataset <- get_example_data("gimap") %>%
-#' gimap_filter(
-#'   filter_type = "both",
-#'   min_n_filters = 2
-#' )
+#'   gimap_filter(
+#'     filter_type = "both",
+#'     min_n_filters = 2
+#'   )
 #'
 #' # You can also specify which columns the filters will be applied to
 #' gimap_dataset <- get_example_data("gimap") %>%
-#'  gimap_filter(
-#'   filter_type = "zero_count_only",
-#'   filter_zerocount_target_col = c(1, 2)
-#' )
+#'   gimap_filter(
+#'     filter_type = "zero_count_only",
+#'     filter_zerocount_target_col = c(1, 2)
+#'   )
 #' }
 gimap_filter <- function(.data = NULL,
                          gimap_dataset,
@@ -112,12 +112,14 @@ gimap_filter <- function(.data = NULL,
     data.frame(
       zc_filter = qc_filter_zerocounts(
         gimap_dataset,
-        filter_zerocount_target_col = filter_zerocount_target_col)$filter,
+        filter_zerocount_target_col = filter_zerocount_target_col
+      )$filter,
       p_filter = qc_filter_plasmid(
         gimap_dataset,
         cutoff = cutoff,
-        filter_plasmid_target_col = filter_plasmid_target_col)$filter$plasmid_cpm_filter
-      ) %>%
+        filter_plasmid_target_col = filter_plasmid_target_col
+      )$filter$plasmid_cpm_filter
+    ) %>%
     dplyr::mutate(both = rowSums(.) >= min_n_filters)
 
   ## The final call is based on what they specify

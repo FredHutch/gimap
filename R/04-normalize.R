@@ -187,12 +187,14 @@ gimap_normalize <- function(.data = NULL,
       gimap_dataset$metadata$sample_metadata %>%
       # Note that timepoints are extablished as three categories:
       # control, early, or late.
-      dplyr::mutate(timepoints = !!sym(timepoints),
+      dplyr::mutate(
+        timepoints = !!sym(timepoints),
         comparison = dplyr::case_when(
-        timepoints == min(timepoints) ~ "control",
-        timepoints == max(timepoints) ~ "late",
-        TRUE ~ "early"
-      )) %>%
+          timepoints == min(timepoints) ~ "control",
+          timepoints == max(timepoints) ~ "late",
+          TRUE ~ "early"
+        )
+      ) %>%
       dplyr::mutate(comparison = factor(comparison,
         levels = c("control", "early", "late")
       ))
@@ -291,7 +293,7 @@ gimap_normalize <- function(.data = NULL,
 
     comparison_df <- comparison_df %>%
       dplyr::mutate(
-        lfc = lfc - median(lfc[unexpressed_ctrl_flag == TRUE])
+        lfc = lfc - median(comparison_df$lfc[comparison_df$unexpressed_ctrl_flag], na.rm = TRUE)
       )
   }
 

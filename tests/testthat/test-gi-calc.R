@@ -58,16 +58,44 @@ test_that("Test Genetic Interaction score calculations using LFC", {
 })
 
 
-test_that("Test Genetic Interaction score calculations by rep", {
+test_that("Test Genetic Interaction score without normalization", {
   testthat::skip_on_cran()
-  gimap_dataset <- get_example_data("gimap") %>%
+  gimap_dataset_wo <- get_example_data("gimap") %>%
     gimap_filter() %>%
     gimap_annotate(cell_line = "HELA") %>%
     gimap_normalize(
+      normalize_by_unexpressed = FALSE,
       timepoints = "day",
     ) %>%
-    calc_gi(stats_by_rep = TRUE)
+    calc_gi()
 
-  testthat::expect_true(class(gimap_dataset)[1] == "list")
+  gimap_dataset_w <- get_example_data("gimap") %>%
+    gimap_filter() %>%
+    gimap_annotate(cell_line = "HELA") %>%
+    gimap_normalize(
+      normalize_by_unexpressed = TRUE,
+      timepoints = "day",
+    ) %>%
+    calc_gi()
 
+
+  # Are the GI scores the same? No
+  testthat::expect_false(
+    all(gimap_dataset_wo$gi_scores$gi_score == gimap_dataset_w$gi_scores$gi_score)
+  )
+
+  # Are the log fold change values the same? No
+  testthat::expect_false(
+    all(gimap_dataset_wo$normalized_log_fc$lfc == gimap_dataset_w$normalized_log_fc$lfc)
+  )
+
+  # Are the CRISPR scores the same? No
+  testthat::expect_false(
+    all(gimap_dataset_wo$normalized_log_fc$crispr_score == gimap_dataset_w$normalized_log_fc$crispr_score)
+  )
+
+  table(
+    gimap_dataset_w$normalized_log_fc$unexpressed_ctrl_flag,
+    gimap_dataset_w$normalized_log_fc$norm_ctrl_flag
+  )
 })

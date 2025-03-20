@@ -33,7 +33,7 @@ gimap_dataset <- gimap_dataset %>%
 
 new_annot_df <- gimap_dataset$annotation
 
-old_annot_df <- old_annot_df[which(old_annot_df$pgRNA_id %in% unlist(gimap_dataset$filtered_data$metadata_pg_ids)),]
+old_annot_df <- old_annot_df[which(old_annot_df$pgRNA_id %in% unlist(gimap_dataset$filtered_data$metadata_pg_ids)), ]
 ```
 
 ## Compare them
@@ -44,12 +44,13 @@ nrow(new_annot_df)
 ```
 
 ```{r}
-joindf <- dplyr::full_join(old_annot_df, new_annot_df, 
-                           by = "pgRNA_id", 
-                           suffix = c("_old", "_new"))
+joindf <- dplyr::full_join(old_annot_df, new_annot_df,
+  by = "pgRNA_id",
+  suffix = c("_old", "_new")
+)
 
-joindf_cn <- joindf %>% 
-  select(log2_cn_gene1, log2_cn_gene2, gene1_log2_cn, gene2_log2_cn) %>% 
+joindf_cn <- joindf %>%
+  select(log2_cn_gene1, log2_cn_gene2, gene1_log2_cn, gene2_log2_cn) %>%
   drop_na()
 
 nrow(joindf_cn)
@@ -62,60 +63,67 @@ nrow(joindf_tpm)
 ```
 
 ```{r}
-annotation_df <- data.frame(label = c(paste0("Number of data points: ", nrow(joindf_cn))),
-                            x = 0.25,
-                            y = 1.75)
+annotation_df <- data.frame(
+  label = c(paste0("Number of data points: ", nrow(joindf_cn))),
+  x = 0.25,
+  y = 1.75
+)
 ```
 
 ```{r}
-ggplot(joindf_cn, aes(x = log2_cn_gene1, y = gene1_log2_cn)) + 
-  geom_point(alpha=0.1) + 
-  ylab("GI_Mapping Output Annotation File: gene1_log2_cn") + 
-  xlab("gimap annotation: log2_cn_gene1") + 
-  theme_classic() + 
+ggplot(joindf_cn, aes(x = log2_cn_gene1, y = gene1_log2_cn)) +
+  geom_point(alpha = 0.1) +
+  ylab("GI_Mapping Output Annotation File: gene1_log2_cn") +
+  xlab("gimap annotation: log2_cn_gene1") +
+  theme_classic() +
   geom_abline(intercept = 0, slope = 1) +
-  geom_text(data = annotation_df, aes(x=x ,y=y, label=label)) +
-  stat_regline_equation(label.y=1.55) + stat_cor(label.y = 1.45)
-
+  geom_text(data = annotation_df, aes(x = x, y = y, label = label)) +
+  stat_regline_equation(label.y = 1.55) +
+  stat_cor(label.y = 1.45)
 ```
 
 ```{r}
-ggplot(joindf_cn, aes(x=log2_cn_gene2, y=gene2_log2_cn)) + 
-  geom_point(alpha=0.1) + 
-  ylab("GI_Mapping Output Annotation File: gene2_log2_cn") + 
-  xlab("gimap annotation: log2_cn_gene2") + 
-  theme_classic() + 
+ggplot(joindf_cn, aes(x = log2_cn_gene2, y = gene2_log2_cn)) +
+  geom_point(alpha = 0.1) +
+  ylab("GI_Mapping Output Annotation File: gene2_log2_cn") +
+  xlab("gimap annotation: log2_cn_gene2") +
+  theme_classic() +
   geom_abline(intercept = 0, slope = 1) +
-  geom_text(data = annotation_df, aes(x=x ,y=y, label=label)) +
-  stat_regline_equation(label.y=1.55) + stat_cor(label.y = 1.45)
+  geom_text(data = annotation_df, aes(x = x, y = y, label = label)) +
+  stat_regline_equation(label.y = 1.55) +
+  stat_cor(label.y = 1.45)
 ```
 
 ```{r}
-annotation_df <- data.frame(label = c(paste0("Number of data points: ", nrow(joindf_tpm))),
-                            x = 2,
-                            y = 10)
+annotation_df <- data.frame(
+  label = c(paste0("Number of data points: ", nrow(joindf_tpm))),
+  x = 2,
+  y = 10
+)
 ```
 
 ```{r}
-ggplot(joindf_tpm, aes(x=log2_tpm_gene2, y=gene2_log2_tpm)) + 
-  geom_point(alpha=0.1) + 
-  ylab("GI_Mapping Output Annotation File: gene2_log2_tpm") + 
-  xlab("gimap annotation: log2_tpm_gene2") + 
-  theme_classic() + 
+ggplot(joindf_tpm, aes(x = log2_tpm_gene2, y = gene2_log2_tpm)) +
+  geom_point(alpha = 0.1) +
+  ylab("GI_Mapping Output Annotation File: gene2_log2_tpm") +
+  xlab("gimap annotation: log2_tpm_gene2") +
+  theme_classic() +
   geom_abline(intercept = 0, slope = 1) +
-  geom_text(data = annotation_df, aes(x=x ,y=y, label=label)) +
-  stat_regline_equation(label.y=9) + stat_cor(label.y = 8.25)
+  geom_text(data = annotation_df, aes(x = x, y = y, label = label)) +
+  stat_regline_equation(label.y = 9) +
+  stat_cor(label.y = 8.25)
 ```
 
 ```{r}
-ggplot(joindf_tpm, aes(x=log2_tpm_gene1, y=gene1_log2_tpm)) + 
-  geom_point(alpha=0.1) + 
-  ylab("GI_Mapping Output Annotation File: gene1_log2_tpm") + 
-  xlab("gimap annotation: log2_tpm_gene1") + 
-  theme_classic() + 
+ggplot(joindf_tpm, aes(x = log2_tpm_gene1, y = gene1_log2_tpm)) +
+  geom_point(alpha = 0.1) +
+  ylab("GI_Mapping Output Annotation File: gene1_log2_tpm") +
+  xlab("gimap annotation: log2_tpm_gene1") +
+  theme_classic() +
   geom_abline(intercept = 0, slope = 1) +
-  geom_text(data = annotation_df, aes(x=x ,y=y, label=label)) +
-  stat_regline_equation(label.y=9) + stat_cor(label.y = 8.25)
+  geom_text(data = annotation_df, aes(x = x, y = y, label = label)) +
+  stat_regline_equation(label.y = 9) +
+  stat_cor(label.y = 8.25)
 ```
 
 |Which comparison | gimap # NA	| GI Mapping # NA	| # overlap  based on pgRNA ID (using intersect) |

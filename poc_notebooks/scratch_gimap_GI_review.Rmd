@@ -96,21 +96,22 @@ Have to drop NA's because the gimap results include `Day05_RepA_early` datapoint
 
 ```{r}
 # Reshape the data so we can plot
-joined_df <- gimap_dataset$gi_scores %>% 
-  dplyr::inner_join(old_gi_results, 
-                   by = c("pgRNA_target", "rep", "target_type"), 
-                   suffix = c("_new", "_old")) %>% 
+joined_df <- gimap_dataset$gi_scores %>%
+  dplyr::inner_join(old_gi_results,
+    by = c("pgRNA_target", "rep", "target_type"),
+    suffix = c("_new", "_old")
+  ) %>%
   dplyr::filter(!grepl("Day05", rep))
 ```
 
 
 
 ```{r}
-joined_df %>% 
+joined_df %>%
   ggplot(aes(x = mean_gi_score, y = mean_GI_score)) +
   geom_point() +
-  xlab("New Mean GI score") + 
-  ylab("Old Mean GI score") + 
+  xlab("New Mean GI score") +
+  ylab("Old Mean GI score") +
   facet_wrap(~target_type) +
   theme(legend.position = "none")
 
