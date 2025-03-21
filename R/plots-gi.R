@@ -5,7 +5,6 @@
 #' while dashed lines indicate the lower and upper quartile residuals.
 #' @param gimap_dataset A special dataset structure that is originally setup using `setup_data()` and has had gi scores calculated with `calc_gi()`.
 #' @param facet_rep Should the replicates be wrapped with facet_wrap()?
-#' @param reps_to_drop Names of replicates that should be not plotted (Optional)
 #' @import dplyr
 #' @import ggplot2
 #' @export
@@ -27,7 +26,7 @@
 #' plot_rank_scatter(gimap_dataset)
 #' plot_volcano(gimap_dataset)
 #' }
-plot_exp_v_obs_scatter <- function(gimap_dataset, facet_rep = FALSE, reps_to_drop = "") {
+plot_exp_v_obs_scatter <- function(gimap_dataset, facet_rep = FALSE) {
   if (!("gimap_dataset" %in% class(gimap_dataset))) {
     stop(
       "This function only works",
@@ -52,22 +51,7 @@ plot_exp_v_obs_scatter <- function(gimap_dataset, facet_rep = FALSE, reps_to_dro
     "mean_observed_cs"
   )
 
-  regression_data <- gimap_dataset$gi_scores %>%
-    filter(target_type != "gene_gene")
-
-  if (reps_to_drop != "") {
-    regression_data <- regression_data %>% # get only single targeting
-      filter(!(rep %in% reps_to_drop))
-  }
-
-  gplot_data <- gimap_dataset$gi_scores
-
-  if (reps_to_drop != "") {
-    gplot_data <- gplot_data %>%
-      filter(!(rep %in% reps_to_drop))
-  }
-
-  gplot <- gplot_data %>%
+  gplot <- gimap_dataset$gi_scores %>%
     mutate(broad_target_type = case_when(
       target_type == "gene_gene" ~ "DKO",
       target_type == "ctrl_gene" ~ "control",
@@ -112,11 +96,7 @@ plot_exp_v_obs_scatter <- function(gimap_dataset, facet_rep = FALSE, reps_to_dro
       ylab("Observed LFC score\n(paralog 1 & 2 DKO)")
   }
 
-  if (facet_rep) {
-    return(gplot + facet_wrap(~rep))
-  } else {
-    return(gplot)
-  }
+  return(gplot)
 }
 #' Rank plot for target-level GI scores
 #' @description This plot is meant to be functionally equivalent to Fig 5a (for HeLa, equivalent of Fig 3c for PC9).
@@ -158,14 +138,7 @@ plot_rank_scatter <- function(gimap_dataset, reps_to_drop = "") {
     )
   }
 
-  plot_data <- gimap_dataset$gi_scores
-
-  if ("rep" %in% colnames(gimap_dataset$gi_scores)) {
-    plot_data <- gimap_dataset$gi_scores %>%
-      filter(!(rep %in% reps_to_drop))
-  }
-
-  gplot <- plot_data %>%
+  gplot <- gimap_dataset$gi_scores %>%
     dplyr::ungroup() %>%
     filter(target_type == "gene_gene") %>%
     mutate(Rank = percent_rank(gi_score)) %>%
@@ -190,7 +163,6 @@ plot_rank_scatter <- function(gimap_dataset, reps_to_drop = "") {
 #' Blue points are synthetic lethal paralog GIs with GI < 0.5 and FDR < 0.1; red points are buffering paralog GIs with GI > 0.25 and FDR < 0.1.
 #' @param gimap_dataset A special dataset structure that is originally setup using `setup_data()` and has had gi scores calculated with `calc_gi()`.
 #' @param facet_rep Should the replicates be wrapped with facet_wrap()?
-#' @param reps_to_drop Names of replicates that should be not plotted (Optional)
 #' @import dplyr
 #' @import ggplot2
 #' @return A ggplot2 volcano plot of the target level genetic interaction scores.
@@ -210,7 +182,7 @@ plot_rank_scatter <- function(gimap_dataset, reps_to_drop = "") {
 #' plot_rank_scatter(gimap_dataset)
 #' plot_volcano(gimap_dataset)
 #' }
-plot_volcano <- function(gimap_dataset, facet_rep = FALSE, reps_to_drop = "") {
+plot_volcano <- function(gimap_dataset, facet_rep = FALSE) {
   if (!("gimap_dataset" %in% class(gimap_dataset))) {
     stop(
       "This function only works",
@@ -225,14 +197,7 @@ plot_volcano <- function(gimap_dataset, facet_rep = FALSE, reps_to_drop = "") {
     )
   }
 
-  plot_data <- gimap_dataset$gi_scores
-
-  if ("rep" %in% colnames(gimap_dataset$gi_scores)) {
-    plot_data <- gimap_dataset$gi_scores %>%
-      filter(!(rep %in% reps_to_drop))
-  }
-
-  gplot <- plot_data %>%
+  gplot <- gimap_dataset$gi_scores %>%
     filter(target_type == "gene_gene") %>% # get only double targeting
     mutate(
       logfdr = -log10(fdr),
@@ -262,11 +227,7 @@ plot_volcano <- function(gimap_dataset, facet_rep = FALSE, reps_to_drop = "") {
     ylab("-log10(FDR)") +
     xlab("Mean GI score")
 
-  if (facet_rep) {
-    return(gplot + facet_wrap(~rep))
-  } else {
-    return(gplot)
-  }
+  return(gplot)
 }
 #' Target bar plot for CRISPR scores
 #' @description This plot is for when you'd like to examine a target pair
@@ -297,9 +258,9 @@ plot_volcano <- function(gimap_dataset, facet_rep = FALSE, reps_to_drop = "") {
 #' head(dplyr::arrange(gimap_dataset$gi_score, fdr))
 #'
 #' # "TIAL1_TIA1" is top result so let's plot that
-#' plot_targets_bar(gimap_dataset, target1 = "TIAL1", target2 = "TIA1")
+#' plot_targets(gimap_dataset, target1 = "TIAL1", target2 = "TIA1")
 #' }
-plot_targets_bar <- function(gimap_dataset, target1, target2, reps_to_drop = "") {
+plot_targets <- function(gimap_dataset, target1, target2, reps_to_drop = "") {
   if (!("gimap_dataset" %in% class(gimap_dataset))) {
     stop(
       "This function only works",
@@ -307,28 +268,30 @@ plot_targets_bar <- function(gimap_dataset, target1, target2, reps_to_drop = "")
     )
   }
 
-  if (is.null(gimap_dataset$linear_model)) {
+  if (is.null(gimap_dataset$normalized_log_fc)) {
     stop(
       "This function only works with",
-      "gimap_dataset objects which have had gi calculated with calc_gi()"
+      "gimap_dataset objects which have had CRISPR scores calculated with gimap_normalize()"
     )
   }
 
+  expected_col <- ifelse("crispr_score" %in% colnames(gimap_dataset$normalized_log_fc),
+                         "crispr_score",
+                         "lfc"
+  )
+
   gplot_data <- gimap_dataset$normalized_log_fc %>%
-      dplyr::filter(gene1_symbol == target1 | gene2_symbol == target2)
+      dplyr::filter(gene1_symbol == target1 | gene2_symbol == target2) %>%
+      filter(!(rep %in% reps_to_drop))
+
 
   if (nrow(gplot_data) == 0) {
     stop("No targets were found with those gene names")
   }
 
-  if ("rep" %in% colnames(gimap_dataset$gi_scores)) {
-    gplot_data <- gimap_dataset$gi_scores %>%
-      filter(!(rep %in% reps_to_drop))
-  }
-
   gplot <- gplot_data %>%
     ggplot(aes(
-      y = crispr_score,
+      y = !!sym(expected_col),
       x = target_type
     )) +
     geom_boxplot(aes(fill = target_type), outlier.shape = NA)  +
@@ -339,8 +302,8 @@ plot_targets_bar <- function(gimap_dataset, target1, target2, reps_to_drop = "")
       # this assumes that target1 is the {target1}_ctrl gene
       "gene_gene" = "DKO"
     )) +
-    geom_jitter(aes(x = target_type, y = crispr_score, color = pg_ids), pch = 21, size = 1,
-                width = .2) +
+    geom_jitter(aes(x = target_type, y = crispr_score, color = pg_ids),
+                pch = 21, size = 1, width = .2) +
     theme_bw() +
     xlab("") +
     ggtitle(paste0(target1, "/", target2)) +
@@ -352,10 +315,10 @@ plot_targets_bar <- function(gimap_dataset, target1, target2, reps_to_drop = "")
       axis.text.x = element_text(angle = 45, hjust = 1)
     )
 
-  if (expected_col == "mean_expected_cs") {
+  if (expected_col == "crispr_score") {
     gplot <- gplot +
       ylab("CRISPR score")
-  } else if (expected_col == "mean_expected_lfc") {
+  } else if (expected_col == "lfc") {
     gplot <- gplot +
       ylab("Adjusted Log Fold Change")
   }

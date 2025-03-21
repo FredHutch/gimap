@@ -68,7 +68,8 @@ Let's examine this example pgPEN counts table. It's divided into columns contain
 For the purposes of this tutorial, we can grab example data from the package.
 
 ```{r }
-example_data <- get_example_data("count")
+example_data <- get_example_data("count") %>% 
+  dplyr::select(!Day05_RepA)
 ```
 
 The metadata you have may vary slightly from this but you'll want to make sure you have the essential variables and information regarding how you collected your data.
@@ -91,7 +92,7 @@ Required for a timepoint analysis is a Day 0 (or plasmid) sample, and at least o
 
 ```{r }
 counts <- example_data %>%
-  select(c("Day00_RepA", "Day05_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC")) %>%
+  select(c("Day00_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC")) %>%
   as.matrix()
 ```
 
@@ -116,9 +117,9 @@ You need to have two columns in the metadata you provide. You'll need to specify
 
 ```{r }
 sample_metadata <- data.frame(
-  col_names = c("Day00_RepA", "Day05_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC"),
-  day = as.numeric(c("0", "5", "22", "22", "22")),
-  rep = as.factor(c("RepA", "RepA", "RepA", "RepB", "RepC"))
+  col_names = c("Day00_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC"),
+  day = as.numeric(c("0", "22", "22", "22")),
+  rep = as.factor(c("RepA", "RepA", "RepB", "RepC"))
 )
 ```
 
@@ -251,6 +252,7 @@ You can remove any samples from these plots by altering the `reps_to_drop` argum
 
 ```{r }
 plot <- plot_exp_v_obs_scatter(gimap_dataset)
+plot
 ```
 
 ```{r }
@@ -266,11 +268,8 @@ plot_volcano(gimap_dataset)
 We can pick out a specific pair to plot.
 
 ```{r }
-# "NDEL1_NDE1" is top result so let's plot that
-plot_targets_bar(gimap_dataset,
-  target1 = "TIAL1", target2 = "TIA1",
-  reps_to_drop = "Day05_RepA_early"
-)
+# "CNOT8_CNOT7" is top result so let's plot that
+plot_targets(gimap_dataset, target1 = "CNOT8", target2 = "CNOT7")
 ```
 
 ## Saving results to files

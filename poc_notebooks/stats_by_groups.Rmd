@@ -29,16 +29,30 @@ gimap_dataset <- get_example_data("gimap") %>%
   calc_gi()
 ```
 
+## Characterizing what has changed
+
+```{r}
+plot(gimap_data_org$gi_scores$mean_observed_cs, gimap_dataset$gi_scores$mean_observed_cs)
+
+plot(gimap_data_org$gi_scores$mean_expected_cs, gimap_dataset$gi_scores$mean_expected_cs)
+```
+
+```{r}
+plot(-log10(gimap_data_org$gi_scores$fdr) , -log10(gimap_dataset$gi_scores$fdr))
+
+plot(gimap_data_org$gi_scores$mean_expected_cs, gimap_dataset$gi_scores$mean_expected_cs)
+```
+
+## Now
 
 ```{r}
 plot_exp_v_obs_scatter(gimap_dataset)
-```
-
-```{r}
 plot_rank_scatter(gimap_dataset)
-```
-
-
-```{r}
 plot_volcano(gimap_dataset)
+```
+# Before
+```{r}
+plot_exp_v_obs_scatter(gimap_data_org)
+plot_rank_scatter(gimap_data_org)
+plot_volcano(gimap_data_org)
 ```

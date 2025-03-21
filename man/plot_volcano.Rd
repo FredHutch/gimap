@@ -4,14 +4,12 @@
 \alias{plot_volcano}
 \title{Volcano plot for GI scores}
 \usage{
-plot_volcano(gimap_dataset, facet_rep = FALSE, reps_to_drop = "")
+plot_volcano(gimap_dataset, facet_rep = FALSE)
 }
 \arguments{
 \item{gimap_dataset}{A special dataset structure that is originally setup using `setup_data()` and has had gi scores calculated with `calc_gi()`.}
 
 \item{facet_rep}{Should the replicates be wrapped with facet_wrap()?}
-
-\item{reps_to_drop}{Names of replicates that should be not plotted (Optional)}
 }
 \value{
 A ggplot2 volcano plot of the target level genetic interaction scores.

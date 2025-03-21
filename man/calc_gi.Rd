@@ -4,7 +4,7 @@
 \alias{calc_gi}
 \title{Calculate Genetic Interaction scores}
 \usage{
-calc_gi(.data = NULL, gimap_dataset, use_lfc = FALSE, stats_by_rep = FALSE)
+calc_gi(.data = NULL, gimap_dataset, use_lfc = FALSE)
 }
 \arguments{
 \item{.data}{Data can be piped in with tidyverse pipes from function to
@@ -16,9 +16,6 @@ function. But the data must still be a gimap_dataset}
 \item{use_lfc}{Should Log fold change be used to calculate GI scores instead
 of CRISPR scores? If you do not have negative controls or CRISPR scores you
 will need to set this to TRUE.}
-
-\item{stats_by_rep}{Should statistics be calculated per rep or should replicates
-be collapsed?}
 }
 \value{
 A gimap dataset with statistics and genetic interaction scores

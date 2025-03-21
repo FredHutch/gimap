@@ -266,8 +266,8 @@ plot_volcano(gimap_dataset)
 We can pick out a specific pair to plot.
 
 ```{r }
-# "MED12L_MED12" is top result so let's plot that
-plot_targets_bar(gimap_dataset, target1 = "AP2A1", target2 = "AP2A2")
+# "DUSP21_DUSP18" is top result so let's plot that
+plot_targets(gimap_dataset, target1 = "DUSP21", target2 = "DUSP18")
 ```
 
 

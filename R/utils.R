@@ -114,12 +114,13 @@ example_data_folder <- function() {
 
 # This function sets up the example count data
 save_example_data <- function() {
-  example_data <- get_example_data("count")
+  example_data <- get_example_data("count") %>%
+    dplyr::select(!Day05_RepA)
 
   example_pg_metadata <- get_example_data("meta")
 
   example_counts <- example_data %>%
-    dplyr::select(c("Day00_RepA", "Day05_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC")) %>%
+    dplyr::select(c("Day00_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC")) %>%
     as.matrix()
 
   example_pg_id <- example_data %>%
@@ -129,7 +130,7 @@ save_example_data <- function() {
     dplyr::select(c("id", "seq_1", "seq_2"))
 
   example_sample_metadata <- data.frame(
-    col_names = c("Day00_RepA", "Day05_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC"),
+    col_names = c("Day00_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC"),
     day = as.numeric(c("0", "5", "22", "22", "22")),
     rep = as.factor(c("RepA", "RepA", "RepA", "RepB", "RepC"))
   )
