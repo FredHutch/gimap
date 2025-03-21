@@ -314,41 +314,24 @@ plot_targets_bar <- function(gimap_dataset, target1, target2, reps_to_drop = "")
     )
   }
 
-  expected_col <- ifelse(is.null(gimap_dataset$gi_scores$mean_expected_cs),
-    "mean_expected_lfc",
-    "mean_expected_cs"
-  )
+  gplot_data <- gimap_dataset$normalized_log_fc %>%
+      dplyr::filter(gene1_symbol == target1 | gene2_symbol == target2)
 
-  gplot_data <- gimap_dataset$gi_scores
+  if (nrow(gplot_data) == 0) {
+    stop("No targets were found with those gene names")
+  }
 
   if ("rep" %in% colnames(gimap_dataset$gi_scores)) {
     gplot_data <- gimap_dataset$gi_scores %>%
       filter(!(rep %in% reps_to_drop))
   }
 
-  gplot_data <- gplot_data %>%
-    dplyr::right_join(
-      gimap_dataset$crispr_score$means_by_rep %>%
-        dplyr::select(rep, pgRNA_target, mean_score, seq),
-      by = "pgRNA_target"
-    ) %>%
-    filter((grepl(target1, pgRNA_target)) | (grepl(target2, pgRNA_target))) %>%
-    dplyr::group_by(rep, pgRNA_target, target_type) %>%
-    dplyr::summarize(mean_score = mean(mean_score)) %>%
-    dplyr::distinct()
-
   gplot <- gplot_data %>%
     ggplot(aes(
-      y = mean_score,
-      x = target_type,
-      fill = target_type
+      y = crispr_score,
+      x = target_type
     )) +
-    geom_bar(position = "dodge", stat = "summary", fun = "mean") +
-    geom_point(aes(x = target_type, y = mean_score), pch = 21, size = 3) +
-    theme_bw() +
-    xlab("") +
-    ggtitle(paste0(target1, "/", target2)) +
-    geom_hline(yintercept = 0) +
+    geom_boxplot(aes(fill = target_type), outlier.shape = NA)  +
     scale_x_discrete(labels = c(
       "ctrl_gene" = paste0(target2, " KO"),
       # this assumes that target2 is the ctrl_{target2} gene
@@ -356,6 +339,12 @@ plot_targets_bar <- function(gimap_dataset, target1, target2, reps_to_drop = "")
       # this assumes that target1 is the {target1}_ctrl gene
       "gene_gene" = "DKO"
     )) +
+    geom_jitter(aes(x = target_type, y = crispr_score, color = pg_ids), pch = 21, size = 1,
+                width = .2) +
+    theme_bw() +
+    xlab("") +
+    ggtitle(paste0(target1, "/", target2)) +
+    geom_hline(yintercept = 0) +
     theme(
       legend.position = "none",
       panel.background = element_blank(),
