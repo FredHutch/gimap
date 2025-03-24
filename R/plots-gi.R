@@ -34,7 +34,7 @@ plot_exp_v_obs_scatter <- function(gimap_dataset, facet_rep = FALSE) {
     )
   }
 
-  if (is.null(gimap_dataset$linear_model)) {
+  if (is.null(gimap_dataset$gi_scores)) {
     stop(
       "This function only works with",
       "gimap_dataset objects which have had gi calculated with calc_gi()"
@@ -131,7 +131,7 @@ plot_rank_scatter <- function(gimap_dataset, reps_to_drop = "") {
     )
   }
 
-  if (is.null(gimap_dataset$linear_model)) {
+  if (is.null(gimap_dataset$gi_scores)) {
     stop(
       "This function only works with",
       "gimap_dataset objects which have had gi calculated with calc_gi()"
@@ -190,7 +190,7 @@ plot_volcano <- function(gimap_dataset, facet_rep = FALSE) {
     )
   }
 
-  if (is.null(gimap_dataset$linear_model)) {
+  if (is.null(gimap_dataset$gi_scores)) {
     stop(
       "This function only works with",
       "gimap_dataset objects which have had gi calculated with calc_gi()"

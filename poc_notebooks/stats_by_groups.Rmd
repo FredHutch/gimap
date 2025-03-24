@@ -42,6 +42,15 @@ plot(-log10(gimap_data_org$gi_scores$fdr) , -log10(gimap_dataset$gi_scores$fdr))
 
 plot(gimap_data_org$gi_scores$mean_expected_cs, gimap_dataset$gi_scores$mean_expected_cs)
 ```
+## Before
+```{r}
+# Rename so it will work 
+gimap_data_org$gi_scores$gi_score <- gimap_data_org$gi_scores$mean_gi_score
+
+plot_exp_v_obs_scatter(gimap_data_org)
+plot_rank_scatter(gimap_data_org)
+plot_volcano(gimap_data_org)
+```
 
 ## Now
 
@@ -49,10 +58,4 @@ plot(gimap_data_org$gi_scores$mean_expected_cs, gimap_dataset$gi_scores$mean_exp
 plot_exp_v_obs_scatter(gimap_dataset)
 plot_rank_scatter(gimap_dataset)
 plot_volcano(gimap_dataset)
-```
-# Before
-```{r}
-plot_exp_v_obs_scatter(gimap_data_org)
-plot_rank_scatter(gimap_data_org)
-plot_volcano(gimap_data_org)
 ```

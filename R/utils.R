@@ -131,8 +131,8 @@ save_example_data <- function() {
 
   example_sample_metadata <- data.frame(
     col_names = c("Day00_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC"),
-    day = as.numeric(c("0", "5", "22", "22", "22")),
-    rep = as.factor(c("RepA", "RepA", "RepA", "RepB", "RepC"))
+    day = as.numeric(c("0", "22", "22", "22")),
+    rep = as.factor(c("RepA", "RepA", "RepB", "RepC"))
   )
 
   gimap_dataset <- setup_data(
