@@ -180,6 +180,7 @@ gimap_annotate <- function(.data = NULL,
     }
     tpm_file <- getOption("tpm_file")
     if (is.null(tpm_file)) tpm_file <- tpm_setup(data_dir = annot_dir)
+    if (!file.exists(tpm_file)) stop("Could not download TPM file")
 
     op <- options("VROOM_CONNECTION_SIZE" = 500072)
     on.exit(options(op))
@@ -195,6 +196,7 @@ gimap_annotate <- function(.data = NULL,
 
     if (is.null(cn_file)) cn_file <- cn_setup(data_dir = annot_dir)
 
+    if (!file.exists(cn_file)) stop("Could not download CN file")
     # Read in the CN data
     depmap_cn <- readr::read_csv(cn_file,
       show_col_types = FALSE,

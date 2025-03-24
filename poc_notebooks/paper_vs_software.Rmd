@@ -2,12 +2,16 @@
 title: "Paper vs gimap"
 author: "Candace Savonen"
 date: "2025-03-24"
-output: html_document
+output:
+  html_notebook:
+    toc: true
+    toc_float: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(ggplot2)
+library(magrittr)
 ```
 
 
@@ -19,8 +23,8 @@ library(ggplot2)
 
 We're going to load the brand new version of gimap that is on this branch. 
 
-```{r}
-devtools::load_all()
+```{r eval = FALSE}
+devtools::load_all("..")
 ```
 
 Calculate new version which combines into one linear model and uses averages across replicates for expected values. 
