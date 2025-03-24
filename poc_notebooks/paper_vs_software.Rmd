@@ -1,0 +1,257 @@
+---
+title: "Paper vs gimap"
+author: "Candace Savonen"
+date: "2025-03-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+
+**Purpose:** the purpose of this notebook is to compare the most recent gimap results to those of the original [Parrish et al paper results](https://www.cell.com/cell-reports/fulltext/S2211-1247(21)01035-4?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS2211124721010354%3Fshowall%3Dtrue#sec-2). Although we don't need to *exactly* replicate the data and can't really, we do want to ensure that they aren't any particular biases or trends showing up that are not related to biology. 
+
+**Conclusion TL;DR** The data looks pretty similar now. There are certainly some outliers that differ but there are no particular trends that I can see as far as samples, probes, or data steps. Basically the differences that exist seem mostly random. 
+
+## Read in gimap results 
+
+We're going to load the brand new version of gimap that is on this branch. 
+
+```{r}
+devtools::load_all()
+```
+
+Calculate new version which combines into one linear model and uses averages across replicates for expected values. 
+
+```{r echo = FALSE}
+gimap_dataset <- get_example_data("gimap") %>%
+  gimap_filter() %>%
+  gimap_annotate(cell_line = "HELA") %>%
+  gimap_normalize(
+    timepoints = "day"
+  ) %>%
+  calc_gi()
+```
+
+## Compare to paper results 
+
+[Downloaded the paper results from online supplementary information](https://www.cell.com/cell-reports/fulltext/S2211-1247(21)01035-4?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS2211124721010354%3Fshowall%3Dtrue#sec-2)
+
+Load in crispr scores from the paper. Make the names so they match and reshape the data. 
+
+```{r}
+paper_cs <- readxl::read_xlsx("parrish_crispr_scores.xlsx", skip = 1) %>% 
+  dplyr::select(pg_ids = pgRNA, 
+                Day22_RepA_late = RepA_CRISPR_score, 
+                Day22_RepB_late=  RepB_CRISPR_score,
+                Day22_RepC_late = RepC_CRISPR_score
+                ) %>%
+  tidyr::pivot_longer(-pg_ids, 
+                      names_to = "rep", 
+                      values_to = "crispr_score")
+```
+
+Load in gi scores from the paper. 
+
+```{r}
+paper_gi <- readxl::read_xlsx("parrish_gi_scores.xlsx", skip = 1) %>%
+  # A little cleaning. 
+  dplyr::mutate(
+pgRNA_target = gsub("\\|", "_", paralog_pair))
+```
+
+# How is recent gimap compare to paper results? 
+
+```{r}
+both_df <- dplyr::left_join(gimap_dataset$gi_scores, paper_gi, by = "pgRNA_target") 
+```
+
+Are the expected values similar? Yes 
+
+```{r}
+ggplot(both_df, aes(x = HeLa_DKO_expected_CS, mean_expected_cs)) + 
+  geom_point() + 
+  theme_bw() + 
+  ylab("gimap mean expected CRISPR values") + 
+  xlab("Parrish et al mean expected CRISPR values")
+```
+How do the observed values line up? Mostly good but a couple wacky ones. 
+
+```{r}
+ggplot(both_df, aes(x = HeLa_DKO_observed_CS, mean_observed_cs)) + 
+  geom_point() + 
+  theme_bw() + 
+  ylab("gimap mean observed CRISPR values") + 
+  xlab("Parrish et al mean observed CRISPR values")
+```
+
+What's that point that super weird in observed? 
+
+It's NBPF3_NBPF15 what's its problem? 
+
+```{r}
+both_df %>%
+  dplyr::mutate(diff = abs(HeLa_DKO_observed_CS -  mean_observed_cs)) %>% 
+  dplyr::select(pgRNA_target, diff, HeLa_DKO_observed_CS, mean_observed_cs) %>%
+  dplyr::arrange(desc(diff))
+```
+
+How do the GI scores line up? Honestly not bad. 
+
+```{r}
+ggplot(both_df, aes(x = HeLa_GI_score, gi_score)) + 
+  geom_point() + 
+  theme_bw() + 
+  ylab("gimap GI score") + 
+  xlab("Parrish et al GI score")
+```
+Which points have the biggest differentials?
+
+```{r}
+both_df %>%
+  dplyr::mutate(diff = abs( HeLa_GI_score - gi_score)) %>% 
+  dplyr::select(pgRNA_target, diff, HeLa_GI_score, gi_score) %>%
+  dplyr::arrange(desc(diff))
+```
+
+How do the FDR scores line up? Not too too bad but lets see what wacky. 
+
+```{r}
+ggplot(both_df, aes(x = -log10(HeLa_GI_fdr), -log10(fdr))) + 
+  geom_point() + 
+  theme_bw() + 
+  ylab("gimap fdr") + 
+  xlab("Parrish et al GI score")
+```
+
+Which targets have the biggest differentials?
+
+```{r}
+both_df %>%
+  dplyr::mutate(diff = abs(HeLa_GI_fdr - fdr)) %>% 
+  dplyr::select(pgRNA_target, diff, HeLa_GI_fdr, fdr) %>%
+  dplyr::arrange(desc(diff))
+```
+
+## How does this look along the data handling journey? 
+
+Hypothesis: If we calculate something a bit wonky in the early stages of the data handling does that effect how much we are different from the original at the later stages of the data? 
+
+Let's reformat this data a bit to take a look at absolute differences of the calculations at the various steps. 
+
+```{r}
+data_step <- both_df %>%
+  dplyr::mutate(
+    observed_diff = abs(HeLa_DKO_observed_CS - mean_observed_cs),
+    expected_diff = abs(HeLa_DKO_expected_CS - mean_expected_cs),
+    gi_diff = abs(HeLa_GI_score - gi_score),
+    fdr_diff = abs(-log10(HeLa_GI_fdr) - -log10(fdr))) %>% 
+  dplyr::select(pgRNA_target, observed_diff, expected_diff, gi_diff, fdr_diff) %>% 
+  tidyr::pivot_longer(-pgRNA_target, 
+                      names_to = "stat", 
+                      values_to = "diff"
+                      ) %>% 
+  dplyr::mutate(stat = factor(stat, 
+                              levels = c("observed_diff", 
+                                         "expected_diff", 
+                                         "gi_diff", 
+                                         "fdr_diff")))
+```
+
+Most of the stats have a small difference but some have a small minority have a big difference 
+between what was found in the paper and what the new version of the software finds. 
+
+Note I have not put fdr on a -log10 scale but it should be on a different scale but it looked wonky because the other stats aren't in this range. So just take that with a grain of salt. 
+
+```{r}
+ggplot(data_step, 
+       aes(x = stat, y = diff, group = stat)) + 
+  geom_violin() + 
+  theme_bw()
+```
+
+Here I'm just plotting some of the targets that had the biggest stat differentials in one or another of the calculations and seeing what happens to that differential at later steps. 
+
+```{r}
+data_step %>% 
+  dplyr::filter(pgRNA_target %in% 
+                  c("PPP1R14C_PPP1R14B", "NKAPL_NKAP", "DDX3Y_DDX3X", 
+                    "DHFR2_DHFR", "ASF1A_ASF1B", "NBPF3_NBPF15", 
+                    "EIF4E1B_EIF4E", "SEC61A2_SEC61A1", "COPG2_COPG1")) %>% 
+ggplot(aes(x = stat, y = diff, group = pgRNA_target, color = pgRNA_target)) + 
+  geom_point() + 
+  geom_line() + 
+  theme_bw() 
+```
+
+I'm not seeing much of a pattern. It seem very random. Which I think is good? 
+
+# How does sample and prob variability look? 
+
+Let's match up the paper data and the new gimap data together. 
+
+```{r}
+both_cs_df <- gimap_dataset$normalized_log_fc %>% 
+  dplyr::select(pgRNA_target, pg_ids, rep, crispr_score) %>% 
+  dplyr::left_join(paper_cs, by = c("pg_ids", "rep"), 
+                   suffix = c("_gimap", "_paper"))
+```
+
+Plot probe level pg_ids. There's some higher differences between the paper and gimap software for the very negative CRISPR scores but not too bad. 
+
+```{r}
+both_cs_df %>% 
+  ggplot(aes(crispr_score_gimap, crispr_score_paper)) + 
+  geom_point() + 
+  facet_wrap(~rep)
+```
+
+Let's look at the construct variability for probes for each target. 
+
+```{r}
+inter_target <- both_cs_df %>% 
+  dplyr::group_by(pgRNA_target, rep) %>% 
+  dplyr::summarize(paper_sd = sd(crispr_score_paper, na.rm = TRUE), 
+                   gimap_sd = sd(crispr_score_gimap, na.rm = TRUE), 
+                   paper_mean = mean(crispr_score_paper, na.rm = TRUE), 
+                   gimap_mean = mean(crispr_score_gimap, na.rm = TRUE), 
+                   .groups = "drop") %>% 
+  dplyr::mutate(sd_diff = abs(paper_sd - gimap_sd))
+```
+
+
+What does within target variability look like between the two data sources? 
+
+```{r}
+inter_target %>% 
+  ggplot(aes(x = paper_sd, y = gimap_sd, color = rep)) + 
+  geom_point() + 
+  theme_bw()
+```
+
+Does this change across samples?
+
+What does the within target standard deviation look like for the software? 
+
+```{r}
+ggplot(inter_target, aes(x = rep, y = gimap_sd, color = rep)) + 
+  geom_violin() + 
+  theme_bw()
+```
+How about the paper? Pretty similar. 
+
+```{r}
+ggplot(inter_target, aes(x = rep, y = paper_sd, color = rep)) + 
+  geom_violin() + 
+  theme_bw()
+```
+
+## Session info 
+
+So you know what software was used to calculate this take a look here 
+
+```{r}
+sessionInfo()
+```
