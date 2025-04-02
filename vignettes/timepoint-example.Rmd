@@ -68,7 +68,7 @@ Let's examine this example pgPEN counts table. It's divided into columns contain
 For the purposes of this tutorial, we can grab example data from the package.
 
 ```{r }
-example_data <- get_example_data("count") %>% 
+example_data <- get_example_data("count") %>%
   dplyr::select(!Day05_RepA)
 ```
 

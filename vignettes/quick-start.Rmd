@@ -168,7 +168,7 @@ We can pick out a specific pair to plot.
 
 ```{r eval = FALSE}
 # "TIAL1_TIA1" is top result so let's plot that
-plot_targets_bar(gimap_dataset,
+plot_targets(gimap_dataset,
   target1 = "TIAL1", target2 = "TIA1",
   reps_to_drop = "Day05_RepA_early"
 )

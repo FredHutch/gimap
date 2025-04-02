@@ -276,7 +276,7 @@ plot_targets(gimap_dataset, target1 = "DUSP21", target2 = "DUSP18")
 head(dplyr::arrange(gimap_dataset$gi_score, fdr))
 
 # "NDEL1_NDE1" is top result so let's plot that
-plot_targets_bar(gimap_dataset, target1 = "NDEL1", target2 = "NDE1")
+plot_targets(gimap_dataset, target1 = "NDEL1", target2 = "NDE1")
 ```
 
 ## Saving results to files
