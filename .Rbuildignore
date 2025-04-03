@@ -32,3 +32,7 @@ LICENSE
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
 SECURITY.md
+vignettes/example_qc_report.Rmd
+output_timepoints
+output_treatment
+
