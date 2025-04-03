@@ -36,12 +36,14 @@ remotes::install_github("FredHutch/gimap")
 
 ## Loading needed packages
 
-```{r eval = FALSE}
+```{r echo = FALSE, results = 'hide'}
 library(gimap)
+```
+```
 library(dplyr)
 ```
 
-```{reval = FALSE}
+```{r eval = FALSE}
 output_dir <- "output_treatment"
 dir.create(output_dir, showWarnings = FALSE)
 ```
