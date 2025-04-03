@@ -18,7 +18,7 @@ by the `gimap_annotate()` function if the cn_annotate = TRUE"><!-- mathjax --><s
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gimap</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3</span>
       </span>
     </div>
 
@@ -33,7 +33,10 @@ by the `gimap_annotate()` function if the cn_annotate = TRUE"><!-- mathjax --><s
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/example_qc_report.html">QC Report</a>
+      <a href="../articles/output_timepoints/example_qc_report.html">QC Report</a>
+    </li>
+    <li>
+      <a href="../articles/output_treatment/example_qc_report.html">QC Report</a>
     </li>
     <li>
       <a href="../articles/quick-start.html">Quick Start</a>
@@ -74,7 +77,10 @@ by the `gimap_annotate()` function if the cn_annotate = TRUE</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">cn_setup</span><span class="op">(</span>overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">cn_setup</span><span class="op">(</span></span>
+<span>  overwrite <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  data_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"gimap"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -83,6 +89,11 @@ by the `gimap_annotate()` function if the cn_annotate = TRUE</p>
 
 <dl><dt id="arg-overwrite">overwrite<a class="anchor" aria-label="anchor" href="#arg-overwrite"></a></dt>
 <dd><p>Should the files be redownloaded?</p></dd>
+
+
+<dt id="arg-data-dir">data_dir<a class="anchor" aria-label="anchor" href="#arg-data-dir"></a></dt>
+<dd><p>What directory should this be saved to? Default is with package
+files</p></dd>
 
 </dl></div>
 

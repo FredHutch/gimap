@@ -22,7 +22,7 @@ cutoff"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/math
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gimap</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3</span>
       </span>
     </div>
 
@@ -37,7 +37,10 @@ cutoff"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/math
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/example_qc_report.html">QC Report</a>
+      <a href="../articles/output_timepoints/example_qc_report.html">QC Report</a>
+    </li>
+    <li>
+      <a href="../articles/output_treatment/example_qc_report.html">QC Report</a>
     </li>
     <li>
       <a href="../articles/quick-start.html">Quick Start</a>
@@ -121,7 +124,7 @@ plasmid log2 CPM</p>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
-<span class="r-in"><span><span class="va">gimap_dataset</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_example_data.html">get_example_data</a></span><span class="op">(</span><span class="st">"gimap"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">gimap_dataset</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_example_data.html">get_example_data</a></span><span class="op">(</span><span class="st">"gimap"</span>, data_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">qc_filter_plasmid</span><span class="op">(</span><span class="va">gimap_dataset</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $filter</span>
@@ -191,8 +194,8 @@ plasmid log2 CPM</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $reportdf</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Plasmid_log2cpmBelowCutoff     n percent</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                      FALSE 32721   98.65</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                       TRUE   449    1.35</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                      FALSE 31269   94.27</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                       TRUE  1901    5.73</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># or to specify a cutoff value that will be used in the filter rather than</span></span></span>
@@ -220,8 +223,8 @@ plasmid log2 CPM</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $reportdf</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Plasmid_log2cpmBelowCutoff     n percent</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                      FALSE 32890   99.16</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                       TRUE   280    0.84</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                      FALSE 30818   92.91</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                       TRUE  2352    7.09</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
