@@ -8,7 +8,6 @@ vignettes/gimap_QC_Report.html
 vignettes/gimap_dataset_final.RDS
 vignettes/qc_plots/*
 CONTRIBUTING.md
-docs/*
 gimap_QC_Report.html
 gimap_QC_Report.Rmd
 qc_plots
@@ -41,4 +40,3 @@ SECURITY.md
 vignettes/example_qc_report.Rmd
 output_timepoints
 output_treatment
-doc/*
