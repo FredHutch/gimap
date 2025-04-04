@@ -1,3 +1,8 @@
+
+# gimap 1.1.0
+
+* Adjustments to gimap calculations -- all reps collapsed and linear models done with mean across reps.
+
 # gimap 1.0.3
 
 * Polish how annotation data is saved
