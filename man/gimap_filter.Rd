@@ -91,16 +91,16 @@ gimap_dataset <- get_example_data("gimap") \%>\%
 # If you want to use multiple filters and more than one to flag a pgRNA
 # construct before it's filtered out, use the `min_n_filters` argument
 gimap_dataset <- get_example_data("gimap") \%>\%
-gimap_filter(
-  filter_type = "both",
-  min_n_filters = 2
-)
+  gimap_filter(
+    filter_type = "both",
+    min_n_filters = 2
+  )
 
 # You can also specify which columns the filters will be applied to
 gimap_dataset <- get_example_data("gimap") \%>\%
- gimap_filter(
-  filter_type = "zero_count_only",
-  filter_zerocount_target_col = c(1, 2)
-)
+  gimap_filter(
+    filter_type = "zero_count_only",
+    filter_zerocount_target_col = c(1, 2)
+  )
 }
 }

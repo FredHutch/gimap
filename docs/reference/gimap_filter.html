@@ -20,7 +20,7 @@ behavior of each filter"><!-- mathjax --><script src="https://cdnjs.cloudflare.c
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gimap</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3</span>
       </span>
     </div>
 
@@ -35,9 +35,6 @@ behavior of each filter"><!-- mathjax --><script src="https://cdnjs.cloudflare.c
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/example_qc_report.html">QC Report</a>
-    </li>
-    <li>
       <a href="../articles/quick-start.html">Quick Start</a>
     </li>
     <li>
@@ -165,7 +162,7 @@ timepoint replicates</p>
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">gimap_dataset</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_example_data.html">get_example_data</a></span><span class="op">(</span><span class="st">"gimap"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
+<span class="r-in"><span><span class="va">gimap_dataset</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_example_data.html">get_example_data</a></span><span class="op">(</span><span class="st">"gimap"</span>, data_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu">gimap_filter</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># To see filtered data</span></span></span>
@@ -182,17 +179,17 @@ timepoint replicates</p>
 <span class="r-in"><span><span class="co"># If you want to use multiple filters and more than one to flag a pgRNA</span></span></span>
 <span class="r-in"><span><span class="co"># construct before it's filtered out, use the `min_n_filters` argument</span></span></span>
 <span class="r-in"><span><span class="va">gimap_dataset</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_example_data.html">get_example_data</a></span><span class="op">(</span><span class="st">"gimap"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span><span class="fu">gimap_filter</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  filter_type <span class="op">=</span> <span class="st">"both"</span>,</span></span>
-<span class="r-in"><span>  min_n_filters <span class="op">=</span> <span class="fl">2</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">gimap_filter</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    filter_type <span class="op">=</span> <span class="st">"both"</span>,</span></span>
+<span class="r-in"><span>    min_n_filters <span class="op">=</span> <span class="fl">2</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># You can also specify which columns the filters will be applied to</span></span></span>
 <span class="r-in"><span><span class="va">gimap_dataset</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_example_data.html">get_example_data</a></span><span class="op">(</span><span class="st">"gimap"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span> <span class="fu">gimap_filter</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  filter_type <span class="op">=</span> <span class="st">"zero_count_only"</span>,</span></span>
-<span class="r-in"><span>  filter_zerocount_target_col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">gimap_filter</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    filter_type <span class="op">=</span> <span class="st">"zero_count_only"</span>,</span></span>
+<span class="r-in"><span>    filter_zerocount_target_col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

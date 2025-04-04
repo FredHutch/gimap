@@ -118,7 +118,7 @@ gimap_object <- function() {
     annotation = NULL,
     normalized_log_fc = NULL,
     gi_scores = NULL,
-    overall_results = NULL
+    linear_model = NULL
   )
 
   return(gimap_obj)

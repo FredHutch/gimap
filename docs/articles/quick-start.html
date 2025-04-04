@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gimap</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3</span>
       </span>
     </div>
 
@@ -98,37 +98,41 @@
 </h2>
 <p>For more background on gimap and the calculations done here, <a href="https://github.com/FredHutch/gimap/blob/main/README.md" class="external-link">read
 here</a></p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/FredHutch/gimap" class="external-link">gimap</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error in get(paste0(generic, ".", class), envir = get_method_env()) : </span></span>
-<span><span class="co">#&gt;   object 'type_sum.accel' not found</span></span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
+<div class="section level3">
+<h3 id="requirements">Requirements<a class="anchor" aria-label="anchor" href="#requirements"></a>
+</h3>
+<p>Besides installing the gimap package, you will also need to install
+wget if you do not already have it installed. This will allow you to
+download the annotation files needed to run <code>gimap</code>.</p>
+<p><a href="https://phoenixnap.com/kb/wget-command-with-examples#How_to_Install_wget" class="external-link">How
+to install wget</a></p>
+<p>To install the <code>gimap</code> package you will need to run:</p>
+<pre><code><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"gimap"</span><span class="op">)</span></span></code></pre>
+<p>Or you can install the development version from GitHub:</p>
+<pre><code><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"FredHutch/gimap"</span><span class="op">)</span></span></code></pre>
+</div>
+<div class="section level3">
+<h3 id="loading-needed-packages">Loading needed packages<a class="anchor" aria-label="anchor" href="#loading-needed-packages"></a>
+</h3>
+<pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
 <span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     filter, lag</span></span>
 <span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span></code></pre></div>
+<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span></code></pre>
+</div>
 <div class="section level3">
 <h3 id="set-up">Set Up<a class="anchor" aria-label="anchor" href="#set-up"></a>
 </h3>
-<p>First let’s create a folder we will save files to.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<p>First we can create a folder we will save files to.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">output_dir</span> <span class="op">&lt;-</span> <span class="st">"output_timepoints"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">output_dir</span>, showWarnings <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">example_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_example_data.html">get_example_data</a></span><span class="op">(</span><span class="st">"count"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">33170</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">8</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> "\t"</span></span>
-<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (3): id, seq_1, seq_2</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">dbl</span> (5): Day00_RepA, Day05_RepA, Day22_RepA, Day22_RepB, Day22_RepC</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Use `spec()` to retrieve the full column specification for this data.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Specify the column types or set `show_col_types = FALSE` to quiet this message.</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">example_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_example_data.html">get_example_data</a></span><span class="op">(</span><span class="st">"count"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="setting-up-data">Setting up data<a class="anchor" aria-label="anchor" href="#setting-up-data"></a>
@@ -146,27 +150,27 @@ counts and specify the construct</li>
 <code>sample_metadata</code> - metadata that describes the columns
 of the counts including their timepoints</li>
 </ul>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">counts</span> <span class="op">&lt;-</span> <span class="va">example_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Day00_RepA"</span>, <span class="st">"Day05_RepA"</span>, <span class="st">"Day22_RepA"</span>, <span class="st">"Day22_RepB"</span>, <span class="st">"Day22_RepC"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">counts</span> <span class="op">&lt;-</span> <span class="va">example_data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Day00_RepA"</span>, <span class="st">"Day22_RepA"</span>, <span class="st">"Day22_RepB"</span>, <span class="st">"Day22_RepC"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><code>pg_id</code> are just the unique IDs listed in the same
 order/sorted the same way as the count data.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pg_ids</span> <span class="op">&lt;-</span> <span class="va">example_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pg_ids</span> <span class="op">&lt;-</span> <span class="va">example_data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="st">"id"</span><span class="op">)</span></span></code></pre></div>
 <p>Sample metadata is the information that describes the samples and is
 sorted the same order as the columns in the count data.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sample_metadata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  col_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Day00_RepA"</span>, <span class="st">"Day05_RepA"</span>, <span class="st">"Day22_RepA"</span>, <span class="st">"Day22_RepB"</span>, <span class="st">"Day22_RepC"</span><span class="op">)</span>,</span>
-<span>  day <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0"</span>, <span class="st">"5"</span>, <span class="st">"22"</span>, <span class="st">"22"</span>, <span class="st">"22"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  rep <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"RepA"</span>, <span class="st">"RepA"</span>, <span class="st">"RepA"</span>, <span class="st">"RepB"</span>, <span class="st">"RepC"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  col_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Day00_RepA"</span>, <span class="st">"Day22_RepA"</span>, <span class="st">"Day22_RepB"</span>, <span class="st">"Day22_RepC"</span><span class="op">)</span>,</span>
+<span>  day <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0"</span>, <span class="st">"22"</span>, <span class="st">"22"</span>, <span class="st">"22"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  rep <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"RepA"</span>, <span class="st">"RepA"</span>, <span class="st">"RepB"</span>, <span class="st">"RepC"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>We’ll need to provide <code>example_counts</code>,
 <code>pg_ids</code> and <code>sample_metadata</code> to
 <code><a href="../reference/setup_data.html">setup_data()</a></code>.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gimap_dataset</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/setup_data.html">setup_data</a></span><span class="op">(</span></span>
 <span>  counts <span class="op">=</span> <span class="va">counts</span>,</span>
 <span>  pg_ids <span class="op">=</span> <span class="va">pg_ids</span>,</span>
@@ -174,41 +178,29 @@ sorted the same order as the columns in the count data.</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p>It’s ideal to run quality checks first. The <code><a href="../reference/run_qc.html">run_qc()</a></code>
 function will create a report we can look at to assess this.</p>
-<pre><code><span><span class="fu"><a href="../reference/run_qc.html">run_qc</a></span><span class="op">(</span><span class="va">gimap_dataset</span>,</span>
-<span>       output_file <span class="op">=</span> <span class="st">"example_qc_report.Rmd"</span>,</span>
-<span>       overwrite <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>       quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/run_qc.html">run_qc</a></span><span class="op">(</span><span class="va">gimap_dataset</span>,</span>
+<span>  output_file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_dir</span>, <span class="st">"example_qc_report.Rmd"</span><span class="op">)</span>,</span>
+<span>  overwrite <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  plots_dir <span class="op">=</span> <span class="st">"plots"</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>You can take a look at an <a href="http://htmlpreview.github.io/?https://raw.githubusercontent.com/FredHutch/gimap/main/inst/example_qc_report.html" class="external-link">example
 QC report here</a>.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">gimap_dataset</span> <span class="op">&lt;-</span> <span class="va">gimap_dataset</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/gimap_filter.html">gimap_filter</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/gimap_annotate.html">gimap_annotate</a></span><span class="op">(</span>cell_line <span class="op">=</span> <span class="st">"HELA"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">gimap_dataset</span> <span class="op">&lt;-</span> <span class="va">gimap_dataset</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/gimap_filter.html">gimap_filter</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/gimap_annotate.html">gimap_annotate</a></span><span class="op">(</span>cell_line <span class="op">=</span> <span class="st">"HELA"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/gimap_normalize.html">gimap_normalize</a></span><span class="op">(</span></span>
 <span>    timepoints <span class="op">=</span> <span class="st">"day"</span></span>
-<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/calc_gi.html">calc_gi</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Annotating Data</span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">1884</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">3</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> ","</span></span>
-<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (3): gene, gene_symbol, entrez_id</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Use `spec()` to retrieve the full column specification for this data.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Specify the column types or set `show_col_types = FALSE` to quiet this message.</span></span>
-<span><span class="co">#&gt; Normalizing Log Fold Change</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Calculating Genetic Interaction scores</span></span></code></pre></div>
+<span>  <span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/calc_gi.html">calc_gi</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="example-output">Example output<a class="anchor" aria-label="anchor" href="#example-output"></a>
 </h3>
 <p>Genetic interaction is calculated by:</p>
 <ul>
-<li>
-<code>rep</code> - indicates which sample from the original the data
-is from. Note the pretreatment is used for calculation and its
-statistics are not reported.</li>
 <li>
 <code>pgRNA_target</code> - what gene(s) were targeted by this the
 original pgRNAs for these data</li>
@@ -230,224 +222,46 @@ score from single targets.<br>
 <li>
 <code>fdr</code> - False discovery rate corrected p values</li>
 </ul>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">gimap_dataset</span><span class="op">$</span><span class="va">gi_scores</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">fdr</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span>format <span class="op">=</span> <span class="st">"html"</span><span class="op">)</span> </span></code></pre></div>
-<table class="table">
-<thead><tr>
-<th style="text-align:left;">
-rep
-</th>
-<th style="text-align:left;">
-pgRNA_target
-</th>
-<th style="text-align:right;">
-mean_expected_cs
-</th>
-<th style="text-align:right;">
-mean_observed_cs
-</th>
-<th style="text-align:right;">
-mean_gi_score
-</th>
-<th style="text-align:left;">
-target_type
-</th>
-<th style="text-align:right;">
-p_val
-</th>
-<th style="text-align:right;">
-fdr
-</th>
-</tr></thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-Day22_RepA_late
-</td>
-<td style="text-align:left;">
-NDEL1_NDE1
-</td>
-<td style="text-align:right;">
--1.8731292
-</td>
-<td style="text-align:right;">
--2.673450
-</td>
-<td style="text-align:right;">
--1.292412
-</td>
-<td style="text-align:left;">
-gene_gene
-</td>
-<td style="text-align:right;">
-0.0e+00
-</td>
-<td style="text-align:right;">
-0.0000270
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Day22_RepA_late
-</td>
-<td style="text-align:left;">
-PFN2_PFN1
-</td>
-<td style="text-align:right;">
--1.5811362
-</td>
-<td style="text-align:right;">
--2.360606
-</td>
-<td style="text-align:right;">
--1.172104
-</td>
-<td style="text-align:left;">
-gene_gene
-</td>
-<td style="text-align:right;">
-1.0e-07
-</td>
-<td style="text-align:right;">
-0.0000598
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Day22_RepA_late
-</td>
-<td style="text-align:left;">
-CNOT8_CNOT7
-</td>
-<td style="text-align:right;">
--0.2525986
-</td>
-<td style="text-align:right;">
--2.298083
-</td>
-<td style="text-align:right;">
--1.985598
-</td>
-<td style="text-align:left;">
-gene_gene
-</td>
-<td style="text-align:right;">
-9.0e-07
-</td>
-<td style="text-align:right;">
-0.0003051
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Day22_RepC_late
-</td>
-<td style="text-align:left;">
-CNOT8_CNOT7
-</td>
-<td style="text-align:right;">
--0.6030327
-</td>
-<td style="text-align:right;">
--2.222123
-</td>
-<td style="text-align:right;">
--1.684182
-</td>
-<td style="text-align:left;">
-gene_gene
-</td>
-<td style="text-align:right;">
-4.0e-07
-</td>
-<td style="text-align:right;">
-0.0004501
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Day22_RepC_late
-</td>
-<td style="text-align:left;">
-SHMT2_SHMT1
-</td>
-<td style="text-align:right;">
--1.0214662
-</td>
-<td style="text-align:right;">
--1.737076
-</td>
-<td style="text-align:right;">
--0.927188
-</td>
-<td style="text-align:left;">
-gene_gene
-</td>
-<td style="text-align:right;">
-9.0e-07
-</td>
-<td style="text-align:right;">
-0.0004535
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Day22_RepC_late
-</td>
-<td style="text-align:left;">
-AKIRIN1_AKIRIN2
-</td>
-<td style="text-align:right;">
--1.7072333
-</td>
-<td style="text-align:right;">
--2.379270
-</td>
-<td style="text-align:right;">
--1.123690
-</td>
-<td style="text-align:left;">
-gene_gene
-</td>
-<td style="text-align:right;">
-5.9e-06
-</td>
-<td style="text-align:right;">
-0.0006682
-</td>
-</tr>
-</tbody>
-</table>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">gimap_dataset</span><span class="op">$</span><span class="va">gi_scores</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">fdr</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span>format <span class="op">=</span> <span class="st">"html"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="plot-the-results">Plot the results<a class="anchor" aria-label="anchor" href="#plot-the-results"></a>
 </h3>
 <p>You can remove any samples from these plots by altering the
 <code>reps_to_drop</code> argument.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_exp_v_obs_scatter.html">plot_exp_v_obs_scatter</a></span><span class="op">(</span><span class="va">gimap_dataset</span>, reps_to_drop <span class="op">=</span> <span class="st">"Day05_RepA_early"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="quick-start_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_rank_scatter.html">plot_rank_scatter</a></span><span class="op">(</span><span class="va">gimap_dataset</span>, reps_to_drop <span class="op">=</span> <span class="st">"Day05_RepA_early"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="quick-start_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_exp_v_obs_scatter.html">plot_exp_v_obs_scatter</a></span><span class="op">(</span><span class="va">gimap_dataset</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Save it to a file</span></span>
+<span><span class="fu">ggsave</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_dir</span>, <span class="st">"exp_v_obs_scatter.png"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="output_timepoints%2Fexp_v_obs_scatter.png"></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_volcano.html">plot_volcano</a></span><span class="op">(</span><span class="va">gimap_dataset</span>, reps_to_drop <span class="op">=</span> <span class="st">"Day05_RepA_early"</span>, facet_rep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="quick-start_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
-<p>Here’s how you can save plots like the above.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_rank_scatter.html">plot_rank_scatter</a></span><span class="op">(</span><span class="va">gimap_dataset</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Save it to a file</span></span>
+<span><span class="fu">ggsave</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_dir</span>, <span class="st">"plot_rank_scatter.png"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="output_timepoints%2Fplot_rank_scatter.png"></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"volcano_plot.png"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Saving 7.29 x 4.51 in image</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_volcano.html">plot_volcano</a></span><span class="op">(</span><span class="va">gimap_dataset</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Save it to a file</span></span>
+<span><span class="fu">ggsave</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_dir</span>, <span class="st">"volcano_plot.png"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="output_timepoints%2Fvolcano_plot.png"></p>
 <div class="section level4">
 <h4 id="plot-specific-target-pair">Plot specific target pair<a class="anchor" aria-label="anchor" href="#plot-specific-target-pair"></a>
 </h4>
 <p>We can pick out a specific pair to plot.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># "NDEL1_NDE1" is top result so let's plot that</span></span>
-<span><span class="fu"><a href="../reference/plot_targets_bar.html">plot_targets_bar</a></span><span class="op">(</span><span class="va">gimap_dataset</span>, target1 <span class="op">=</span> <span class="st">"NDEL1"</span>, target2 <span class="op">=</span> <span class="st">"NDE1"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="quick-start_files/figure-html/unnamed-chunk-16-1.png" width="700"></p>
+<code class="sourceCode R"><span><span class="co"># "CNOT8_CNOT7" is top result so let's plot that</span></span>
+<span><span class="fu"><a href="../reference/plot_targets.html">plot_targets</a></span><span class="op">(</span><span class="va">gimap_dataset</span>, target1 <span class="op">=</span> <span class="st">"CNOT8"</span>, target2 <span class="op">=</span> <span class="st">"CNOT7"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Save it to a file</span></span>
+<span><span class="fu">ggsave</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_dir</span>, <span class="st">"CNOT8_CNOT7.png"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="output_timepoints%2FCNOT8_CNOT7.png"></p>
 </div>
 </div>
 <div class="section level3">
@@ -455,10 +269,8 @@ gene_gene
 </h3>
 <p>We can save all these data as an RDS or the genetic interaction
 scores themselves to a tsv file.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">gimap_dataset</span>, <span class="st">"gimap_dataset_final.RDS"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/write_delim.html" class="external-link">write_tsv</a></span><span class="op">(</span><span class="va">gimap_dataset</span><span class="op">$</span><span class="va">gi_scores</span>, <span class="st">"gi_scores.tsv"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">gimap_dataset</span>, <span class="st">"gimap_dataset_final.RDS"</span><span class="op">)</span></span></code></pre>
+<pre><code><span><span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/write_delim.html" class="external-link">write_tsv</a></span><span class="op">(</span><span class="va">gimap_dataset</span><span class="op">$</span><span class="va">gi_scores</span>, <span class="st">"gi_scores.tsv"</span><span class="op">)</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="session-info">Session Info<a class="anchor" aria-label="anchor" href="#session-info"></a>
@@ -468,7 +280,7 @@ scores themselves to a tsv file.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R version 4.4.0 (2024-04-24)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-apple-darwin20</span></span>
-<span><span class="co">#&gt; Running under: macOS 15.1.1</span></span>
+<span><span class="co">#&gt; Running under: macOS 15.3.2</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Matrix products: default</span></span>
 <span><span class="co">#&gt; BLAS:   /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRblas.0.dylib </span></span>
@@ -484,26 +296,23 @@ scores themselves to a tsv file.</p>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] dplyr_1.1.4 gimap_1.0.0</span></span>
+<span><span class="co">#&gt; [1] dplyr_1.1.4 gimap_1.0.3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;  [1] sass_0.4.9         generics_0.1.3     tidyr_1.3.1        stringi_1.8.4     </span></span>
-<span><span class="co">#&gt;  [5] hms_1.1.3          digest_0.6.37      magrittr_2.0.3     evaluate_1.0.1    </span></span>
-<span><span class="co">#&gt;  [9] grid_4.4.0         timechange_0.3.0   RColorBrewer_1.1-3 fastmap_1.2.0     </span></span>
-<span><span class="co">#&gt; [13] jsonlite_1.8.9     backports_1.5.0    purrr_1.0.2        scales_1.3.0      </span></span>
-<span><span class="co">#&gt; [17] textshaping_0.4.1  jquerylib_0.1.4    cli_3.6.3          crayon_1.5.3      </span></span>
-<span><span class="co">#&gt; [21] rlang_1.1.4        bit64_4.5.2        munsell_0.5.1      withr_3.0.2       </span></span>
-<span><span class="co">#&gt; [25] cachem_1.1.0       yaml_2.3.10        parallel_4.4.0     tools_4.4.0       </span></span>
-<span><span class="co">#&gt; [29] tzdb_0.4.0         colorspace_2.1-1   ggplot2_3.5.1      broom_1.0.7       </span></span>
-<span><span class="co">#&gt; [33] curl_6.0.1         vctrs_0.6.5        R6_2.5.1           lifecycle_1.0.4   </span></span>
-<span><span class="co">#&gt; [37] lubridate_1.9.4    snakecase_0.11.1   stringr_1.5.1      bit_4.5.0.1       </span></span>
-<span><span class="co">#&gt; [41] fs_1.6.5           htmlwidgets_1.6.4  vroom_1.6.5        ragg_1.3.3        </span></span>
-<span><span class="co">#&gt; [45] janitor_2.2.0      pkgconfig_2.0.3    desc_1.4.3         pkgdown_2.1.1     </span></span>
-<span><span class="co">#&gt; [49] pillar_1.10.0      bslib_0.8.0.9000   gtable_0.3.6       glue_1.8.0        </span></span>
-<span><span class="co">#&gt; [53] systemfonts_1.1.0  xfun_0.49          tibble_3.2.1       tidyselect_1.2.1  </span></span>
-<span><span class="co">#&gt; [57] rstudioapi_0.17.1  knitr_1.49         farver_2.1.2       htmltools_0.5.8.1 </span></span>
-<span><span class="co">#&gt; [61] labeling_0.4.3     rmarkdown_2.29     readr_2.1.5        pheatmap_1.0.12   </span></span>
-<span><span class="co">#&gt; [65] compiler_4.4.0</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] gtable_0.3.6       jsonlite_1.8.9     compiler_4.4.0     tidyselect_1.2.1  </span></span>
+<span><span class="co">#&gt;  [5] stringr_1.5.1      snakecase_0.11.1   tidyr_1.3.1        jquerylib_0.1.4   </span></span>
+<span><span class="co">#&gt;  [9] systemfonts_1.2.1  scales_1.3.0       textshaping_1.0.0  yaml_2.3.10       </span></span>
+<span><span class="co">#&gt; [13] fastmap_1.2.0      ggplot2_3.5.1      R6_2.5.1           generics_0.1.3    </span></span>
+<span><span class="co">#&gt; [17] knitr_1.49         htmlwidgets_1.6.4  tibble_3.2.1       janitor_2.2.1     </span></span>
+<span><span class="co">#&gt; [21] desc_1.4.3         openssl_2.3.2      munsell_0.5.1      lubridate_1.9.4   </span></span>
+<span><span class="co">#&gt; [25] RColorBrewer_1.1-3 bslib_0.8.0.9000   pillar_1.10.1      rlang_1.1.5       </span></span>
+<span><span class="co">#&gt; [29] stringi_1.8.4      cachem_1.1.0       xfun_0.50          fs_1.6.5          </span></span>
+<span><span class="co">#&gt; [33] sass_0.4.9         timechange_0.3.0   cli_3.6.3          pkgdown_2.1.1     </span></span>
+<span><span class="co">#&gt; [37] magrittr_2.0.3     digest_0.6.37      grid_4.4.0         rstudioapi_0.17.1 </span></span>
+<span><span class="co">#&gt; [41] askpass_1.2.1      lifecycle_1.0.4    vctrs_0.6.5        pheatmap_1.0.12   </span></span>
+<span><span class="co">#&gt; [45] evaluate_1.0.3     glue_1.8.0         ragg_1.3.3         colorspace_2.1-1  </span></span>
+<span><span class="co">#&gt; [49] purrr_1.0.4        rmarkdown_2.29     httr_1.4.7         tools_4.4.0       </span></span>
+<span><span class="co">#&gt; [53] pkgconfig_2.0.3    htmltools_0.5.8.1</span></span></code></pre></div>
 </div>
 </div>
   </div>

@@ -16,11 +16,12 @@ devtools::load_all()
 ## Get the gimap Normalization/LFC results
 
 ```{r}
- gimap_dataset <- get_example_data("gimap") %>%
-   gimap_filter() %>%
-   gimap_annotate(cell_line = "HELA") %>%
-   gimap_normalize(
-     timepoints = "day") %>% 
+gimap_dataset <- get_example_data("gimap") %>%
+  gimap_filter() %>%
+  gimap_annotate(cell_line = "HELA") %>%
+  gimap_normalize(
+    timepoints = "day"
+  ) %>%
   calc_crispr()
 ```
 
@@ -29,7 +30,7 @@ devtools::load_all()
 Some data wrangling here. 
 
 ```{r}
-d.counts_flagged <- read.table("d.HeLa_counts_cpm_flag_long.txt", header=TRUE)
+d.counts_flagged <- read.table("d.HeLa_counts_cpm_flag_long.txt", header = TRUE)
 
 d.annot <- read_tsv("HeLa_lfc_annot_adj_pgRNA.txt")
 ```
@@ -37,20 +38,20 @@ d.annot <- read_tsv("HeLa_lfc_annot_adj_pgRNA.txt")
 
 ```{r}
 ggplot2::ggplot(d.annot, ggplot2::aes(x = norm_ctrl_flag, y = CRISPR_score)) +
- ggplot2::geom_violin() +
- ggplot2::theme(axis.text.x = element_text(angle = 90)) +
- ggplot2::facet_wrap(~rep)
+  ggplot2::geom_violin() +
+  ggplot2::theme(axis.text.x = element_text(angle = 90)) +
+  ggplot2::facet_wrap(~rep)
 
 ggplot2::ggsave("norm_plot.png")
 ```
 
 
 ```{r}
-  ggplot2::ggplot(gimap_dataset$crispr_score, ggplot2::aes(x = norm_ctrl_flag, y = crispr_score)) +
-    ggplot2::geom_violin() +
-    ggplot2::ylim(c(-4, 4)) +
-    ggplot2::theme(axis.text.x = element_text(angle = 90)) +
-    ggplot2::facet_wrap(~rep)
+ggplot2::ggplot(gimap_dataset$crispr_score, ggplot2::aes(x = norm_ctrl_flag, y = crispr_score)) +
+  ggplot2::geom_violin() +
+  ggplot2::ylim(c(-4, 4)) +
+  ggplot2::theme(axis.text.x = element_text(angle = 90)) +
+  ggplot2::facet_wrap(~rep)
 ```
 
 
@@ -150,32 +151,33 @@ setdiff(colnames(old_lfc_results), colnames(gimap_dataset$normalized_log_fc))
 
 ```{r}
 joindf <- dplyr::left_join(old_lfc_results, gimap_dataset$normalized_log_fc,
-                           by = c("pgRNA_id" = "pg_ids", "rep"),
-                           suffix = c("_old", "_new")) %>%
-  select(pgRNA_id, new_calc = lfc_adj, org_calc = lfc_adj2, rep) %>% 
+  by = c("pgRNA_id" = "pg_ids", "rep"),
+  suffix = c("_old", "_new")
+) %>%
+  select(pgRNA_id, new_calc = lfc_adj, org_calc = lfc_adj2, rep) %>%
   dplyr::distinct()
 
 joindf
 ```
 
 ```{r}
-joindf %>% ggplot(aes(x=new_calc, y = org_calc)) +
-  geom_point(alpha=0.1) +
+joindf %>% ggplot(aes(x = new_calc, y = org_calc)) +
+  geom_point(alpha = 0.1) +
   xlab("gimap Normalization/LFC") +
   ylab("GI Mapping Normalization/LFC") +
   theme_classic() +
-  stat_regline_equation(label.y = 2.35) + stat_cor(label.y = 1.95) +
+  stat_regline_equation(label.y = 2.35) +
+  stat_cor(label.y = 1.95) +
   facet_wrap(~rep)
-
 ```
 
 ```{r}
-joindf %>% ggplot(aes(x=new_calc, y = org_calc)) +
-  geom_point(alpha=0.1) +
+joindf %>% ggplot(aes(x = new_calc, y = org_calc)) +
+  geom_point(alpha = 0.1) +
   xlab("gimap Normalization/LFC: lfc_adj") +
   ylab("GI Mapping Normalization/LFC: lfc_adj2") +
   theme_classic() +
-  stat_regline_equation(label.y = 2.35) + stat_cor(label.y = 1.95)
-
+  stat_regline_equation(label.y = 2.35) +
+  stat_cor(label.y = 1.95)
 ```
 

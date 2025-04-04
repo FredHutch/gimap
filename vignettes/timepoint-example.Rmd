@@ -46,7 +46,7 @@ library(dplyr)
 
 First let's create a folder we will save files to.
 
-```
+```{reval = FALSE}
 output_dir <- "output_timepoints"
 dir.create(output_dir, showWarnings = FALSE)
 ```
@@ -68,7 +68,8 @@ Let's examine this example pgPEN counts table. It's divided into columns contain
 For the purposes of this tutorial, we can grab example data from the package.
 
 ```{r eval = FALSE}
-example_data <- get_example_data("count")
+example_data <- get_example_data("count") %>%
+  dplyr::select(!Day05_RepA)
 ```
 
 The metadata you have may vary slightly from this but you'll want to make sure you have the essential variables and information regarding how you collected your data.
@@ -91,7 +92,7 @@ Required for a timepoint analysis is a Day 0 (or plasmid) sample, and at least o
 
 ```{r eval = FALSE}
 counts <- example_data %>%
-  select(c("Day00_RepA", "Day05_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC")) %>%
+  select(c("Day00_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC")) %>%
   as.matrix()
 ```
 
@@ -116,9 +117,9 @@ You need to have two columns in the metadata you provide. You'll need to specify
 
 ```{r eval = FALSE}
 sample_metadata <- data.frame(
-  col_names = c("Day00_RepA", "Day05_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC"),
-  day = as.numeric(c("0", "5", "22", "22", "22")),
-  rep = as.factor(c("RepA", "RepA", "RepA", "RepB", "RepC"))
+  col_names = c("Day00_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC"),
+  day = as.numeric(c("0", "22", "22", "22")),
+  rep = as.factor(c("RepA", "RepA", "RepB", "RepC"))
 )
 ```
 
@@ -176,12 +177,15 @@ There is a filter that flags pgRNA constructs that have low log2 CPM counts for 
   - The histogram of the log2 CPM values of pgRNA constructs at the plasmid time point mentioned earlier does have a dashed line specifying the lower outlier (or a user defined cutoff) and pgRNA constructs with a plasmid log2 CPM lower than that value can be filtered out.
   - We include a table that specifies how many pgRNAs would be filtered out by applying this filter.
 
+It's ideal to run quality checks first. The `run_qc()` function will create a report we can look at to assess this.
+
 ```{r eval = FALSE}
 run_qc(gimap_dataset,
-       output_file = "example_qc_report.Rmd",
-       overwrite = TRUE,
-       plots_dir = "plots",
-       quiet = TRUE)
+  output_file = file.path(output_dir, "example_qc_report.Rmd"),
+  overwrite = TRUE,
+  plots_dir = "plots",
+  quiet = TRUE
+)
 ```
 
 You can take a look at an [example QC report here](http://htmlpreview.github.io/?https://raw.githubusercontent.com/FredHutch/gimap/main/inst/example_qc_report.html).
@@ -249,26 +253,45 @@ head(dplyr::arrange(gimap_dataset$gi_score, fdr))
 You can remove any samples from these plots by altering the `reps_to_drop` argument.
 
 ```{r eval = FALSE}
-plot_exp_v_obs_scatter(gimap_dataset)
+plot <- plot_exp_v_obs_scatter(gimap_dataset)
+
+# Save it to a file
+ggsave(file.path(output_dir, "exp_v_obs_scatter.png"))
 ```
+
+![](output_timepoints/exp_v_obs_scatter.png)
 
 ```{r eval = FALSE}
 plot_rank_scatter(gimap_dataset)
+
+# Save it to a file
+ggsave(file.path(output_dir, "plot_rank_scatter.png"))
 ```
+
+![](output_timepoints/plot_rank_scatter.png)
 
 ```{r eval = FALSE}
 plot_volcano(gimap_dataset)
+
+# Save it to a file
+ggsave(file.path(output_dir, "volcano_plot.png"))
 ```
+
+![](output_timepoints/volcano_plot.png)
 
 ### Plot specific target pair
 
 We can pick out a specific pair to plot.
 
 ```{r eval = FALSE}
-# "NDEL1_NDE1" is top result so let's plot that
-plot_targets_bar(gimap_dataset, target1 = "TIAL1", target2 = "TIA1",
-                 reps_to_drop = "Day05_RepA_early")
+# "CNOT8_CNOT7" is top result so let's plot that
+plot_targets(gimap_dataset, target1 = "CNOT8", target2 = "CNOT7")
+
+# Save it to a file
+ggsave(file.path(output_dir, "CNOT8_CNOT7.png"))
 ```
+
+![](output_timepoints/CNOT8_CNOT7.png)
 
 ## Saving results to files
 
@@ -281,13 +304,13 @@ readr::write_tsv(gimap_dataset$gi_scores, file.path(output_dir, "gi_scores.tsv")
 We can save all these data as an RDS.
 
 ```
-saveRDS(gimap_dataset, "gimap_dataset_final_timepoint.RDS")
+saveRDS(gimap_dataset, file.path(output_dir, "gimap_dataset_final_timepoint.RDS"))
 ```
 
 ## Session Info
 
 This is just for provenance purposes.
 
-```{r eval = FALSE}
+```{r }
 sessionInfo()
 ```

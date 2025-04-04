@@ -36,12 +36,14 @@ remotes::install_github("FredHutch/gimap")
 
 ## Loading needed packages
 
-```{r eval = FALSE}
+```{r echo = FALSE, results = 'hide'}
 library(gimap)
+```
+```
 library(dplyr)
 ```
 
-```
+```{r eval = FALSE}
 output_dir <- "output_treatment"
 dir.create(output_dir, showWarnings = FALSE)
 ```
@@ -175,8 +177,13 @@ There is a filter that flags pgRNA constructs that have low log2 CPM counts for 
   - The histogram of the log2 CPM values of pgRNA constructs at the plasmid time point mentioned earlier does have a dashed line specifying the lower outlier (or a user defined cutoff) and pgRNA constructs with a plasmid log2 CPM lower than that value can be filtered out.
   - We include a table that specifies how many pgRNAs would be filtered out by applying this filter.
 
-```
-run_qc(gimap_dataset, open_results = FALSE)
+```{r eval = FALSE}
+run_qc(gimap_dataset,
+  output_file = file.path(output_dir, "example_qc_report.Rmd"),
+  overwrite = TRUE,
+  plots_dir = "plots",
+  quiet = TRUE
+)
 ```
 
 You can take a look at an [example QC report here](http://htmlpreview.github.io/?https://raw.githubusercontent.com/FredHutch/gimap/main/inst/example_qc_report.html).
@@ -251,52 +258,61 @@ You can remove any samples from these plots by altering the `reps_to_drop` argum
 
 ```{r eval = FALSE}
 plot_exp_v_obs_scatter(gimap_dataset)
+
+# Save it to a file
+ggsave(file.path(output_dir, "exp_v_obs_scatter.png"))
 ```
+
+![](output_treatment/exp_v_obs_scatter.png)
 
 ```{r eval = FALSE}
 plot_rank_scatter(gimap_dataset)
+
+# Save it to a file
+ggsave(file.path(output_dir, "plot_rank_scatter.png"))
 ```
+
+![](output_treatment/plot_rank_scatter.png)
 
 ```{r eval = FALSE}
 plot_volcano(gimap_dataset)
+
+# Save it to a file
+ggsave(file.path(output_dir, "volcano_plot.png"))
 ```
+![](output_treatment/volcano_plot.png)
 
 ### Plot specific target pair
 
 We can pick out a specific pair to plot.
 
 ```{r eval = FALSE}
-# "MED12L_MED12" is top result so let's plot that
-plot_targets_bar(gimap_dataset, target1 = "AP2A1", target2 = "AP2A2")
+# "DUSP21_DUSP18" is top result so let's plot that
+plot_targets(gimap_dataset, target1 = "DUSP21", target2 = "DUSP18")
+
+# Save it to a file
+ggsave(file.path(output_dir, "DUSP21_DUSP18.png"))
 ```
-
-
-```{r eval = FALSE}
-# To plot results, pick out two targets from the gi_score table
-head(dplyr::arrange(gimap_dataset$gi_score, fdr))
-
-# "NDEL1_NDE1" is top result so let's plot that
-plot_targets_bar(gimap_dataset, target1 = "NDEL1", target2 = "NDE1")
-```
+![](output_treatment/DUSP21_DUSP18.png)
 
 ## Saving results to files
 
 We can save the genetic interactions scores like this:
 
-```
+```{r eval = FALSE}
 readr::write_tsv(gimap_dataset$gi_scores, file.path(output_dir, "gi_scores.tsv"))
 ```
 
 We can save all these data as an RDS.
 
-```
-saveRDS(gimap_dataset, "gimap_dataset_final_treatment.RDS")
+```{r eval = FALSE}
+saveRDS(gimap_dataset, file.path(output_dir, "gimap_dataset_final_treatment.RDS"))
 ```
 
 ## Session Info
 
 This is just for provenance purposes.
 
-```{r eval = FALSE}
+```{r }
 sessionInfo()
 ```

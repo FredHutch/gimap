@@ -20,7 +20,7 @@ test_that("Test normalization", {
     dplyr::pull(neg_ctrl_med)
 
   # We expect negative controls to be now equal to 0
-  testthat::expect_equal(neg_controls[2:4], c(0, 0, 0))
+  testthat::expect_equal(neg_controls[1:3], c(0, 0, 0))
 
   pos_controls <- gimap_dataset$normalized_log_fc %>%
     dplyr::filter(norm_ctrl_flag == "positive_control") %>%
@@ -30,7 +30,7 @@ test_that("Test normalization", {
 
   # We expect positive controls to be now equal to -1
   testthat::expect_equal(
-    round(pos_controls[-1]),
+    round(pos_controls),
     round(c(-1, -1, -1))
   )
 })

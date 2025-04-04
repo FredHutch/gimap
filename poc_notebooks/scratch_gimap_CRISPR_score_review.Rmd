@@ -16,11 +16,12 @@ devtools::load_all()
 ## Get the gimap CRISPR Score results
 
 ```{r}
- gimap_dataset <- get_example_data("gimap") %>%
-   gimap_filter() %>%
-   gimap_annotate(cell_line = "HELA") %>%
-   gimap_normalize(
-     timepoints = "day") %>%
+gimap_dataset <- get_example_data("gimap") %>%
+  gimap_filter() %>%
+  gimap_annotate(cell_line = "HELA") %>%
+  gimap_normalize(
+    timepoints = "day"
+  ) %>%
   calc_crispr()
 ```
 
@@ -60,8 +61,8 @@ We are expecting negative controls to be now set to a median of -1.
 For the original data: 
 ```{r}
 old_pos_controls <- old_lfc_results %>%
-  dplyr::filter(target_type == "gene_ctrl" & gene1_essential_flag == TRUE | 
-                  target_type =="ctrl_gene" & gene2_essential_flag == TRUE) %>%
+  dplyr::filter(target_type == "gene_ctrl" & gene1_essential_flag == TRUE |
+    target_type == "ctrl_gene" & gene2_essential_flag == TRUE) %>%
   dplyr::group_by(rep) %>%
   dplyr::summarize(pos_ctrl_med = median(CRISPR_score)) %>%
   dplyr::pull(pos_ctrl_med)
@@ -112,9 +113,10 @@ There appears to be 4 entries for each pgRNA ID and rep combo. They share the sa
 
 ```{r}
 joindf <- dplyr::full_join(old_crispr_results, gimap_dataset$crispr_score,
-                           by = c("pgRNA_id" = "pg_ids", "rep"),
-                           suffix = c("_old", "_new")) %>%
-  select(double_crispr_score, CRISPR_score, rep, pgRNA_id) %>% #225993 rows prior to drop_na
+  by = c("pgRNA_id" = "pg_ids", "rep"),
+  suffix = c("_old", "_new")
+) %>%
+  select(double_crispr_score, CRISPR_score, rep, pgRNA_id) %>% # 225993 rows prior to drop_na
   drop_na() %>%
   distinct()
 
@@ -122,19 +124,21 @@ nrow(joindf)
 ```
 
 ```{r}
-joindf %>% ggplot(aes(x=double_crispr_score, y = CRISPR_score)) +
-  geom_point(alpha=0.1) +
+joindf %>% ggplot(aes(x = double_crispr_score, y = CRISPR_score)) +
+  geom_point(alpha = 0.1) +
   xlab("gimap Normalization/LFC: lfc_adj") +
   ylab("GI Mapping Normalization/LFC: lfc_adj2") +
   theme_classic() +
-  stat_regline_equation(label.y = 2.35) + stat_cor(label.y = 1.95) +
+  stat_regline_equation(label.y = 2.35) +
+  stat_cor(label.y = 1.95) +
   facet_wrap(~rep)
 ```
 ```{r}
-joindf %>% ggplot(aes(x=double_crispr_score, y = CRISPR_score)) +
-  geom_point(alpha=0.1) +
+joindf %>% ggplot(aes(x = double_crispr_score, y = CRISPR_score)) +
+  geom_point(alpha = 0.1) +
   xlab("gimap Normalization/LFC: lfc_adj") +
   ylab("GI Mapping Normalization/LFC: lfc_adj2") +
   theme_classic() +
-  stat_regline_equation(label.y = 2.35) + stat_cor(label.y = 1.95)
+  stat_regline_equation(label.y = 2.35) +
+  stat_cor(label.y = 1.95)
 ```

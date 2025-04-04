@@ -44,12 +44,13 @@
 #' # unexpressed. In the `gimap_normalize` this will by default be used to
 #' # normalize to.
 #' gimap_dataset <- get_example_data("gimap",
-#'                                   data_dir = tempdir()) %>%
+#'   data_dir = tempdir()
+#' ) %>%
 #'   gimap_filter() %>%
 #'   gimap_annotate(
 #'     cell_line = "HELA",
 #'     missing_ids_file =  tempfile(),
-#'     annot_dir = tempdir())
+#'     annot_dir = tempdir()
 #'   )
 #'
 #'
@@ -58,11 +59,13 @@
 #' # `normalize_by_unexpressed = FALSE` in the normalize step you will get a
 #' # warning.
 #' gimap_dataset <- get_example_data("gimap",
-#'                                   data_dir = tempdir()) %>%
+#'   data_dir = tempdir()
+#' ) %>%
 #'   gimap_filter() %>%
 #'   gimap_annotate(
 #'     cell_line_annotate = FALSE,
-#'     annot_dir = tempdir()) %>%
+#'     annot_dir = tempdir()
+#'   ) %>%
 #'   gimap_normalize(
 #'     timepoints = "day",
 #'     normalize_by_unexpressed = FALSE,
@@ -74,7 +77,8 @@
 #' # where custom data is provided to `custom_tpm` is a data frame with
 #' # `genes` and `log2_tpm` as the columns.
 #' gimap_dataset <- get_example_data("gimap",
-#'                                   data_dir = tempdir()) %>%
+#'   data_dir = tempdir()
+#' ) %>%
 #'   gimap_filter() %>%
 #'   gimap_annotate(
 #'     cell_line = "HELA",
@@ -180,6 +184,7 @@ gimap_annotate <- function(.data = NULL,
     }
     tpm_file <- getOption("tpm_file")
     if (is.null(tpm_file)) tpm_file <- tpm_setup(data_dir = annot_dir)
+    if (!file.exists(tpm_file)) stop("Could not download TPM file")
 
     op <- options("VROOM_CONNECTION_SIZE" = 500072)
     on.exit(options(op))
@@ -195,6 +200,7 @@ gimap_annotate <- function(.data = NULL,
 
     if (is.null(cn_file)) cn_file <- cn_setup(data_dir = annot_dir)
 
+    if (!file.exists(cn_file)) stop("Could not download CN file")
     # Read in the CN data
     depmap_cn <- readr::read_csv(cn_file,
       show_col_types = FALSE,
@@ -332,14 +338,15 @@ gimap_annotate <- function(.data = NULL,
 #' @importFrom utils download.file unzip
 tpm_setup <- function(overwrite = TRUE,
                       data_dir = system.file("extdata", package = "gimap")) {
-
   tpm_file <- file.path(data_dir, "CCLE_expression.csv")
 
   options("tpm_file" = tpm_file)
   if (!file.exists(tpm_file) | overwrite) {
     if (!file.exists(file.path(data_dir, "CCLE_expression.csv.zip"))) {
-      get_figshare(file_name = "CCLE_expression.csv",
-                   output_dir = data_dir)
+      get_figshare(
+        file_name = "CCLE_expression.csv",
+        output_dir = data_dir
+      )
     } else {
       unzip(file.path(data_dir, "CCLE_expression.csv.zip"),
         exdir = data_dir, overwrite = TRUE
@@ -394,8 +401,10 @@ cn_setup <- function(overwrite = TRUE,
 
   if (!file.exists(cn_file) | overwrite) {
     if (!file.exists(file.path(data_dir, "CCLE_gene_cn.csv.zip"))) {
-      get_figshare(file_name = "CCLE_gene_cn.csv",
-                   output_dir = data_dir)
+      get_figshare(
+        file_name = "CCLE_gene_cn.csv",
+        output_dir = data_dir
+      )
     } else {
       unzip(file.path(data_dir, "CCLE_gene_cn.csv.zip"),
         exdir = data_dir, overwrite = TRUE
@@ -438,7 +447,6 @@ cn_setup <- function(overwrite = TRUE,
 #' @importFrom utils download.file unzip
 ctrl_genes <- function(overwrite = TRUE,
                        data_dir = system.file("extdata", package = "gimap")) {
-
   ctrl_genes_file <- file.path(data_dir, "Achilles_common_essentials.csv")
 
   options("ctrl_genes_file" = ctrl_genes_file)
@@ -449,8 +457,10 @@ ctrl_genes <- function(overwrite = TRUE,
       data_dir,
       "Achilles_common_essentials.csv.zip"
     ))) {
-      get_figshare(file_name = "Achilles_common_essentials.csv",
-                   output_dir = data_dir)
+      get_figshare(
+        file_name = "Achilles_common_essentials.csv",
+        output_dir = data_dir
+      )
     } else {
       unzip(file.path(data_dir, "Achilles_common_essentials.csv.zip"),
         exdir = data_dir,
@@ -500,7 +510,6 @@ supported_cell_lines <- function() {
 #' delete_annotation()
 #'
 delete_annotation <- function() {
-
   message("Deleting original files")
   unlink(options("tpm_file"))
   unlink(options("cn_file"))
