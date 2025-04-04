@@ -13,14 +13,14 @@ authors:
     affiliation: "1, 2"
   - name: Phoebe Parrish
     orcid: 0000-0002-3530-0105
-    affiliation: "1, 3"
+    affiliation: 1
   - name: Kate Isaac
     orcid: 0000-0001-8701-4197
     affiliation: 1
   - name: Daniel Grosso
     affiliation: 1
   - name: Siobhan O'Brien
-    orcid: ?
+    orcid: 0000-0003-4958-1080
     affiliation: 1
   - name: Alice Berger
     orcid: 0000-0002-6538-2658
@@ -30,15 +30,13 @@ affiliations:
    index: 1
  - name: Synthesize Bio, United States
    index: 2
- - name: Pfizer Oncology
-   index: 3
 date: 02 April 2025
 bibliography: paper.bib
 ---
 
 # Summary
 
-Gene redundancy, particularly among paralog genes, presents significant challenges in understanding gene function through single-gene knockout experiments. Paired guide CRISPR screening has emerged as a powerful approach to address this challenge by enabling simultaneous knockout of two genes. However, analyzing the resulting data requires sophisticated computational methods. GIMAP (Genetic Interaction MAPping) is an R package specifically designed to analyze dual-target CRISPR screening data, with a focus on identifying meaningful genetic interactions such as synthetic lethality and gene cooperativity.
+Gene redundancy, particularly among paralog genes, presents significant challenges in understanding gene function through single-gene knockout experiments []. Paired guide CRISPR screening has emerged as a powerful approach to address this challenge by enabling simultaneous knockout of two genes[]. However, analyzing the resulting data requires sophisticated computational methods. GIMAP (Genetic Interaction MAPping) is an R package specifically designed to analyze dual-target CRISPR screening data, with a focus on identifying meaningful genetic interactions such as synthetic lethality and gene cooperativity.
 
 # Statement of Need
 
@@ -69,7 +67,7 @@ The package provides comprehensive visualization tools including volcano plots t
 
 `gimap` has been successfully used to identify synthetic lethal interactions among paralog genes in cancer cell lines, revealing potential therapeutic targets where single-gene approaches have failed. The package accommodates various experimental designs, including time-course studies and treatment comparisons, offering flexibility for diverse research questions.
 
-Example applications include:
+_Example applications include:_
 - Identification of backup genes that provide functional redundancy in critical cellular pathways
 - Discovery of context-dependent genetic interactions that emerge under specific conditions or treatments
 - Systematic mapping of gene networks based on functional interactions rather than physical associations
