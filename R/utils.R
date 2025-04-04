@@ -77,7 +77,15 @@ get_example_data <- function(which_data,
       )
     }
   } else {
-    file_path <- file.path(system.file("extdata", package = "gimap"), file_name)
+    file_path <- file.path(data_dir, file_name)
+
+    if (!file.exists(file_path)) {
+      download.file(
+        paste0("https://github.com/FredHutch/gimap/",
+               "raw/refs/heads/main/inst/extdata/", file_name),
+        destfile = file_path
+        )
+    }
   }
   dataset <- switch(which_data,
     "count" = readr::read_tsv(file_path,
