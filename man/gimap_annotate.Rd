@@ -72,12 +72,13 @@ genes should be used as controls.
 # unexpressed. In the `gimap_normalize` this will by default be used to
 # normalize to.
 gimap_dataset <- get_example_data("gimap",
-                                  data_dir = tempdir()) \%>\%
+  data_dir = tempdir()
+) \%>\%
   gimap_filter() \%>\%
   gimap_annotate(
     cell_line = "HELA",
     missing_ids_file =  tempfile(),
-    annot_dir = tempdir())
+    annot_dir = tempdir()
   )
 
 
@@ -86,11 +87,13 @@ gimap_dataset <- get_example_data("gimap",
 # `normalize_by_unexpressed = FALSE` in the normalize step you will get a
 # warning.
 gimap_dataset <- get_example_data("gimap",
-                                  data_dir = tempdir()) \%>\%
+  data_dir = tempdir()
+) \%>\%
   gimap_filter() \%>\%
   gimap_annotate(
     cell_line_annotate = FALSE,
-    annot_dir = tempdir()) \%>\%
+    annot_dir = tempdir()
+  ) \%>\%
   gimap_normalize(
     timepoints = "day",
     normalize_by_unexpressed = FALSE,
@@ -102,7 +105,8 @@ gimap_dataset <- get_example_data("gimap",
 # where custom data is provided to `custom_tpm` is a data frame with
 # `genes` and `log2_tpm` as the columns.
 gimap_dataset <- get_example_data("gimap",
-                                  data_dir = tempdir()) \%>\%
+  data_dir = tempdir()
+) \%>\%
   gimap_filter() \%>\%
   gimap_annotate(
     cell_line = "HELA",
