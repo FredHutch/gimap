@@ -4,6 +4,7 @@
 <url><loc>/CONTRIBUTING.html</loc></url>
 <url><loc>/LICENSE-text.html</loc></url>
 <url><loc>/SECURITY.html</loc></url>
+<url><loc>/articles/example_qc_report.html</loc></url>
 <url><loc>/articles/getting_started.html</loc></url>
 <url><loc>/articles/index.html</loc></url>
 <url><loc>/articles/quick-start.html</loc></url>
@@ -14,18 +15,30 @@
 <url><loc>/news/index.html</loc></url>
 <url><loc>/reference/calc_crispr.html</loc></url>
 <url><loc>/reference/calc_gi.html</loc></url>
+<url><loc>/reference/cn_setup.html</loc></url>
+<url><loc>/reference/crtl_genes.html</loc></url>
+<url><loc>/reference/ctrl_genes.html</loc></url>
+<url><loc>/reference/delete_annotation.html</loc></url>
+<url><loc>/reference/delete_example_data.html</loc></url>
+<url><loc>/reference/encrypt_creds_path.html</loc></url>
 <url><loc>/reference/example_data_folder.html</loc></url>
 <url><loc>/reference/get_example_data.html</loc></url>
+<url><loc>/reference/get_figshare.html</loc></url>
 <url><loc>/reference/gimap_QC_Report.html</loc></url>
 <url><loc>/reference/gimap_annotate.html</loc></url>
 <url><loc>/reference/gimap_filter.html</loc></url>
 <url><loc>/reference/gimap_normalize.html</loc></url>
+<url><loc>/reference/gimap_object.html</loc></url>
 <url><loc>/reference/gimap_rep_stats.html</loc></url>
+<url><loc>/reference/gimap_stats.html</loc></url>
 <url><loc>/reference/hello.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/key_encrypt_creds_path.html</loc></url>
+<url><loc>/reference/pipe.html</loc></url>
 <url><loc>/reference/plot_crispr.html</loc></url>
 <url><loc>/reference/plot_exp_v_obs_scatter.html</loc></url>
 <url><loc>/reference/plot_rank_scatter.html</loc></url>
+<url><loc>/reference/plot_targets.html</loc></url>
 <url><loc>/reference/plot_targets_bar.html</loc></url>
 <url><loc>/reference/plot_theme.html</loc></url>
 <url><loc>/reference/plot_volcano.html</loc></url>
@@ -41,5 +54,6 @@
 <url><loc>/reference/save_tbl.html</loc></url>
 <url><loc>/reference/setup_data.html</loc></url>
 <url><loc>/reference/supported_cell_lines.html</loc></url>
+<url><loc>/reference/tpm_setup.html</loc></url>
 </urlset>
 

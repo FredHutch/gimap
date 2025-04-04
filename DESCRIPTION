@@ -29,7 +29,6 @@ Imports:
     pheatmap,
     purrr,
     janitor,
-    broom,
     utils,
     stats,
     stringr, 

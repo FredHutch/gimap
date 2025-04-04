@@ -19,7 +19,7 @@ utils::globalVariables(c(
   "mean_single_crispr_1", "expected_single_crispr", "double_crispr", "double_gi_score",
   "fdr", "lfc", "mean_expected_cs", "mean_gi_score", "mean_single_crispr",
   "expected_double_crispr", "p_val", "single_gi_score", "Rank", "broad_target_type",
-  "logfdr", "pointColor", "both", "mean_score"
+  "logfdr", "pointColor", "both", "mean_score", "gi_score", "Day05_RepA"
 ))
 
 
@@ -47,7 +47,6 @@ utils::globalVariables(c(
 get_example_data <- function(which_data,
                              data_dir = system.file("extdata", package = "gimap"),
                              refresh_data = FALSE) {
-
   file_name <- switch(which_data,
     "count" = "PP_pgPEN_HeLa_counts.txt",
     "count_treatment" = "counts_pgPEN_PC9_example.tsv",
@@ -198,7 +197,7 @@ key_encrypt_creds_path <- function() {
 #'   file_name = "Achilles_common_essentials.csv",
 #'   output_dir = tempdir()
 #' )
-#'}
+#' }
 get_figshare <- function(file_name = NA,
                          item = "19700056",
                          output_dir = tempdir(),
@@ -288,13 +287,14 @@ NULL
 #' delete_example_data()
 #'
 delete_example_data <- function() {
-
-  data_list <- list("count" = NULL,
-                    "count_treatment" = NULL,
-                    "meta" = NULL,
-                    "gimap" = NULL,
-                    "gimap_treatment" = NULL,
-                    "annotation" = NULL)
+  data_list <- list(
+    "count" = NULL,
+    "count_treatment" = NULL,
+    "meta" = NULL,
+    "gimap" = NULL,
+    "gimap_treatment" = NULL,
+    "annotation" = NULL
+  )
 
   message("Deleting the example data files listed in options")
   unlink(options(names(data_list)))

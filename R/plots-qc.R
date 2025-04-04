@@ -138,7 +138,7 @@ qc_variance_hist <- function(gimap_dataset, filter_replicates_target_col = NULL,
 #' @import dplyr
 #' @return a ggplot barplot
 #' @export
-#' @examples
+#' @examples \dontrun{
 #' gimap_dataset <- get_example_data("gimap")
 #' qc_constructs_countzero_bar(gimap_dataset)
 #'
@@ -154,7 +154,7 @@ qc_variance_hist <- function(gimap_dataset, filter_replicates_target_col = NULL,
 #'   filter_zerocount_target_col = 3:5,
 #'   filter_replicates_target_col = 3:5
 #' )
-#'
+#' }
 qc_constructs_countzero_bar <- function(gimap_dataset,
                                         filter_zerocount_target_col = NULL,
                                         filter_replicates_target_col = NULL,
