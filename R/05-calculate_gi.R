@@ -50,10 +50,13 @@
 #' @examples \donttest{
 #'
 #' gimap_dataset <- get_example_data("gimap",
-#'                                   data_dir = tempdir()) %>%
+#'   data_dir = tempdir()
+#' ) %>%
 #'   gimap_filter() %>%
-#'   gimap_annotate(cell_line = "HELA",
-#'                  annot_dir = tempdir()) %>%
+#'   gimap_annotate(
+#'     cell_line = "HELA",
+#'     annot_dir = tempdir()
+#'   ) %>%
 #'   gimap_normalize(
 #'     timepoints = "day",
 #'     missing_ids_file = tempfile()
@@ -177,19 +180,20 @@ calc_gi <- function(.data = NULL,
       mean_single_crispr = mean(crispr_score, na.rm = TRUE),
       # Note this is now the mean of all the control sequences for a particular target
       mean_double_control_crispr = mean(mean_double_control_crispr),
-      .groups = "drop") %>%
+      .groups = "drop"
+    ) %>%
     dplyr::select(
       pgRNA_target,
       targeting_gRNA_seq,
       mean_single_crispr,
       mean_double_control_crispr
     ) %>%
-      ## calculate expected single-targeting GI score by summing the
-      ## single-targeting and the mean_double_control_crispr
-      dplyr::mutate(
-        expected_single_crispr = mean_single_crispr + mean_double_control_crispr,
-      )
-     # TODO: Ask alice do we want to combine target sequences as well?
+    ## calculate expected single-targeting GI score by summing the
+    ## single-targeting and the mean_double_control_crispr
+    dplyr::mutate(
+      expected_single_crispr = mean_single_crispr + mean_double_control_crispr,
+    )
+  # TODO: Ask alice do we want to combine target sequences as well?
 
   # This will be added on to the double crispr df
   expected_single_crispr_df <- single_crispr_df %>%
@@ -238,7 +242,8 @@ calc_gi <- function(.data = NULL,
   # by each rep but we found doing a single linear model made more sense for
   # expectation calculations
   gimap_dataset$linear_model <- lm(mean_single_crispr ~ expected_single_crispr,
-                                   data = single_crispr_df)
+    data = single_crispr_df
+  )
 
   # Pull out the intercept and slope
   calc_slope <- gimap_dataset$linear_model$coefficients[["expected_single_crispr"]]
@@ -296,10 +301,12 @@ calc_gi <- function(.data = NULL,
       pgRNA_target
     ) %>%
     # Collapse to one mean per target now that we've tested
-    dplyr::summarize(mean_observed_cs = mean(mean_observed_cs, na.rm = TRUE),
-                     mean_expected_cs = mean(mean_expected_cs, na.rm = TRUE),
-                     gi_score = mean(gi_score, na.rm = TRUE),
-                     target_type = "gene_gene")
+    dplyr::summarize(
+      mean_observed_cs = mean(mean_observed_cs, na.rm = TRUE),
+      mean_expected_cs = mean(mean_expected_cs, na.rm = TRUE),
+      gi_score = mean(gi_score, na.rm = TRUE),
+      target_type = "gene_gene"
+    )
 
   gi_calc_single_clean <- gi_calc_single %>%
     dplyr::mutate(target_type = dplyr::case_when(

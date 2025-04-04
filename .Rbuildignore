@@ -40,3 +40,4 @@ SECURITY.md
 vignettes/example_qc_report.Rmd
 output_timepoints
 output_treatment
+docs/*

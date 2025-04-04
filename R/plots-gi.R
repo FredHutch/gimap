@@ -276,13 +276,13 @@ plot_targets <- function(gimap_dataset, target1, target2, reps_to_drop = "") {
   }
 
   expected_col <- ifelse("crispr_score" %in% colnames(gimap_dataset$normalized_log_fc),
-                         "crispr_score",
-                         "lfc"
+    "crispr_score",
+    "lfc"
   )
 
   gplot_data <- gimap_dataset$normalized_log_fc %>%
-      dplyr::filter(gene1_symbol == target1 | gene2_symbol == target2) %>%
-      filter(!(rep %in% reps_to_drop))
+    dplyr::filter(gene1_symbol == target1 | gene2_symbol == target2) %>%
+    filter(!(rep %in% reps_to_drop))
 
 
   if (nrow(gplot_data) == 0) {
@@ -294,7 +294,7 @@ plot_targets <- function(gimap_dataset, target1, target2, reps_to_drop = "") {
       y = !!sym(expected_col),
       x = target_type
     )) +
-    geom_boxplot(aes(fill = target_type), outlier.shape = NA)  +
+    geom_boxplot(aes(fill = target_type), outlier.shape = NA) +
     scale_x_discrete(labels = c(
       "ctrl_gene" = paste0(target2, " KO"),
       # this assumes that target2 is the ctrl_{target2} gene
@@ -303,7 +303,8 @@ plot_targets <- function(gimap_dataset, target1, target2, reps_to_drop = "") {
       "gene_gene" = "DKO"
     )) +
     geom_jitter(aes(x = target_type, y = crispr_score, color = pg_ids),
-                pch = 21, size = 1, width = .2) +
+      pch = 21, size = 1, width = .2
+    ) +
     theme_bw() +
     xlab("") +
     ggtitle(paste0(target1, "/", target2)) +
