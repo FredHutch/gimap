@@ -17,7 +17,7 @@ authors:
   - name: Kate Isaac
     orcid: 0000-0001-8701-4197
     affiliation: 1
-  - name: Daniel Grosso
+  - name: Daniel Groso
     affiliation: 1
   - name: Siobhan O'Brien
     orcid: 0000-0003-4958-1080
@@ -40,11 +40,11 @@ The gimap (Genetic Interaction MAPping) R package addresses a fundamental challe
 
 # Statement of Need
 
-When genes have backup copies in our genome, a common result of evolutionary processes, it becomes challenging to understand their true functions [citation suggestion?]. This redundancy makes it hard to identify effective therapeutic targets using traditional methods that disable just one gene at a time [citation suggestion?]. A more effective approach involves disabling two genes simultaneously to reveal these backup relationships [@thompson_combinatorial_2021].
+When genes have backup copies in our genome, a common result of evolutionary processes, it becomes challenging to understand their true functions (https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1008466). This redundancy makes it hard to identify effective therapeutic targets using traditional methods that disable just one gene at a time [citation suggestion?]. A more effective approach involves disabling two genes simultaneously to reveal these backup relationships [@thompson_combinatorial_2021].
 
-Recent advances in CRISPR technology now allow researchers to knock out gene pairs at once, offering a powerful solution to this problem [citation suggestion?]. Although software solutions exist for single knockout CRISPR software methods exist, such as MAGeCK, there is no standardized software solution for paired gene CRISPR studies [@mageck].
+Recent advances in CRISPR technology now allow researchers to knock out gene pairs at once, offering a powerful solution to this problem (https://pubmed.ncbi.nlm.nih.gov/31911676/). Although software solutions exist for single knockout CRISPR, such as MAGeCK, there is no standardized software solution for paired gene CRISPR studies [@mageck].
 
-R package called `gimap` (Genetic Interaction MAPping) was developed specifically for analyzing these dual-target CRISPR experiments. It helps researchers identify important relationships between genes, such as when two genes work together or when disabling both creates a dramatic effect that wouldn't occur by disabling either one alone.
+R-package called `gimap` (Genetic Interaction MAPping) was developed specifically for analyzing these dual-target CRISPR experiments. It helps researchers identify important relationships between genes, such as when two genes work together or when disabling both creates a dramatic effect that wouldn't occur by disabling either one alone.
 
 `gimap` is specifically tailored to handle the unique characteristics of paired guide CRISPR data, including the distinction between single-targeting and double-targeting constructs and the need to account for differential double-strand break effects. The package seamlessly integrates with data generated using a specialized pgPEN library but can be adapted for any paired-guide CRISPR screening approach [@parrish_discovery_2021].
 
@@ -56,7 +56,7 @@ R package called `gimap` (Genetic Interaction MAPping) was developed specificall
 
 In order to ensure usability for the research community we built `gimap` using the following design philosophy.
 
-1. Making best practices are default options and including warning messages for when alternative options are chose (e.g. if filtering has not been applied).  
+1. Making best practices as default options and including warning messages for when alternative options are chosen (e.g. if filtering has not been applied).  
 2. We also tried to mimic usage elements from familiar packages such as fastqc reports (our `run_qc()` function creates such a report) [@fastqc].
 3. Try to document and inform users of the statistics and decisions that have been made by the software clearly!
 
@@ -73,7 +73,7 @@ In order to ensure usability for the research community we built `gimap` using t
    GI score = observed score - (intercept + slope × expected score)
    ```
 
-4. **Statistical Analysis**: T-tests compare the distribution of double-targeting genetic interaction scores against the background distribution of single-targeting scores, with false discovery rate correction for multiple hypothesis testing.
+4. **Statistical Analysis**: t-tests compare the distribution of double-targeting genetic interaction scores against the background distribution of single-targeting scores, with false discovery rate correction for multiple hypothesis testing.
 
 The package provides comprehensive visualization tools including volcano plots to highlight significant genetic interactions and detailed result tables for further analysis.
 
@@ -143,6 +143,6 @@ Individual target pairs like the gene pair CNOT7 and CNOT8 can be plotted using:
 
 # Acknowledgements
 
-This work is funded by NCI grant R01CA262556 and the Translational Data Science IRC of Fred Hutchinson Cancer Center.
+This work is funded by NCI grant R01CA262556 and the Translational Data Science IRC of Fred Hutchinson Cancer Center. SO is a Washington Research Foundation postdoctoral fellow. 
 
 # References
