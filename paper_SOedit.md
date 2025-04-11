@@ -19,6 +19,8 @@ authors:
     affiliation: 1
   - name: Daniel Groso
     affiliation: 1
+  - name: Marissa Fujimoto
+    affiliation: 1
   - name: Siobhan O'Brien
     orcid: 0000-0003-4958-1080
     affiliation: 1
