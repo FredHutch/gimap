@@ -17,7 +17,9 @@ authors:
   - name: Kate Isaac
     orcid: 0000-0001-8701-4197
     affiliation: 1
-  - name: Daniel Grosso
+  - name: Daniel Groso
+    affiliation: 1
+  - name: Marissa Fujimoto
     affiliation: 1
   - name: Siobhan O'Brien
     orcid: 0000-0003-4958-1080
@@ -42,7 +44,7 @@ The gimap (Genetic Interaction MAPping) R package addresses a fundamental challe
 
 When multiple genes have the same function, a common result of evolutionary processes, it becomes challenging to isolate their true functions. This redundancy makes it hard to identify effective therapeutic targets using traditional methods that disable just one gene at a time [citation suggestion?]. A more effective approach involves disabling two genes simultaneously to reveal these backup relationships [@thompson_combinatorial_2021].
 
-Recent advances in CRISPR technology now allow researchers to knock out gene pairs at once, offering a powerful solution to this problem [citation suggestion?]. Although software solutions exist for single knockout CRISPR software methods exist, such as MAGeCK, there is no standardized software solution for paired gene CRISPR studies [@mageck].
+Recent advances in CRISPR technology now allow researchers to knock out gene pairs at once, offering a powerful solution to this problem (https://pubmed.ncbi.nlm.nih.gov/31911676/). Although software solutions exist for single knockout CRISPR, such as MAGeCK, there is no standardized software solution for paired gene CRISPR studies [@mageck].
 
 The R package, called `gimap` (Genetic Interaction MAPping), was developed specifically for analyzing these dual-target CRISPR experiments. It helps researchers identify important relationships between genes, such as when two genes work together or when disabling both creates a dramatic effect that wouldn't occur by disabling either one alone.
 
@@ -56,7 +58,7 @@ The R package, called `gimap` (Genetic Interaction MAPping), was developed speci
 
 In order to ensure usability for the research community we built `gimap` using the following design philosophy.
 
-1. Making best practices are default options and including warning messages for when alternative options are chose (e.g. if filtering has not been applied).  
+1. Making best practices as default options and including warning messages for when alternative options are chosen (e.g. if filtering has not been applied).  
 2. We also tried to mimic usage elements from familiar packages such as fastqc reports (our `run_qc()` function creates such a report) [@fastqc].
 3. Try to document and inform users of the statistics and decisions that have been made by the software clearly!
 
@@ -143,6 +145,6 @@ Individual target pairs like the gene pair CNOT7 and CNOT8 can be plotted using:
 
 # Acknowledgements
 
-This work is funded by NCI grant R01CA262556 and the Translational Data Science IRC of Fred Hutchinson Cancer Center.
+This work is funded by NCI grant R01CA262556 and the Translational Data Science IRC of Fred Hutchinson Cancer Center. SO is a Washington Research Foundation postdoctoral fellow. 
 
 # References
