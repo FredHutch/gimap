@@ -36,17 +36,17 @@ bibliography: paper.bib
 
 # Summary
 
-The gimap (Genetic Interaction MAPping) R package addresses a fundamental challenge in genomic research: the difficulty of understanding gene function when backup copies exist. Gene redundancy makes traditional single-gene knockout methods ineffective for identifying therapeutic targets, as backup genes can mask the effects when a single gene is disabled. gimap offers a solution by providing a comprehensive framework for analyzing dual-target CRISPR screening data, where two genes are simultaneously disabled to reveal their backup relationships. The package processes raw count data through a multi-step pipeline that includes normalization, calculation of expected and observed CRISPR scores, computation of genetic interaction scores, and statistical analysis to identify significant interactions. Unlike general  tools, gimap is specifically tailored for paired guide CRISPR data with built-in quality control reporting and visualization tools. The package makes best practices the default options and is available on GitHub with comprehensive documentation to support the research community in extracting meaningful insights from complex genetic screening experiments.
+The gimap (Genetic Interaction MAPping) R package addresses a fundamental challenge in genomic research: the difficulty of understanding combinatorial interactions among genes. Gene redundancy makes traditional single-gene knockout methods ineffective for identifying therapeutic targets, as backup genes can mask the effects when a single gene is disabled. gimap offers a solution by providing a comprehensive framework for analyzing dual-target CRISPR screening data, where two genes are simultaneously disabled to reveal their backup relationships. This software implements the methods used by @parrish_discovery_2021. The package processes raw count data through a multi-step pipeline that includes normalization, calculation of expected and observed CRISPR scores, computation of genetic interaction scores, and statistical analysis to identify significant interactions. Unlike general  tools, gimap is specifically tailored for paired guide CRISPR data with built-in quality control reporting and visualization tools. The package makes best practices the default options and is available on GitHub with comprehensive documentation to support the research community in extracting meaningful insights from complex genetic screening experiments.
 
 # Statement of Need
 
-When genes have backup copies in our genome, a common result of evolutionary processes, it becomes challenging to understand their true functions [citation suggestion?]. This redundancy makes it hard to identify effective therapeutic targets using traditional methods that disable just one gene at a time [citation suggestion?]. A more effective approach involves disabling two genes simultaneously to reveal these backup relationships [@thompson_combinatorial_2021].
+When multiple genes have the same function, a common result of evolutionary processes, it becomes challenging to isolate their true functions. This redundancy makes it hard to identify effective therapeutic targets using traditional methods that disable just one gene at a time [citation suggestion?]. A more effective approach involves disabling two genes simultaneously to reveal these backup relationships [@thompson_combinatorial_2021].
 
 Recent advances in CRISPR technology now allow researchers to knock out gene pairs at once, offering a powerful solution to this problem [citation suggestion?]. Although software solutions exist for single knockout CRISPR software methods exist, such as MAGeCK, there is no standardized software solution for paired gene CRISPR studies [@mageck].
 
-R package called `gimap` (Genetic Interaction MAPping) was developed specifically for analyzing these dual-target CRISPR experiments. It helps researchers identify important relationships between genes, such as when two genes work together or when disabling both creates a dramatic effect that wouldn't occur by disabling either one alone.
+The R package, called `gimap` (Genetic Interaction MAPping), was developed specifically for analyzing these dual-target CRISPR experiments. It helps researchers identify important relationships between genes, such as when two genes work together or when disabling both creates a dramatic effect that wouldn't occur by disabling either one alone.
 
-`gimap` is specifically tailored to handle the unique characteristics of paired guide CRISPR data, including the distinction between single-targeting and double-targeting constructs and the need to account for differential double-strand break effects. The package seamlessly integrates with data generated using a specialized pgPEN library but can be adapted for any paired-guide CRISPR screening approach [@parrish_discovery_2021].
+`gimap` is specifically tailored to handle the unique characteristics of paired guide CRISPR data, including the distinction between single-targeting and double-targeting constructs and the need to account for differential double-strand break effects. The package seamlessly integrates with data generated using a specialized pgPEN library but can be adapted for most paired guide CRISPR screening approaches [@parrish_discovery_2021].
 
 # Implementation
 
@@ -64,16 +64,16 @@ In order to ensure usability for the research community we built `gimap` using t
 
 `gimap` implements a multi-step analysis pipeline:
 
-1. **Normalization**: Raw count data is transformed into log2 counts per million (CPM) and adjusted by subtracting pre-treatment values to obtain log2 fold changes. These are further normalized based on the distribution of negative and positive controls.
+![gimap workflow completes 3 main steps.\label{fig:example}](figure1.png)
 
-2. **Expected Score Calculation**: For double-targeting constructs, expected CRISPR scores are calculated as the sum of the corresponding single-targeting scores. For single-targeting constructs, the expected score combines the single-target effect with the mean effect of control constructs.
+1. **Normalize Data**: Raw count data is transformed into log2 counts per million (CPM) and adjusted by subtracting pre-treatment values to obtain log2 fold changes. These are further normalized based on the distribution of negative  (e.g. safe-targeting or non-targeting controls) and positive controls (pgRNAs targeting known essential genes).
 
-3. **Genetic Interaction Scoring**: Interaction scores represent the difference between observed and expected CRISPR scores, adjusted using a linear model to account for systematic biases:
+2. **Score Genetic Interactions**: For double-targeting constructs, expected CRISPR scores are calculated as the sum of the corresponding single-targeting scores. For single-targeting constructs, the expected score combines the single-target effect with the mean effect of control constructs. Interaction scores represent the difference between observed and expected CRISPR scores, adjusted using a linear model to account for systematic biases:
    ```
    GI score = observed score - (intercept + slope × expected score)
    ```
 
-4. **Statistical Analysis**: T-tests compare the distribution of double-targeting genetic interaction scores against the background distribution of single-targeting scores, with false discovery rate correction for multiple hypothesis testing.
+3. **Calculate Statistics**: T-tests compare the distribution of double-targeting genetic interaction scores against the background distribution of single-targeting scores, with false discovery rate correction for multiple hypothesis testing.
 
 The package provides comprehensive visualization tools including volcano plots to highlight significant genetic interactions and detailed result tables for further analysis.
 
