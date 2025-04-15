@@ -70,35 +70,32 @@ In order to ensure usability for the research community we built `gimap` using t
 
 1. **Normalize Data**: Raw count data is transformed into log2 counts per million (CPM) and adjusted by subtracting pre-treatment values to obtain log2 fold changes. These are further normalized based on the distribution of negative  (e.g. safe-targeting or non-targeting controls) and positive controls (pgRNAs targeting known essential genes).
 
-  a. **Log2 Counts Per Million (CPM) Transformation**:
-    - Let $C_{i,j}$ be the raw count for gene $i$ in sample $j$
-    - Let $N_j$ be the total number of counts in sample $j$
+a. _Log2 Counts Per Million (CPM) Transformation_:
+- Let $C_{i,j}$ be the raw count for gene $i$ in sample $j$
+- Let $N_j$ be the total number of counts in sample $j$
 
-    The log2 CPM transformation is:
-    $$L_{i,j} = \log_2\left(\frac{C_{i,j} \times 10^6}{N_j} + 1\right)$$
-    (The +1 is often included to avoid log(0) issues)
+$$L_{i,j} = \log_2\left(\frac{C_{i,j} \times 10^6}{N_j} + 1\right)$$
+(The +1 is often included to avoid log(0) issues)
 
-  b. **Adjustment by Pre-treatment Values**:
-    - Let $L_{i,j}^{post}$ be the log2 CPM value post-treatment
-    - Let $L_{i,j}^{pre}$ be the log2 CPM value pre-treatment
+b. _Adjustment by Pre-treatment Values_:
+- Let $L_{i,j}^{post}$ be the log2 CPM value post-treatment
+- Let $L_{i,j}^{pre}$ be the log2 CPM value pre-treatment
 
-   The log2 fold change is:
-   $$LFC_{i,j} = L_{i,j}^{post} - L_{i,j}^{pre}$$
+$$LFC_{i,j} = L_{i,j}^{post} - L_{i,j}^{pre}$$
 
-  c. **Normalization Based on Controls**:
-    - Let $LFC_{i,j}$ be the log2 fold change calculated above
-    - Let $\mu_{neg}$ and $\sigma_{neg}$ be the mean and standard deviation of negative controls (safe-targeting or non-targeting)
-    - Let $\mu_{pos}$ and $\sigma_{pos}$ be the mean and standard deviation of positive controls (pgRNAs targeting essential genes)
+c. _Normalization Based on Controls_:
+- Let $LFC_{i,j}$ be the log2 fold change calculated above
+- Let $\mu_{neg}$ and $\sigma_{neg}$ be the mean and standard deviation of negative controls (safe-targeting or non-targeting)
+- Let $\mu_{pos}$ and $\sigma_{pos}$ be the mean and standard deviation of positive controls (pgRNAs targeting essential genes)
 
-    The normalized score is:
-    $$Z_{i,j} = \frac{LFC_{i,j} - \mu_{neg}}{\mu_{neg} - \mu_{pos}}$$
+$$Z_{i,j} = \frac{LFC_{i,j} - \mu_{neg}}{\mu_{neg} - \mu_{pos}}$$
 
-    Or alternatively, using a more complex normalization that accounts for the distributions of both control types:
-    $$Z_{i,j} = \frac{LFC_{i,j} - \mu_{neg}}{\sigma_{neg}} \times \frac{\sigma_{pos}}{\mu_{neg} - \mu_{pos}}$$
+Or alternatively, using a more complex normalization that accounts for the distributions of both control types:
+$$Z_{i,j} = \frac{LFC_{i,j} - \mu_{neg}}{\sigma_{neg}} \times \frac{\sigma_{pos}}{\mu_{neg} - \mu_{pos}}$$
 
 This equation represents the transformation from raw count data to normalized log2 fold changes, calibrated against both negative and positive control distributions.
 
-2. **Score Genetic Interactions**: For double-targeting constructs, expected CRISPR scores are calculated as the sum of the corresponding single-targeting scores. For single-targeting constructs, the expected score combines the single-target effect with the mean effect of control constructs. Interaction scores represent the difference between observed and expected CRISPR scores, adjusted using a linear model to account for systematic biases:
+2. **Score Genetic Interactions**: For double-targeting constructs, expected CRISPR scores are calculated as the sum of the corresponding single-targeting scores. For single-targeting constructs, the expected score combines the single-target effect with the mean effect of control constructs. Interaction scores represent the difference between observed and expected CRISPR scores, adjusted using a linear model to account for systematic biases.
 
 For double-targeting constructs:
 - Let $S_{i,j}^{obs}$ be the observed CRISPR score for a construct targeting genes $i$ and $j$
@@ -150,7 +147,7 @@ Then, to account for multiple hypothesis testing, we apply false discovery rate 
    $$p_{(k)} \leq \frac{k}{m} \cdot \alpha$$
 3. Reject the null hypothesis for all tests with p-values $\leq p_{(k)}$
 
-The package provides comprehensive visualization tools including volcano plots to highlight significant genetic interactions and detailed result tables for further analysis.
+The package also provides comprehensive visualization tools including volcano plots to highlight significant genetic interactions and detailed result tables for further analysis.
 
 # Use Cases
 
