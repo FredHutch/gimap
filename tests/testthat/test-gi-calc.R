@@ -4,7 +4,8 @@ test_that("Test Genetic Interaction score calculations", {
     gimap_filter() %>%
     gimap_annotate(cell_line = "HELA") %>%
     gimap_normalize(
-      timepoints = "day"
+      timepoints = "day",
+      missing_ids_file = tempfile()
     ) %>%
     calc_gi()
 
@@ -42,7 +43,8 @@ test_that("Test Genetic Interaction score calculations using LFC", {
     gimap_annotate(cell_line = "HELA") %>%
     gimap_normalize(
       timepoints = "day",
-      adj_method = "no_adjustment"
+      adj_method = "no_adjustment",
+      missing_ids_file = tempfile()
     ) %>%
     calc_gi(use_lfc = TRUE)
 
@@ -58,6 +60,7 @@ test_that("Test Genetic Interaction score without normalization", {
     gimap_normalize(
       normalize_by_unexpressed = FALSE,
       timepoints = "day",
+      missing_ids_file = tempfile()
     ) %>%
     calc_gi()
 
@@ -67,6 +70,7 @@ test_that("Test Genetic Interaction score without normalization", {
     gimap_normalize(
       normalize_by_unexpressed = TRUE,
       timepoints = "day",
+      missing_ids_file = tempfile()
     ) %>%
     calc_gi()
 
