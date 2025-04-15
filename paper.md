@@ -66,11 +66,9 @@ In order to ensure usability for the research community we built `gimap` using t
 
 `gimap` implements a multi-step analysis pipeline:
 
-![gimap workflow completes 3 main steps. Part A, B, and C of the figure show the major steps of the workflow which are to normalize the data through a multi step process, score genetic interactions based on the expected versus observed scores, and finally to calculate statistics to identify statistically significant genetic interactions \label{fig:example}](figure1.png)
+![gimap workflow completes 3 main steps. Part A, B, and C of the figure show the major steps of the workflow which are to normalize the data through a multi step process, score genetic interactions based on the expected versus observed scores, and finally to calculate statistics to identify statistically significant genetic interactions.](figure.png)
 
 1. **Normalize Data**: Raw count data is transformed into log2 counts per million (CPM) and adjusted by subtracting pre-treatment values to obtain log2 fold changes. These are further normalized based on the distribution of negative  (e.g. safe-targeting or non-targeting controls) and positive controls (pgRNAs targeting known essential genes).
-
-Here's the mathematical representation of the transformation process described:
 
   a. **Log2 Counts Per Million (CPM) Transformation**:
     - Let $C_{i,j}$ be the raw count for gene $i$ in sample $j$
