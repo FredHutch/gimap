@@ -8,11 +8,11 @@
 #' @importFrom ggplot2 ggplot labs
 #' @return counts_cdf a ggplot
 #' @export
-#' @examples
+#' @examples \dontrun{
 #'
 #' gimap_dataset <- get_example_data("gimap")
 #' qc_cdf(gimap_dataset)
-#'
+#'}
 qc_cdf <- function(gimap_dataset, wide_ar = 0.75) {
   long_form <-
     tidyr::pivot_longer(data.frame(gimap_dataset$transformed_data$log2_cpm),
@@ -45,10 +45,10 @@ qc_cdf <- function(gimap_dataset, wide_ar = 0.75) {
 #' @import ggplot2
 #' @return sample_cpm_histogram a ggplot
 #' @export
-#' @examples
+#' @examples \dontrun{
 #' gimap_dataset <- get_example_data("gimap")
 #' qc_sample_hist(gimap_dataset)
-#'
+#' }
 qc_sample_hist <- function(gimap_dataset, wide_ar = 0.75) {
   long_form <-
     tidyr::pivot_longer(data.frame(gimap_dataset$transformed_data$log2_cpm),
@@ -86,10 +86,10 @@ qc_sample_hist <- function(gimap_dataset, wide_ar = 0.75) {
 #' @import dplyr
 #' @return a ggplot histogram
 #' @export
-#' @examples
+#' @examples \dontrun{
 #' gimap_dataset <- get_example_data("gimap")
 #' qc_variance_hist(gimap_dataset)
-#'
+#' }
 qc_variance_hist <- function(gimap_dataset, filter_replicates_target_col = NULL, wide_ar = 0.75) {
   if (is.null(filter_replicates_target_col)) {
     filter_replicates_target_col <- c(
@@ -208,10 +208,10 @@ qc_constructs_countzero_bar <- function(gimap_dataset,
 #' @importFrom stats cor
 #' @return `sample_cor_heatmap` a pheatmap
 #' @export
-#' @examples
+#' @examples \dontrun{
 #' gimap_dataset <- get_example_data("gimap")
 #' qc_cor_heatmap(gimap_dataset)
-#'
+#' }
 qc_cor_heatmap <- function(gimap_dataset) {
   cpm_cor <- gimap_dataset$transformed_data$cpm %>%
     cor() %>%
@@ -243,7 +243,7 @@ qc_cor_heatmap <- function(gimap_dataset) {
 #' @export
 #' @import ggplot2
 #' @return a ggplot histogram
-#' @examples
+#' @examples \dontrun{
 #'
 #' gimap_dataset <- get_example_data("gimap")
 #'
@@ -258,7 +258,7 @@ qc_cor_heatmap <- function(gimap_dataset) {
 #' # or to specify a "cutoff" value that will be displayed as a dashed vertical
 #' # line as well as to specify a different column (or set of columns) to select
 #' qc_plasmid_histogram(gimap_dataset, cutoff = 2, filter_plasmid_target_col = 1:2)
-#'
+#' }
 qc_plasmid_histogram <- function(gimap_dataset,
                                  cutoff = NULL,
                                  filter_plasmid_target_col = NULL,
