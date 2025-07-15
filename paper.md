@@ -151,10 +151,10 @@ The package also provides comprehensive visualization tools including volcano pl
 
 # Use Cases
 
-`gimap` has been successfully used to identify synthetic lethal interactions among paralog genes in cancer cell lines, revealing potential therapeutic targets where single-gene approaches have failed. The package accommodates various experimental designs, including time-course studies and treatment comparisons, offering flexibility for diverse research questions.
+`gimap` has been successfully used to identify synthetic lethal interactions among paralog genes in cancer cell lines, revealing potential therapeutic targets that single-gene approaches have missed. The package accommodates various experimental designs, including time-course studies and treatment comparisons, offering flexibility for diverse research questions.
 
 _Example applications include:_  
-- Identification of backup genes that provide functional redundancy in critical cellular pathways  
+- Identification of genes that provide functional redundancy in critical cellular pathways  
 - Discovery of context-dependent genetic interactions that emerge under specific conditions or treatments  
 - Systematic mapping of gene networks based on functional interactions rather than physical associations  
 
@@ -164,6 +164,6 @@ _Example applications include:_
 
 # Acknowledgements
 
-This work is funded by NCI grant R01CA262556 and the Translational Data Science IRC of Fred Hutchinson Cancer Center. SO is a Washington Research Foundation postdoctoral fellow.
+This work is funded by NCI grant R01CA262556 and the Translational Data Science Integrated Research Center of Fred Hutchinson Cancer Center. SO is a Washington Research Foundation postdoctoral fellow.
 
 # References
