@@ -12,7 +12,7 @@
 #'
 #' gimap_dataset <- get_example_data("gimap")
 #' qc_cdf(gimap_dataset)
-#'}
+#' }
 qc_cdf <- function(gimap_dataset, wide_ar = 0.75) {
   long_form <-
     tidyr::pivot_longer(data.frame(gimap_dataset$transformed_data$log2_cpm),
