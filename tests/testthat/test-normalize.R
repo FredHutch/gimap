@@ -4,7 +4,8 @@ test_that("Test normalization", {
     gimap_filter() %>%
     gimap_annotate(cell_line = "HELA") %>%
     gimap_normalize(
-      timepoints = "day"
+      timepoints = "day",
+      missing_ids_file = tempfile()
     )
 
   # make sure the important columns are there
@@ -43,7 +44,8 @@ test_that("Test normalization without expression cutoff", {
     gimap_annotate(cell_line = "HELA") %>%
     gimap_normalize(
       timepoints = "day",
-      normalize_by_unexpressed = TRUE
+      normalize_by_unexpressed = TRUE,
+      missing_ids_file = tempfile()
     )
 
   gimap_dataset_false <- get_example_data("gimap") %>%
@@ -51,11 +53,12 @@ test_that("Test normalization without expression cutoff", {
     gimap_annotate(cell_line = "HELA") %>%
     gimap_normalize(
       timepoints = "day",
-      normalize_by_unexpressed = FALSE
+      normalize_by_unexpressed = FALSE,
+      missing_ids_file = tempfile()
     )
 
   testthat::expect_true(
     all(gimap_dataset_true$normalized_log_fc$lfc[1:6] !=
-          gimap_dataset_false$normalized_log_fc$lfc[1:6]))
-
+      gimap_dataset_false$normalized_log_fc$lfc[1:6])
+  )
 })

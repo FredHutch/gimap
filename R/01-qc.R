@@ -27,7 +27,7 @@
 #' @importFrom utils browseURL
 #' @importFrom tidyr pivot_longer
 #' @importFrom magrittr %>%
-#' @examples
+#' @examples \dontrun{
 #'
 #' gimap_dataset <- get_example_data("gimap")
 #'
@@ -36,7 +36,7 @@
 #'   plots_dir = tempdir(),
 #'   output_file = paste0(tempfile(), "_QC_Report.Rmd")
 #' )
-#'
+#' }
 run_qc <- function(gimap_dataset,
                    output_file,
                    plots_dir,
