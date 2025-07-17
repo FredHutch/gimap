@@ -79,7 +79,8 @@ get_example_data <- function(which_data,
       )
     }
   } else {
-    
+    save_example_timepoint_data()
+    save_example_treatment_data()
   }
   
   dataset <- switch(which_data,
@@ -347,11 +348,3 @@ delete_example_data <- function() {
   options(data_list)
 }
 
-.onLoad <- function(libname, pkgname) {
-  # This runs when the package is loaded (via library() or require())
-  # Good for one-time setup, checking dependencies, etc.
-  
-  # Example:
-  save_example_timepoint_data()
-  save_example_treatment_data()
-}
