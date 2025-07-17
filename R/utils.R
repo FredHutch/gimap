@@ -1,3 +1,4 @@
+
 utils::globalVariables(c(
   "pg_ids", "plot_theme()", "negative_control", "positive_control", "mean_observed_cs", "timepoints", "value", "timepoint_avg", "target_type",
   "unexpressed_ctrl_flag", "median", "lfc_adj", "median", "gRNA1_seq", "gRNA2_seq",
@@ -77,8 +78,6 @@ get_example_data <- function(which_data,
       )
     }
   } 
-  save_example_timepoint_data()
-  save_example_treatment_data()
   
   dataset <- switch(which_data,
     "count" = readr::read_tsv(file_path,
@@ -343,4 +342,13 @@ delete_example_data <- function() {
 
   # Set options as NULL
   options(data_list)
+}
+
+.onLoad <- function(libname, pkgname) {
+  # This runs when the package is loaded (via library() or require())
+  # Good for one-time setup, checking dependencies, etc.
+  
+  # Example:
+  save_example_timepoint_data()
+  save_example_treatment_data()
 }
