@@ -79,9 +79,11 @@ get_example_data <- function(which_data,
   } else {
     file_path <- file.path(data_dir, file_name)
 
-    save_example_timepoint_data()
-    save_example_treatment_data()
-    
+    if (which_data == "count") {
+      save_example_timepoint_data()
+    } else {
+      save_example_treatment_data()
+    }
   }
   dataset <- switch(which_data,
     "count" = readr::read_tsv(file_path,
@@ -123,9 +125,9 @@ save_example_timepoint_data <- function() {
     dplyr::select(!Day05_RepA)
 
   example_pg_metadata <- get_example_data("meta")
-
-  counts <- example_data %>%
-    select(c("pretreatment", "dmsoA", "dmsoB", "drug1A", "drug1B")) %>%
+  
+  example_counts <- example_data %>%
+    dplyr::select(c("Day00_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC")) %>%
     as.matrix()
 
   example_pg_id <- example_data %>%
@@ -135,8 +137,9 @@ save_example_timepoint_data <- function() {
     dplyr::select(c("id", "seq_1", "seq_2"))
 
   example_sample_metadata <- data.frame(
-    col_names = c("pretreatment", "dmsoA", "dmsoB", "drug1A", "drug1B"),
-    drug_treatment = as.factor(c("pretreatment", "dmso", "dmso", "drug", "drug"))
+    col_names = c("Day00_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC"),
+    day = as.numeric(c("0", "22", "22", "22")),
+    rep = as.factor(c("RepA", "RepA", "RepB", "RepC"))
   )
 
   gimap_dataset <- setup_data(
@@ -159,25 +162,23 @@ save_example_timepoint_data <- function() {
 #' @export
 #' @return Returns the file path to folder where the example data is stored
 save_example_treatment_data <- function() {
-  example_data <- get_example_data("count_treatment") %>%
-    dplyr::select(!Day05_RepA)
+  example_data <- get_example_data("count_treatment")
   
   example_pg_metadata <- get_example_data("meta")
   
   example_counts <- example_data %>%
-    dplyr::select(c("Day00_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC")) %>%
+    select(c("pretreatment", "dmsoA", "dmsoB", "drug1A", "drug1B")) %>%
     as.matrix()
   
   example_pg_id <- example_data %>%
     dplyr::select("id")
   
-  example_pg_metadata <- example_data %>%
-    dplyr::select(c("id", "seq_1", "seq_2"))
+  example_pg_metadata <- example_pg_metadata %>%
+    dplyr::select(c("pgRNA_ID", "target1_sgRNA_seq", "target1_sgRNA_seq"))
   
   example_sample_metadata <- data.frame(
-    col_names = c("Day00_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC"),
-    day = as.numeric(c("0", "22", "22", "22")),
-    rep = as.factor(c("RepA", "RepA", "RepB", "RepC"))
+    col_names = c("pretreatment", "dmsoA", "dmsoB", "drug1A", "drug1B"),
+    drug_treatment = as.factor(c("pretreatment", "dmso", "dmso", "drug", "drug"))
   )
   
   gimap_dataset <- setup_data(
