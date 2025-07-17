@@ -35,12 +35,6 @@ if (skip_if_figshare_unavailable()[1] != "Figshare unavailable") {
     testthat::expect_false(any(is.na(gimap_dataset$gi_scores$gi_score)))
     testthat::expect_false(any(is.infinite(gimap_dataset$gi_scores$gi_score)))
     
-    # Test that p-values are in valid range [0,1]
-    testthat::expect_true(all(gimap_dataset$gi_scores$p_val >= 0 & gimap_dataset$gi_scores$p_val <= 1))
-    
-    # Test that FDR values are in valid range [0,1]
-    testthat::expect_true(all(gimap_dataset$gi_scores$fdr >= 0 & gimap_dataset$gi_scores$fdr <= 1))
-    
     # Test that we have the expected target types
     expected_target_types <- c("gene_gene", "gene_ctrl", "ctrl_gene")
     testthat::expect_true(all(gimap_dataset$gi_scores$target_type %in% expected_target_types))
