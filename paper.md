@@ -95,7 +95,11 @@ $$Z_{i,j} = \frac{LFC_{i,j} - \mu_{neg}}{\sigma_{neg}} \times \frac{\sigma_{pos}
 
 This equation represents the transformation from raw count data to normalized log2 fold changes, calibrated against both negative and positive control distributions.
 
-2. **Score Genetic Interactions**: For double-targeting constructs, expected CRISPR scores are calculated as the sum of the corresponding single-targeting scores. For single-targeting constructs, the expected score combines the single-target effect with the mean effect of control constructs. Interaction scores represent the difference between observed and expected CRISPR scores, adjusted using a linear model to account for systematic biases.
+2. **Score Genetic Interactions**: The goal of this step is to quantify deviations from expected additive effects when two genes are simultaneously targeted, which allows us to identify true genetic interactions beyond what would be predicted from single-gene effects alone.
+
+We model a control distribution for non-interacting genes by assuming that in the absence of genetic interactions, the effect of simultaneously targeting two genes should be additive (i.e., the sum of their individual effects). We further assume that the observed genetic interaction (GI) score is a linear transformation of the expected GI score plus a consistent error term sampled from an approximately normal distribution. This error distribution is shared across all genes and is homoscedastic (constant variance) across expected GI scores, allowing us to use linear modeling approaches to account for systematic biases.
+
+For double-targeting constructs, expected CRISPR scores are calculated as the sum of the corresponding single-targeting scores. For single-targeting constructs, the expected score combines the single-target effect with the mean effect of control constructs. Interaction scores represent the difference between observed and expected CRISPR scores, adjusted using a linear model to account for systematic biases.
 
 For double-targeting constructs:
 - Let $S_{i,j}^{obs}$ be the observed CRISPR score for a construct targeting genes $i$ and $j$
@@ -116,15 +120,14 @@ The interaction score calculation, with adjustment for systematic biases:
 - Let $I_{i,j}$ be the interaction score for genes $i$ and $j$
 - Let $S_{i,j}^{obs}$ be the observed score
 - Let $S_{i,j}^{exp}$ be the expected score
-- Let $\beta_0, \beta_1, \beta_2, ..., \beta_k$ be coefficients for the linear model
-- Let $X_1, X_2, ..., X_k$ be variables accounting for systematic biases (which could include factors like position effects, targeting efficiency, etc.)
+- Let $\beta_0$ and $\beta_1$ be the intercept and slope from a linear regression of observed vs expected scores
 
 The interaction score calculation:
-$$I_{i,j} = S_{i,j}^{obs} - S_{i,j}^{exp} - (\beta_0 + \beta_1X_1 + \beta_2X_2 + ... + \beta_kX_k)$$
+$$I_{i,j} = S_{i,j}^{obs} - (\beta_0 + \beta_1 \cdot S_{i,j}^{exp})$$
 
-Where the genetic interaction score is the difference between observed and expected CRISPR scores, with systematic biases accounted for using a linear model adjustment.
+Where the genetic interaction score is the difference between the observed score and the linear model prediction based on the expected score, accounting for systematic deviations between observed and expected values.
 
-3. **Calculate Statistics**: T-tests compare the distribution of double-targeting genetic interaction scores against the background distribution of single-targeting scores, with false discovery rate correction for multiple hypothesis testing.
+3. **Calculate Statistics**: T-tests compare the distribution of double-targeting genetic interaction scores for one pair against the background distribution of single-targeting scores, with false discovery rate correction for multiple hypothesis testing.
 
 - $S_{double}$ as the set of double-targeting genetic interaction scores
 - $S_{single}$ as the set of single-targeting scores (background distribution)
@@ -132,7 +135,7 @@ Where the genetic interaction score is the difference between observed and expec
 - $\mu_{single}$ as the mean of single-targeting scores
 - $\sigma_{double}$ as the standard deviation of double-targeting scores
 - $\sigma_{single}$ as the standard deviation of single-targeting scores
-- $n_{double}$ and $n_{single}$ as the sample sizes
+- $n_{double}$ and $n_{single}$ as the sample size of the paired guides
 
 The t-test statistic would be:
 
@@ -140,7 +143,7 @@ $$t = \frac{\mu_{double} - \mu_{single}}{\sqrt{\frac{\sigma_{double}^2}{n_{doubl
 
 For each comparison, we calculate a p-value from this t-statistic.
 
-Then, to account for multiple hypothesis testing, we apply false discovery rate (FDR) correction:
+Then, to account for multiple hypothesis testing, we apply false discovery rate (FDR) correction using Benjamini Hochberg procedure [@benjamini1995controlling]:
 
 1. Order all p-values: $p_{(1)} \leq p_{(2)} \leq ... \leq p_{(m)}$
 2. For a given FDR threshold $\alpha$ (e.g., 0.05), find the largest $k$ such that:
