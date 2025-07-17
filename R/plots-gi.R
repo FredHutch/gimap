@@ -10,7 +10,7 @@
 #' @export
 #' @return A ggplot2 scatterplot of the target level observed vs expected
 #' CRISPR scores.
-#' @examples \donttest{
+#' @examples \dontrun{
 #'
 #' gimap_dataset <- get_example_data("gimap") %>%
 #'   gimap_filter() %>%

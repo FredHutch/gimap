@@ -16,7 +16,6 @@ CODE_OF_CONDUCT.md
 SECURITY.md
 gimap_QC_Report.Rmd
 gimap_QC_Report.html
-gimap_dataset_final.RDS’
 missing_ids_file.csv
 qc_plots/*
 ^CRAN-SUBMISSION$
@@ -24,14 +23,8 @@ qc_plots/*
 .secrets/*
 .secrets/encryption.R$
 CCLE_gene_cn.csv$
-CCLE_expression.csv$Achilles_common_essentials.csv$
-make_it_noisy.R$
+CCLE_expression.csv$make_it_noisy.R$
 poc_notebooks/*
-inst/extdata/pgPEN_annotations.txt
-inst/extdata/pgRNA_ID_pgPEN_library_comp.csv
-inst/extdata/PP_pgPEN_HeLa_counts.txt
-inst/extdata/counts_pgPEN_PC9_example.tsv
-inst/extdata/gimap_dataset_treatment.RDSinst/extdata/gimap_dataset_timepoint.RDS
 make_it_noisy.R
 Dockerfile
 LICENSE
@@ -44,4 +37,5 @@ output_treatment
 docs/*
 paper.md
 paper.bib
+figure.png
 
