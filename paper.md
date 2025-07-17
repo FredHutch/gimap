@@ -42,7 +42,7 @@ The gimap (Genetic Interaction MAPping) R package addresses a fundamental challe
 
 # Statement of Need
 
-When multiple genes have the same function, a common result of evolutionary processes, it becomes challenging to isolate their true functions. This redundancy makes it hard to identify effective therapeutic targets using traditional methods that disable just one gene at a time [citation suggestion?]. A more effective approach involves disabling two genes simultaneously to reveal these backup relationships [@thompson_combinatorial_2021].
+When multiple genes have the same function, a common result of evolutionary processes, it becomes challenging to isolate their true functions. This redundancy means that many possible therapeutic targets are missed by traditional methods that disable just one gene at a time [@parrish_discovery_2021; @dekegel2019paralog]. A more complementary approach involves disabling two genes simultaneously to reveal these backup relationships [@thompson_combinatorial_2021].
 
 Recent advances in CRISPR technology now allow researchers to knock out gene pairs at once, offering a powerful solution to this problem (https://pubmed.ncbi.nlm.nih.gov/31911676/). Although software solutions exist for single knockout CRISPR, such as MAGeCK, there is no standardized software solution for paired gene CRISPR studies [@mageck].
 
@@ -59,16 +59,16 @@ The R package, called `gimap` (Genetic Interaction MAPping), was developed speci
 In order to ensure usability for the research community we built `gimap` using the following design philosophy.
 
 1. Making best practices as default options and including warning messages for when alternative options are chosen (e.g. if filtering has not been applied).  
-2. We also tried to mimic usage elements from familiar packages such as fastqc reports (our `run_qc()` function creates such a report) [@fastqc].
-3. Try to document and inform users of the statistics and decisions that have been made by the software clearly!
+2. Using elements from familiar packages such as fastqc reports (our `run_qc()` function creates such a report) [@fastqc].
+3. Trying to document and inform users of the statistics and decisions that have been made by the software clearly.
 
 ## gimap data handling
 
 `gimap` implements a multi-step analysis pipeline:
 
-![gimap workflow completes 3 main steps. Part A, B, and C of the figure show the major steps of the workflow which are to normalize the data through a multi step process, score genetic interactions based on the expected versus observed scores, and finally to calculate statistics to identify statistically significant genetic interactions.](figure.png)
+![gimap workflow completes 3 main steps. Part A, B, and C of the figure show the major steps of the workflow which are to normalize the data through a multi step process, score genetic interactions based on the expected versus observed CRISPR scores, and finally to calculate statistics to identify statistically significant genetic interactions.](figure.png)
 
-1. **Normalize Data**: Raw count data is transformed into log2 counts per million (CPM) and adjusted by subtracting pre-treatment values to obtain log2 fold changes. These are further normalized based on the distribution of negative  (e.g. safe-targeting or non-targeting controls) and positive controls (pgRNAs targeting known essential genes).
+1. **Normalize Data**: Raw count data is transformed into log2 counts per million (CPM) and adjusted by subtracting pre-treatment values to obtain log2 fold changes. These are further normalized based on the distribution of negative (e.g. safe-targeting or non-targeting controls) and positive controls (pgRNAs targeting known essential genes). This scaling normalization is analogous to the normalization methods employed by the Cancer Dependency Map (depmap.org) [@depmap2025; @arafeh2025depmap].
 
 a. _Log2 Counts Per Million (CPM) Transformation_:
 - Let $C_{i,j}$ be the raw count for gene $i$ in sample $j$
@@ -151,10 +151,10 @@ The package also provides comprehensive visualization tools including volcano pl
 
 # Use Cases
 
-`gimap` has been successfully used to identify synthetic lethal interactions among paralog genes in cancer cell lines, revealing potential therapeutic targets where single-gene approaches have failed. The package accommodates various experimental designs, including time-course studies and treatment comparisons, offering flexibility for diverse research questions.
+`gimap` has been successfully used to identify synthetic lethal interactions among paralog genes in cancer cell lines, revealing potential therapeutic targets that single-gene approaches have missed. The package accommodates various experimental designs, including time-course studies and treatment comparisons, offering flexibility for diverse research questions.
 
 _Example applications include:_  
-- Identification of backup genes that provide functional redundancy in critical cellular pathways  
+- Identification of genes that provide functional redundancy in critical cellular pathways  
 - Discovery of context-dependent genetic interactions that emerge under specific conditions or treatments  
 - Systematic mapping of gene networks based on functional interactions rather than physical associations  
 
@@ -164,6 +164,6 @@ _Example applications include:_
 
 # Acknowledgements
 
-This work is funded by NCI grant R01CA262556 and the Translational Data Science IRC of Fred Hutchinson Cancer Center. SO is a Washington Research Foundation postdoctoral fellow.
+This work is funded by NCI grant R01CA262556 and the Translational Data Science Integrated Research Center of Fred Hutchinson Cancer Center. SO is a Washington Research Foundation postdoctoral fellow.
 
 # References
