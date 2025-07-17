@@ -76,15 +76,10 @@ get_example_data <- function(which_data,
         output_dir = data_dir
       )
     }
-  } else {
-    file_path <- file.path(data_dir, file_name)
-
-    if (which_data == "count") {
-      save_example_timepoint_data()
-    } else {
-      save_example_treatment_data()
-    }
-  }
+  } 
+  save_example_timepoint_data()
+  save_example_treatment_data()
+  
   dataset <- switch(which_data,
     "count" = readr::read_tsv(file_path,
       show_col_types = FALSE
