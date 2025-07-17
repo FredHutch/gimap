@@ -13,7 +13,7 @@
 #' @return A special gimap_dataset to be used with the other functions in this
 #' package.
 #' @export
-#' @examples
+#' @examples \dontrun{
 #'
 #' counts <- get_example_data("count", data_dir = tempdir()) %>%
 #'   dplyr::select(c(
@@ -36,7 +36,7 @@
 #'   pg_ids = pg_ids,
 #'   sample_metadata = sample_metadata
 #' )
-#'
+#'}
 setup_data <- function(counts = NULL,
                        pg_ids = NULL,
                        sample_metadata = NULL) {

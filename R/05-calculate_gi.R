@@ -47,7 +47,7 @@
 #' @import dplyr
 #' @importFrom stats lm
 #' @export
-#' @examples \donttest{
+#' @examples \dontrun{
 #'
 #' gimap_dataset <- get_example_data("gimap",
 #'   data_dir = tempdir()
