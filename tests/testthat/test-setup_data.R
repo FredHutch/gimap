@@ -1,7 +1,7 @@
 skip_if_figshare_unavailable <- function() {
   tryCatch(
     {
-      httr::HEAD("https://figshare.com", httr::timeout(5))
+      get_example_data("gimap")
     },
     error = function(e) {
       "Figshare unavailable"
