@@ -5,7 +5,7 @@ skip_if_figshare_unavailable <- function() {
     "Figshare unavailable"
   })
 }
-if (skip_if_figshare_unavailable() != "Figshare unavailable") {
+if (skip_if_figshare_unavailable()[1] != "Figshare unavailable") {
   test_that("Figshare API download works", {
     testthat::skip_on_cran()
     
