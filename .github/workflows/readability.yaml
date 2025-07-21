@@ -11,7 +11,7 @@ jobs:
         runs-on: ubuntu-latest
         permissions: 
             pull-request: read
-            content: read
+            contents: read
         steps:
             - name: Checkout repo with history
               uses: actions/checkout@v4
