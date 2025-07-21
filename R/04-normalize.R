@@ -69,7 +69,7 @@
 #' genes in the set.
 #' @import dplyr
 #' @export
-#' @examples \donttest{
+#' @examples \dontrun{
 #'
 #' gimap_dataset_org <- get_example_data("gimap") %>%
 #'   gimap_filter() %>%

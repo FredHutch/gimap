@@ -101,7 +101,7 @@ log2FC adjusted = log2FC /
 (median negative control for a sample - median positive control for a sample)
 }
 \examples{
-\donttest{
+\dontrun{
 
 gimap_dataset_org <- get_example_data("gimap") \%>\%
   gimap_filter() \%>\%
