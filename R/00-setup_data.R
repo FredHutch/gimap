@@ -36,7 +36,7 @@
 #'   pg_ids = pg_ids,
 #'   sample_metadata = sample_metadata
 #' )
-#'}
+#' }
 setup_data <- function(counts = NULL,
                        pg_ids = NULL,
                        sample_metadata = NULL) {
