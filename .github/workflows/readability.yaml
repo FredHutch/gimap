@@ -3,16 +3,22 @@ name: Report readability
 # This action only works on pull request events
 on: pull_request
 
+
 jobs:
+
     report-readability:
         name: Report readability
         runs-on: ubuntu-latest
+        permissions: 
+            contents: read
+            issues: write
         steps:
             - name: Checkout repo with history
               uses: actions/checkout@v4
               with:
                   fetch-depth: 0
+
             - uses: Rebilly/lexi@v2
               with:
-                  github-token: ${{ secrets.GH_PAT }}
                   glob: '**/*.md'
+                  github-token: ${{ secrets.GITHUB_TOKEN }}  # Required for authentication

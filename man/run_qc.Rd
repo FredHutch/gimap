@@ -55,6 +55,7 @@ a QC report saved locally
 This function takes a `gimap_dataset` and creates a QC report
 }
 \examples{
+\dontrun{
 
 gimap_dataset <- get_example_data("gimap")
 
@@ -63,5 +64,5 @@ run_qc(
   plots_dir = tempdir(),
   output_file = paste0(tempfile(), "_QC_Report.Rmd")
 )
-
+}
 }

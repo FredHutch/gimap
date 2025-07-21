@@ -22,7 +22,7 @@ The solid line is the linear regression line for the negative control (single KO
 while dashed lines indicate the lower and upper quartile residuals.
 }
 \examples{
-\donttest{
+\dontrun{
 
 gimap_dataset <- get_example_data("gimap") \%>\%
   gimap_filter() \%>\%

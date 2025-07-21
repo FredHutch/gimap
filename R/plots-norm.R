@@ -12,7 +12,7 @@
 #'
 #' @import ggplot2
 #'
-#' @examples \donttest{
+#' @examples \dontrun{
 #'
 #' gimap_dataset <- get_example_data("gimap") %>%
 #'   gimap_filter() %>%

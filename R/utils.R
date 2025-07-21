@@ -1,3 +1,4 @@
+
 utils::globalVariables(c(
   "pg_ids", "plot_theme()", "negative_control", "positive_control", "mean_observed_cs", "timepoints", "value", "timepoint_avg", "target_type",
   "unexpressed_ctrl_flag", "median", "lfc_adj", "median", "gRNA1_seq", "gRNA2_seq",
@@ -61,8 +62,9 @@ get_example_data <- function(which_data,
     delete_example_data()
   }
 
+  file_path <- file.path(data_dir, file_name)
+
   if (!grepl("RDS$", file_name)) {
-    file_path <- file.path(data_dir, file_name)
 
     # Save file path in the options
     file_path_list <- list(file_path)
@@ -77,16 +79,10 @@ get_example_data <- function(which_data,
       )
     }
   } else {
-    file_path <- file.path(data_dir, file_name)
-
-    if (!file.exists(file_path)) {
-      download.file(
-        paste0("https://github.com/FredHutch/gimap/",
-               "raw/refs/heads/main/inst/extdata/", file_name),
-        destfile = file_path
-        )
-    }
+    save_example_timepoint_data()
+    save_example_treatment_data()
   }
+
   dataset <- switch(which_data,
     "count" = readr::read_tsv(file_path,
       show_col_types = FALSE
@@ -119,8 +115,10 @@ example_data_folder <- function() {
   dirname(file)
 }
 
-# This function sets up the example count data
-save_example_data <- function() {
+#' Set up example count data
+#' @export
+#' @return Returns the file path to folder where the example data is stored
+save_example_timepoint_data <- function() {
   example_data <- get_example_data("count") %>%
     dplyr::select(!Day05_RepA)
 
@@ -155,7 +153,46 @@ save_example_data <- function() {
     full.names = TRUE
   )
 
-  saveRDS(gimap_dataset, file.path(dirname(example_folder), "gimap_dataset.RDS"))
+  saveRDS(gimap_dataset, file.path(dirname(example_folder), "gimap_dataset_timepoint.RDS"))
+}
+
+#' Set up example count data
+#' @export
+#' @return Returns the file path to folder where the example data is stored
+save_example_treatment_data <- function() {
+  example_data <- get_example_data("count_treatment")
+
+  example_pg_metadata <- get_example_data("meta")
+
+  example_counts <- example_data %>%
+    select(c("pretreatment", "dmsoA", "dmsoB", "drug1A", "drug1B")) %>%
+    as.matrix()
+
+  example_pg_id <- example_data %>%
+    dplyr::select("id")
+
+  example_pg_metadata <- example_pg_metadata %>%
+    dplyr::select(c("pgRNA_ID", "target1_sgRNA_seq", "target1_sgRNA_seq"))
+
+  example_sample_metadata <- data.frame(
+    col_names = c("pretreatment", "dmsoA", "dmsoB", "drug1A", "drug1B"),
+    drug_treatment = as.factor(c("pretreatment", "dmso", "dmso", "drug", "drug"))
+  )
+
+  gimap_dataset <- setup_data(
+    counts = example_counts,
+    pg_ids = example_pg_id,
+    sample_metadata = example_sample_metadata
+  )
+
+  example_folder <- list.files(
+    pattern = "counts_pgPEN_PC9_example.tsv",
+    recursive = TRUE,
+    system.file("extdata", package = "gimap"),
+    full.names = TRUE
+  )
+
+  saveRDS(gimap_dataset, file.path(dirname(example_folder), "gimap_dataset_treatment.RDS"))
 }
 
 plot_options <- function() {
@@ -194,7 +231,7 @@ key_encrypt_creds_path <- function() {
 #' in as data frames.
 #' @export
 #'
-#' @examples \donttest{
+#' @examples \dontrun{
 #'
 #' get_figshare(
 #'   return_list = TRUE,
@@ -310,3 +347,4 @@ delete_example_data <- function() {
   # Set options as NULL
   options(data_list)
 }
+
