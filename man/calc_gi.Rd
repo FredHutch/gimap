@@ -15,7 +15,7 @@ function. But the data must still be a gimap_dataset}
 
 \item{use_lfc}{Should Log fold change be used to calculate GI scores instead
 of CRISPR scores? If you do not have negative controls or CRISPR scores you
-will need to set this to TRUE.}
+will need to set this to TRUE. Then 0 will be used as the comparison value.}
 }
 \value{
 A gimap dataset with statistics and genetic interaction scores
