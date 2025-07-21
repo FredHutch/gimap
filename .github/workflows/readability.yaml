@@ -10,7 +10,6 @@ jobs:
         name: Report readability
         runs-on: ubuntu-latest
         permissions: 
-            pull-request: read
             contents: read
         steps:
             - name: Checkout repo with history
