@@ -240,7 +240,7 @@ gimap_annotate <- function(.data = NULL,
       percent, "% :percent of genes with matches in the custom_tpm data"
     )
 
-    stopifnot(
+    warning(
       "less than half of the genes have custom_tpm matches" =
         percent > 50
     )

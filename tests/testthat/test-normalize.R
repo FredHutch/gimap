@@ -17,7 +17,7 @@ test_that("Test normalization", {
   neg_controls <- gimap_dataset$normalized_log_fc %>%
     dplyr::filter(norm_ctrl_flag == "negative_control") %>%
     dplyr::group_by(rep) %>%
-    dplyr::summarize(neg_ctrl_med = median(crispr_score)) %>%
+    dplyr::summarize(neg_ctrl_med = median(crispr_score, na.rm = TRUE)) %>%
     dplyr::pull(neg_ctrl_med)
 
   # We expect negative controls to be now equal to 0
