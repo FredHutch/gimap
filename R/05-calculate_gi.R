@@ -231,7 +231,6 @@ calc_gi <- function(.data = NULL,
     dplyr::mutate(
       expected_double_crispr = mean_single_crispr_1 + mean_single_crispr_2
     )
-  # TODO: Ask Alice: Should there be by reps at this point?
 
   #### STEP 2 LINEAR MODEL AND GI SCORE CALC
 
