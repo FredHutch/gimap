@@ -487,10 +487,10 @@ ctrl_genes <- function(overwrite = TRUE,
 #' @export
 #' @return A list of the cell line names that are available in DepMap for use
 #' for annotation in this package.
-#' @examples
+#' @examples \dontrun{
 #'
 #' cell_lines <- supported_cell_lines()
-#'
+#' }
 supported_cell_lines <- function() {
   depmap_metadata <- readr::read_csv(
     "https://figshare.com/ndownloader/files/35020903",

@@ -28,7 +28,7 @@ in as data frames.
 Handler function for GET requests from Figshare
 }
 \examples{
-\donttest{
+\dontrun{
 
 get_figshare(
   return_list = TRUE,

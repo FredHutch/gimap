@@ -72,7 +72,7 @@ filters, but users can select a subset of these filters or even adjust the
 behavior of each filter
 }
 \examples{
-\donttest{
+\dontrun{
 
 gimap_dataset <- get_example_data("gimap", data_dir = tempdir()) \%>\%
   gimap_filter()

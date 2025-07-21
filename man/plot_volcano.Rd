@@ -20,7 +20,7 @@ Volcano plot of target-level GI scores
 Blue points are synthetic lethal paralog GIs with GI < 0.5 and FDR < 0.1; red points are buffering paralog GIs with GI > 0.25 and FDR < 0.1.
 }
 \examples{
-\donttest{
+\dontrun{
 
 gimap_dataset <- get_example_data("gimap") \%>\%
   gimap_filter() \%>\%
