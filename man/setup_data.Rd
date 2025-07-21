@@ -28,6 +28,7 @@ This function allows people to have their data ready to be
  processed by gimap
 }
 \examples{
+\dontrun{
 
 counts <- get_example_data("count", data_dir = tempdir()) \%>\%
   dplyr::select(c(
@@ -50,5 +51,5 @@ gimap_dataset <- setup_data(
   pg_ids = pg_ids,
   sample_metadata = sample_metadata
 )
-
+}
 }

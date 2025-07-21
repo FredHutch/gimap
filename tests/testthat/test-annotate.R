@@ -1,7 +1,7 @@
 skip_if_figshare_unavailable <- function() {
   tryCatch(
     {
-      get_example_data("gimap")
+      get_figshare("Achilles_common_essentials.csv")
     },
     error = function(e) {
       "Figshare unavailable"
