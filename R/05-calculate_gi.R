@@ -39,7 +39,7 @@
 #' `setup_data()` function.
 #' @param use_lfc Should Log fold change be used to calculate GI scores instead
 #' of CRISPR scores? If you do not have negative controls or CRISPR scores you
-#' will need to set this to TRUE.
+#' will need to set this to TRUE. Then 0 will be used as the comparison value. 
 #' @return A gimap dataset with statistics and genetic interaction scores
 #' calculated. Overall results in the returned object can be obtained using
 #' gimap_dataset$overall_results Whereas target level genetic interaction
@@ -150,6 +150,11 @@ calc_gi <- function(.data = NULL,
     )
   # This means we have a mean double control crispr for each control sequence
 
+  # Add this check after creating control_target_df
+  if (nrow(control_target_df) == 0) {
+    message("No ctrl_ctrl controls found. Using mean_double_control_crispr = 0 for calculations.")
+  }
+
   # Calculate expected and mean CRISPR scores for single targets
   single_crispr_df <- lfc_adj %>%
     dplyr::filter(target_type %in% c("ctrl_gene", "gene_ctrl")) %>%
@@ -179,7 +184,7 @@ calc_gi <- function(.data = NULL,
     summarize(
       mean_single_crispr = mean(crispr_score, na.rm = TRUE),
       # Note this is now the mean of all the control sequences for a particular target
-      mean_double_control_crispr = mean(mean_double_control_crispr),
+      mean_double_control_crispr = mean(mean_double_control_crispr, na.rm = TRUE),
       .groups = "drop"
     ) %>%
     dplyr::select(
@@ -191,9 +196,10 @@ calc_gi <- function(.data = NULL,
     ## calculate expected single-targeting GI score by summing the
     ## single-targeting and the mean_double_control_crispr
     dplyr::mutate(
+      ## Replace NA values in mean_double control_crispr with 0 when there are no ctrl_ctrl controls
+      mean_double_control_crispr = ifelse(is.na(mean_double_control_crispr), 0, mean_double_control_crispr),
       expected_single_crispr = mean_single_crispr + mean_double_control_crispr,
     )
-  # TODO: Ask alice do we want to combine target sequences as well?
 
   # This will be added on to the double crispr df
   expected_single_crispr_df <- single_crispr_df %>%

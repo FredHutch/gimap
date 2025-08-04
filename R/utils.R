@@ -1,4 +1,3 @@
-
 utils::globalVariables(c(
   "pg_ids", "plot_theme()", "negative_control", "positive_control", "mean_observed_cs", "timepoints", "value", "timepoint_avg", "target_type",
   "unexpressed_ctrl_flag", "median", "lfc_adj", "median", "gRNA1_seq", "gRNA2_seq",
@@ -65,7 +64,6 @@ get_example_data <- function(which_data,
   file_path <- file.path(data_dir, file_name)
 
   if (!grepl("RDS$", file_name)) {
-
     # Save file path in the options
     file_path_list <- list(file_path)
     names(file_path_list) <- which_data
@@ -347,4 +345,3 @@ delete_example_data <- function() {
   # Set options as NULL
   options(data_list)
 }
-
