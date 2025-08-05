@@ -39,7 +39,10 @@
 #' `setup_data()` function.
 #' @param use_lfc Should Log fold change be used to calculate GI scores instead
 #' of CRISPR scores? If you do not have negative controls or CRISPR scores you
-#' will need to set this to TRUE. Then 0 will be used as the comparison value. 
+#' will need to set this to TRUE.
+#' @param use_ntc If you do not have negative controls or do not want them to be
+#' used set this to FALSE and then 0 will be used as the comparison value. Default
+#' is that use_ntc = TRUE and looks for negative control genes.
 #' @return A gimap dataset with statistics and genetic interaction scores
 #' calculated. Overall results in the returned object can be obtained using
 #' gimap_dataset$overall_results Whereas target level genetic interaction
@@ -67,13 +70,15 @@
 #' }
 calc_gi <- function(.data = NULL,
                     gimap_dataset,
-                    use_lfc = FALSE) {
+                    use_lfc = FALSE,
+                    use_ntc = TRUE) {
   # Summary the calculation
   # single_target_crispr_1 = geneA_nt1, geneA_nt2...
   # single_target_crispr_2 = nt1_geneB, nt2_geneB...
   # double_crispr_score = geneA_geneBpg1, geneA_geneBpg2...
 
   # mean_double_control_crispr = mean for the same control sequence
+  # Unless use_ntc is set to FALSE
 
   # expected_crispr_double=single_target_crispr_1 + single_target_crispr_2
   # expected_crispr_single_1=single_target_crispr_1 + mean_double_control_crispr
@@ -152,7 +157,14 @@ calc_gi <- function(.data = NULL,
 
   # Add this check after creating control_target_df
   if (nrow(control_target_df) == 0) {
-    message("No ctrl_ctrl controls found. Using mean_double_control_crispr = 0 for calculations.")
+    message("No ctrl_ctrl controls found. Using mean_double_control_crispr = 0 for calculations.",
+            "\n If ctrl_ctrl's are expected then re-evaluate your annotations.")
+  }
+
+  # Add this check after creating control_target_df
+  if (!use_ntc) {
+    message("use_ntc = FALSE so ctrl_ctrl values either do not exist or will be ignored.",
+            "Using mean_double_control_crispr = 0 for calculations")
   }
 
   # Calculate expected and mean CRISPR scores for single targets
@@ -198,6 +210,8 @@ calc_gi <- function(.data = NULL,
     dplyr::mutate(
       ## Replace NA values in mean_double control_crispr with 0 when there are no ctrl_ctrl controls
       mean_double_control_crispr = ifelse(is.na(mean_double_control_crispr), 0, mean_double_control_crispr),
+      # OR if use_ntc == FALSE then it will still be set to 0
+      mean_double_control_crispr = ifelse(use_ntc, mean_double_control_crispr, 0),
       expected_single_crispr = mean_single_crispr + mean_double_control_crispr,
     )
 
