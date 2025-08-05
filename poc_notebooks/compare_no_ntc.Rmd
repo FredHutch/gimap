@@ -1,0 +1,60 @@
+---
+title: "No negative controls"
+output: html_document
+date: "2025-08-05"
+author: Candace Savonen 
+---
+
+
+```{r}
+devtools::load_all()
+```
+
+Set up the original dataset and then use the same 
+
+```{r}
+gimap_dataset <- get_example_data("gimap") %>%
+  gimap_filter() %>%
+  gimap_annotate(cell_line = "HELA") %>%
+  gimap_normalize(
+    timepoints = "day",
+    missing_ids_file = tempfile()
+  ) %>%
+  calc_gi()
+```
+
+Now run the same thing but don't use the negative controls. 
+
+```{r}
+gimap_dataset_no_ntc <- get_example_data("gimap") %>%
+  gimap_filter() %>%
+  gimap_annotate(cell_line = "HELA") %>%
+  gimap_normalize(
+    timepoints = "day",
+    missing_ids_file = tempfile()
+  ) %>%
+  calc_gi(use_ntc = FALSE)
+```
+
+## Comparisons
+
+```{r}
+plot_exp_v_obs_scatter(gimap_dataset)
+plot_exp_v_obs_scatter(gimap_dataset_no_ntc)
+```
+
+```{r}
+plot_rank_scatter(gimap_dataset)
+plot_rank_scatter(gimap_dataset_no_ntc)
+```
+
+```{r}
+plot_volcano(gimap_dataset)
+plot_volcano(gimap_dataset_no_ntc)
+```
+
+## Session info 
+
+```{r}
+sessionInfo()
+```
