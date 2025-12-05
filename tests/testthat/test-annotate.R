@@ -1,14 +1,9 @@
 skip_if_figshare_unavailable <- function() {
-  tryCatch(
-    {
-      get_figshare("Achilles_common_essentials.csv")
-    },
-    error = function(e) {
-      "Figshare unavailable"
-    }
-  )
+  result <- get_figshare("Achilles_common_essentials.csv")
+  # Returns TRUE if Figshare is available, FALSE otherwise
+  !is.null(result)
 }
-if (skip_if_figshare_unavailable()[1] != "Figshare unavailable") {
+if (skip_if_figshare_unavailable()) {
   test_that("Annotation options", {
     testthat::skip_on_cran()
     gimap_dataset <- get_example_data("gimap") %>%

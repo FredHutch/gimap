@@ -1,14 +1,9 @@
 skip_if_figshare_unavailable <- function() {
-  tryCatch(
-    {
-      get_figshare("Achilles_common_essentials.csv")
-    },
-    error = function(e) {
-      "Figshare unavailable"
-    }
-  )
+  result <- get_figshare("Achilles_common_essentials.csv")
+  # Returns TRUE if Figshare is available, FALSE otherwise
+  !is.null(result)
 }
-if (skip_if_figshare_unavailable()[1] != "Figshare unavailable") {
+if (skip_if_figshare_unavailable()) {
   # Example data for testing
   example_counts <- matrix(1:20, nrow = 4, ncol = 5)
   example_pg_ids <- data.frame(id = 1:4)

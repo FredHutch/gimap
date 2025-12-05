@@ -4,12 +4,17 @@
 \alias{gimap_stats}
 \title{Do tests --an internal function used by calc_gi() function}
 \usage{
-gimap_stats(gi_calc_double, gi_calc_single, replicate = NULL)
+gimap_stats(gi_calc_double, gi_calc_single, use_ntc = TRUE, replicate = NULL)
 }
 \arguments{
 \item{gi_calc_double}{a data.frame with adjusted double gi scores}
 
 \item{gi_calc_single}{a data.frame with adjusted single gi scores}
+
+\item{use_ntc}{Logical. If TRUE, uses a two-sample t-test comparing double
+target GI scores against single target GI scores. If FALSE, uses a one-sample
+t-test against mu=0 since single target GI scores have zero variance when
+negative controls are not used.}
 
 \item{replicate}{a name of a replicate to filter out from gi_calc_adj Optional}
 }
