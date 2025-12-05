@@ -166,6 +166,15 @@ if (skip_if_figshare_unavailable()[1] != "Figshare unavailable") {
       ) %>%
       calc_gi(use_ntc = FALSE)
 
+    plot_exp_v_obs_scatter(gimap_dataset_no_ntc)
+    plot_exp_v_obs_scatter(gimap_dataset)
+
+    plot_rank_scatter(gimap_dataset_no_ntc)
+    plot_rank_scatter(gimap_dataset)
+
+    plot_volcano(gimap_dataset_no_ntc)
+    plot_volcano(gimap_dataset)
+
     # Check that gi_score values are not all NA
     testthat::expect_false(all(is.na(gimap_dataset_no_ctrl$gi_scores$gi_score)))
 
