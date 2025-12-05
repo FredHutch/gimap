@@ -304,7 +304,8 @@ calc_gi <- function(.data = NULL,
   #### STEP 3: RUN THE TESTS
   target_results_df <- gimap_stats(
     gi_calc_single = gi_calc_single,
-    gi_calc_double = gi_calc_double
+    gi_calc_double = gi_calc_double,
+    use_ntc = use_ntc
   )
 
   #### STEP 4: FORMATTING DATA FOR EASY STORING
@@ -383,22 +384,35 @@ calc_gi <- function(.data = NULL,
 #' @description Create results table that has t test p values
 #' @param gi_calc_single a data.frame with adjusted single gi scores
 #' @param gi_calc_double a data.frame with adjusted double gi scores
+#' @param use_ntc Logical. If TRUE, uses a two-sample t-test comparing double
+#' target GI scores against single target GI scores. If FALSE, uses a one-sample
+#' t-test against mu=0 since single target GI scores have zero variance when
+#' negative controls are not used.
 #' @param replicate a name of a replicate to filter out from gi_calc_adj Optional
 #' @importFrom stats p.adjust t.test wilcox.test
-gimap_stats <- function(gi_calc_double, gi_calc_single, replicate = NULL) {
+gimap_stats <- function(gi_calc_double, gi_calc_single, use_ntc = TRUE, replicate = NULL) {
   ## get a vector of GI scores for all single-targeting ("control") pgRNAs
   ## for each rep
   ## get double-targeting pgRNAs for this rep, do a t-test to compare the
   ## double-targeting GI scores for each paralog pair to the control vector
   ## adjust for multiple testing using the Benjamini-Hochberg method
 
-  gi_scores <- gi_calc_double %>%
-    group_by(pgRNA_target) %>%
-    mutate(p_val = t.test(
-      x = gi_calc_single$gi_score,
-      y = gi_score, # all construct guides here
-      paired = FALSE
-    )$p.value)
+  if (use_ntc) {
+    # Two-sample t-test: compare double target GI scores against single target GI scores
+    gi_scores <- gi_calc_double %>%
+      group_by(pgRNA_target) %>%
+      mutate(p_val = t.test(
+        x = gi_calc_single$gi_score,
+        y = gi_score, # all construct guides here
+        paired = FALSE
+      )$p.value)
+  } else {
+    # One-sample t-test: test if double target GI scores differ from 0
+    # Used when use_ntc=FALSE because single target GI scores are all ~0
+    gi_scores <- gi_calc_double %>%
+      group_by(pgRNA_target) %>%
+      mutate(p_val = t.test(gi_score, mu = 0)$p.value)
+  }
 
 
   ## adjust for multiple testing using the Benjamini-Hochberg method
