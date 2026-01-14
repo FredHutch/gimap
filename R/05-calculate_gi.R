@@ -211,7 +211,7 @@ calc_gi <- function(.data = NULL,
       ## Replace NA values in mean_double control_crispr with 0 when there are no ctrl_ctrl controls
       mean_double_control_crispr = ifelse(is.na(mean_double_control_crispr), 0, mean_double_control_crispr),
       # OR if use_ntc == FALSE then it will still be set to 0
-      mean_double_control_crispr = ifelse(use_ntc, mean_double_control_crispr, 0),
+      mean_double_control_crispr = if_else(rep(use_ntc, times=n()), mean_double_control_crispr, 0),
       expected_single_crispr = mean_single_crispr + mean_double_control_crispr,
     )
 
