@@ -1,5 +1,5 @@
 ---
-title: 'gimap: An R Package for Genetic Interaction Mapping in Dual-Target CRISPR Screens'
+title: "gimap: An R Package for Genetic Interaction Mapping in Dual-Target CRISPR Screens"
 tags:
   - R
   - CRISPR
@@ -28,17 +28,17 @@ authors:
     orcid: 0000-0002-6538-2658
     affiliation: 1
 affiliations:
- - name: Fred Hutchinson Cancer Center, United States
-   index: 1
- - name: Synthesize Bio, United States
-   index: 2
+  - name: Fred Hutchinson Cancer Center, United States
+    index: 1
+  - name: Synthesize Bio, United States
+    index: 2
 date: 02 April 2025
 bibliography: paper.bib
 ---
 
 # Summary
 
-The gimap (Genetic Interaction MAPping) R package addresses a fundamental challenge in genomic research: the difficulty of understanding combinatorial interactions among genes. Gene redundancy makes traditional single-gene knockout methods ineffective for identifying therapeutic targets, as backup genes can mask the effects when a single gene is disabled. gimap offers a solution by providing a comprehensive framework for analyzing dual-target CRISPR screening data, where two genes are simultaneously disabled to reveal their backup relationships. This software implements the methods used by @parrish_discovery_2021. The package processes raw count data through a multi-step pipeline that includes normalization, calculation of expected and observed CRISPR scores, computation of genetic interaction scores, and statistical analysis to identify significant interactions. Unlike general  tools, gimap is specifically tailored for paired guide CRISPR data with built-in quality control reporting and visualization tools. The package makes best practices the default options and is available on GitHub with comprehensive documentation to support the research community in extracting meaningful insights from complex genetic screening experiments.
+The gimap (Genetic Interaction MAPping) R package addresses a fundamental challenge in genomic research: the difficulty of understanding combinatorial interactions among genes. Gene redundancy makes traditional single-gene knockout methods ineffective for identifying therapeutic targets, as backup genes can mask the effects when a single gene is disabled. gimap offers a solution by providing a comprehensive framework for analyzing dual-target CRISPR screening data, where two genes are simultaneously disabled to reveal their backup relationships. This software implements the methods used by @parrish_discovery_2021. The package processes raw count data through a multi-step pipeline that includes normalization, calculation of expected and observed CRISPR scores, computation of genetic interaction scores, and statistical analysis to identify significant interactions. Unlike general tools, gimap is specifically tailored for paired guide CRISPR data with built-in quality control reporting and visualization tools. The package makes best practices the default options and is available on GitHub with comprehensive documentation to support the research community in extracting meaningful insights from complex genetic screening experiments.
 
 # Statement of Need
 
@@ -58,7 +58,7 @@ The R package, called `gimap` (Genetic Interaction MAPping), was developed speci
 
 In order to ensure usability for the research community we built `gimap` using the following design philosophy.
 
-1. Making best practices as default options and including warning messages for when alternative options are chosen (e.g. if filtering has not been applied).  
+1. Making best practices as default options and including warning messages for when alternative options are chosen (e.g. if filtering has not been applied).
 2. Using elements from familiar packages such as fastqc reports (our `run_qc()` function creates such a report) [@fastqc].
 3. Trying to document and inform users of the statistics and decisions that have been made by the software clearly.
 
@@ -66,11 +66,12 @@ In order to ensure usability for the research community we built `gimap` using t
 
 `gimap` implements a multi-step analysis pipeline:
 
-![gimap workflow completes 3 main steps. Part A, B, and C of the figure show the major steps of the workflow which are to normalize the data through a multi step process, score genetic interactions based on the expected versus observed CRISPR scores, and finally to calculate statistics to identify statistically significant genetic interactions.](figure.png)
+![gimap workflow completes 3 main steps. Part A, B, and C of the figure show the major steps of the workflow which are to normalize the data through a multi step process, score genetic interactions based on the expected versus observed CRISPR scores, and finally to calculate statistics to identify statistically significant genetic interactions.](./figure.png)
 
 1. **Normalize Data**: Raw count data is transformed into log2 counts per million (CPM) and adjusted by subtracting pre-treatment values to obtain log2 fold changes. These are further normalized based on the distribution of negative (e.g. safe-targeting or non-targeting controls) and positive controls (pgRNAs targeting known essential genes). This scaling normalization is analogous to the normalization methods employed by the Cancer Dependency Map (depmap.org) [@depmap2025; @arafeh2025depmap].
 
 a. _Log2 Counts Per Million (CPM) Transformation_:
+
 - Let $C_{i,j}$ be the raw count for gene $i$ in sample $j$
 - Let $N_j$ be the total number of counts in sample $j$
 
@@ -78,12 +79,14 @@ $$L_{i,j} = \log_2\left(\frac{C_{i,j} \times 10^6}{N_j} + 1\right)$$
 (The +1 is often included to avoid log(0) issues)
 
 b. _Adjustment by Pre-treatment Values_:
+
 - Let $L_{i,j}^{post}$ be the log2 CPM value post-treatment
 - Let $L_{i,j}^{pre}$ be the log2 CPM value pre-treatment
 
 $$LFC_{i,j} = L_{i,j}^{post} - L_{i,j}^{pre}$$
 
 c. _Normalization Based on Controls_:
+
 - Let $LFC_{i,j}$ be the log2 fold change calculated above
 - Let $\mu_{neg}$ and $\sigma_{neg}$ be the mean and standard deviation of negative controls (safe-targeting or non-targeting)
 - Let $\mu_{pos}$ and $\sigma_{pos}$ be the mean and standard deviation of positive controls (pgRNAs targeting essential genes)
@@ -102,6 +105,7 @@ We model a control distribution for non-interacting genes by assuming that in th
 For double-targeting constructs, expected CRISPR scores are calculated as the sum of the corresponding single-targeting scores. For single-targeting constructs, the expected score combines the single-target effect with the mean effect of control constructs. Interaction scores represent the difference between observed and expected CRISPR scores, adjusted using a linear model to account for systematic biases.
 
 For double-targeting constructs:
+
 - Let $S_{i,j}^{obs}$ be the observed CRISPR score for a construct targeting genes $i$ and $j$
 - Let $S_i$ be the single-targeting score for gene $i$
 - Let $S_j$ be the single-targeting score for gene $j$
@@ -110,6 +114,7 @@ The expected score for a double-targeting construct is:
 $$S_{i,j}^{exp} = S_i + S_j$$
 
 For single-targeting constructs:
+
 - Let $S_i^{obs}$ be the observed CRISPR score for a construct targeting gene $i$
 - Let $\mu_{control}$ be the mean effect of control constructs
 
@@ -117,6 +122,7 @@ The expected score for a single-targeting construct is:
 $$S_i^{exp} = S_i + \mu_{control}$$
 
 The interaction score calculation, with adjustment for systematic biases:
+
 - Let $I_{i,j}$ be the interaction score for genes $i$ and $j$
 - Let $S_{i,j}^{obs}$ be the observed score
 - Let $S_{i,j}^{exp}$ be the expected score
@@ -156,10 +162,11 @@ The package also provides comprehensive visualization tools including volcano pl
 
 `gimap` has been successfully used to identify synthetic lethal interactions among paralog genes in cancer cell lines, revealing potential therapeutic targets that single-gene approaches have missed. The package accommodates various experimental designs, including time-course studies and treatment comparisons, offering flexibility for diverse research questions.
 
-_Example applications include:_  
-- Identification of genes that provide functional redundancy in critical cellular pathways  
-- Discovery of context-dependent genetic interactions that emerge under specific conditions or treatments  
-- Systematic mapping of gene networks based on functional interactions rather than physical associations  
+_Example applications include:_
+
+- Identification of genes that provide functional redundancy in critical cellular pathways
+- Discovery of context-dependent genetic interactions that emerge under specific conditions or treatments
+- Systematic mapping of gene networks based on functional interactions rather than physical associations
 
 # Conclusion
 
