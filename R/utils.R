@@ -1,14 +1,15 @@
 utils::globalVariables(c(
-  "pg_ids", "plot_theme()", "negative_control", "positive_control", "mean_observed_cs", "timepoints", "value", "timepoint_avg", "target_type",
+  "id", "pg_ids", "plot_theme()", "negative_control", "positive_control", "mean_observed_cs", "timepoints", "value", "timepoint_avg", "target_type",
   "unexpressed_ctrl_flag", "median", "lfc_adj", "median", "gRNA1_seq", "gRNA2_seq",
   "control_gRNA_seq", "crispr_score", "pgRNA_target", "mean_double_control_crispr",
   "pgRNA_target", "targeting_gRNA_seq", "mean_single_crispr", "double_crispr_score",
+
   "single_crispr_score_1", "single_crispr_score_2", "pgRNA_target_double", "mean_single_crispr_1",
   "mean_single_crispr_2", "mean_double_control_crispr_2",
   "expected_crispr", "term", "estimate", "mean_expected_crispr", "intercept", "slope",
   "p_val_ttest", "p_val_wil", "fde_vals_ttest", "fdr_vals_wil", "double_gi_score",
   "single_gi_score_1", "single_gi_score_2", "gene", "DepMap_ID",
-  "gene1_symbol", "gene2_symbol", "expressed_flag", "norm_ctrl_flag", "bool_vals",
+ "gene1_symbol", "gene2_symbol", "expressed_flag", "norm_ctrl_flag", "bool_vals",
   "filter_name", "counts", "numzero", "name", "value", "lfc_plasmid_vs_late", "lfc_adj",
   "double_gi_score", "count_normalized", "construct",
   "filterFlag", "plasmid_log2_cpm", "log2_cpm", "gene_symbol", "gene_symbol_1", "gene_symbol_2",
@@ -21,6 +22,26 @@ utils::globalVariables(c(
   "expected_double_crispr", "p_val", "single_gi_score", "Rank", "broad_target_type",
   "logfdr", "pointColor", "both", "mean_score", "gi_score", "Day05_RepA", "id"
 ))
+
+#' Check if internet/URL is available
+#' @description Internal helper function to check if an internet resource is
+#' reachable before attempting to download.
+#' @param url The URL to check availability for
+#' @param timeout_seconds Timeout in seconds for the check
+#' @return TRUE if the URL is reachable, FALSE otherwise
+#' @keywords internal
+check_internet_available <- function(url = "https://api.figshare.com",
+                                     timeout_seconds = 5) {
+  tryCatch(
+    {
+      response <- httr::HEAD(url, httr::timeout(timeout_seconds))
+      httr::status_code(response) < 400
+    },
+    error = function(e) {
+      FALSE
+    }
+  )
+}
 
 
 #' Returns example data for package
@@ -70,15 +91,47 @@ get_example_data <- function(which_data,
     options(file_path_list)
 
     if (!file.exists(file_path)) {
-      get_figshare(
+      download_result <- get_figshare(
         file_name = file_name,
         item = "28264271",
         output_dir = data_dir
       )
+      # Handle case where download failed
+      if (is.null(download_result)) {
+        message(
+          "Could not download example data '", which_data, "'. ",
+          "The file is not available locally and could not be fetched from Figshare."
+        )
+        return(NULL)
+      }
     }
   } else {
-    save_example_timepoint_data()
-    save_example_treatment_data()
+    # For RDS files, check if underlying data can be obtained
+    result <- tryCatch(
+      {
+        save_example_timepoint_data()
+        save_example_treatment_data()
+        TRUE
+      },
+      error = function(e) {
+        message(
+          "Could not prepare example data '", which_data, "': ", e$message
+        )
+        return(FALSE)
+      }
+    )
+    if (!isTRUE(result)) {
+      return(NULL)
+    }
+  }
+
+  # Check if file exists before trying to read
+  if (!file.exists(file_path)) {
+    message(
+      "Example data file not found: ", file_path, "\n",
+      "The data could not be downloaded. Please check your internet connection."
+    )
+    return(NULL)
   }
 
   dataset <- switch(which_data,
@@ -247,25 +300,65 @@ get_figshare <- function(file_name = NA,
                          return_list = FALSE) {
   if (is.null(output_dir)) output_dir <- system.file("extdata", package = "gimap")
 
-  decrypted <- openssl::aes_cbc_decrypt(
-    readRDS(encrypt_creds_path()),
-    key = readRDS(key_encrypt_creds_path())
+  # Check if Figshare is available before attempting to connect
+ if (!check_internet_available("https://api.figshare.com")) {
+    message(
+      "Cannot connect to Figshare. ",
+      "Please check your internet connection and try again later."
+    )
+    return(NULL)
+  }
+
+  decrypted <- tryCatch(
+    {
+      openssl::aes_cbc_decrypt(
+        readRDS(encrypt_creds_path()),
+        key = readRDS(key_encrypt_creds_path())
+      )
+    },
+    error = function(e) {
+      message("Could not decrypt Figshare credentials: ", e$message)
+      return(NULL)
+    }
   )
+
+  if (is.null(decrypted)) {
+    return(NULL)
+  }
 
   url <- file.path("https://api.figshare.com/v2/articles", item)
 
-  # Github api get
-  result <- httr::GET(
-    url,
-    httr::progress(),
-    httr::add_headers(
-      Authorization = paste0("Bearer ", unserialize(decrypted)$client_secret)
-    ),
-    httr::accept_json()
+  # Figshare API get with error handling
+  result <- tryCatch(
+    {
+      httr::GET(
+        url,
+        httr::progress(),
+        httr::add_headers(
+          Authorization = paste0("Bearer ", unserialize(decrypted)$client_secret)
+        ),
+        httr::accept_json()
+      )
+    },
+    error = function(e) {
+      message(
+        "Failed to connect to Figshare API: ", e$message, "\n",
+        "Please check your internet connection and try again later."
+      )
+      return(NULL)
+    }
   )
 
+  if (is.null(result)) {
+    return(NULL)
+  }
+
   if (httr::status_code(result) != 200) {
-    httr::stop_for_status(result)
+    message(
+      "Figshare API returned an error (HTTP ", httr::status_code(result), ").\n",
+      "The resource may be temporarily unavailable. Please try again later."
+    )
+    return(NULL)
   }
 
   # Process and return results
@@ -282,17 +375,36 @@ get_figshare <- function(file_name = NA,
     dplyr::pull(id)
 
   message("Downloading: ", file_name)
-  result <- httr::GET(
-    file.path("https://api.figshare.com/v2/file/download/", file_id),
-    httr::progress(),
-    httr::add_headers(
-      Authorization = paste0("Bearer ", unserialize(decrypted)$client_secret)
-    ),
-    httr::accept_json()
+  result <- tryCatch(
+    {
+      httr::GET(
+        file.path("https://api.figshare.com/v2/file/download/", file_id),
+        httr::progress(),
+        httr::add_headers(
+          Authorization = paste0("Bearer ", unserialize(decrypted)$client_secret)
+        ),
+        httr::accept_json()
+      )
+    },
+    error = function(e) {
+      message(
+        "Failed to download file from Figshare: ", e$message, "\n",
+        "Please check your internet connection and try again later."
+      )
+      return(NULL)
+    }
   )
 
+  if (is.null(result)) {
+    return(NULL)
+  }
+
   if (httr::status_code(result) != 200) {
-    httr::stop_for_status(result)
+    message(
+      "Failed to download file from Figshare (HTTP ", httr::status_code(result), ").\n",
+      "The resource may be temporarily unavailable. Please try again later."
+    )
+    return(NULL)
   }
 
   result_content <- httr::content(result, "text",

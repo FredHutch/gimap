@@ -4,7 +4,7 @@
 \alias{calc_gi}
 \title{Calculate Genetic Interaction scores}
 \usage{
-calc_gi(.data = NULL, gimap_dataset, use_lfc = FALSE)
+calc_gi(.data = NULL, gimap_dataset, use_lfc = FALSE, use_ntc = TRUE)
 }
 \arguments{
 \item{.data}{Data can be piped in with tidyverse pipes from function to
@@ -15,7 +15,11 @@ function. But the data must still be a gimap_dataset}
 
 \item{use_lfc}{Should Log fold change be used to calculate GI scores instead
 of CRISPR scores? If you do not have negative controls or CRISPR scores you
-will need to set this to TRUE. Then 0 will be used as the comparison value.}
+will need to set this to TRUE.}
+
+\item{use_ntc}{If you do not have negative controls or do not want them to be
+used set this to FALSE and then 0 will be used as the comparison value. Default
+is that use_ntc = TRUE and looks for negative control genes.}
 }
 \value{
 A gimap dataset with statistics and genetic interaction scores

@@ -139,6 +139,10 @@ gimap_annotate <- function(.data = NULL,
     annotation_df <- readr::read_table(annotation_file)
   } else {
     annotation_df <- get_example_data("annotation")
+    if (is.null(annotation_df)) {
+      message("Could not retrieve annotation data. Returning dataset without annotation.")
+      return(gimap_dataset)
+    }
   }
 
   message("Annotating Data")
@@ -159,16 +163,46 @@ gimap_annotate <- function(.data = NULL,
     # Essential gene labeling is from
     # inst/extdata/Achilles_common_essentials.csv
     control_genes <- ctrl_genes()
+    if (is.null(control_genes)) {
+      message("Could not retrieve control genes. Returning dataset without annotation.")
+      return(gimap_dataset)
+    }
   }
 
   ############################ Get TPM data ####################################
   if (cell_line_annotate) {
     # This is used to flag things
     ## get TPM and CN information (w/ option for user to upload their own info)
-    depmap_metadata <- readr::read_csv(
-      "https://figshare.com/ndownloader/files/35020903",
-      show_col_types = FALSE
+    depmap_metadata <- tryCatch(
+      {
+        readr::read_csv(
+          "https://figshare.com/ndownloader/files/35020903",
+          show_col_types = FALSE
+        )
+      },
+      error = function(e) {
+        message(
+          "Could not download DepMap metadata. ",
+          "Please check your internet connection and try again later.\n",
+          "Error: ", e$message
+        )
+        return(NULL)
+      }
     )
+
+    if (is.null(depmap_metadata)) {
+      message("Returning dataset without cell line annotation due to network error.")
+      return(gimap_dataset)
+    }
+
+    # Check if expected columns exist in the downloaded data
+    if (!("stripped_cell_line_name" %in% colnames(depmap_metadata))) {
+      message(
+        "DepMap metadata format has changed - expected column 'stripped_cell_line_name' not found. ",
+        "Returning dataset without cell line annotation."
+      )
+      return(gimap_dataset)
+    }
 
     my_depmap_id <- depmap_metadata %>%
       dplyr::filter(stripped_cell_line_name == toupper(cell_line)) %>%
@@ -184,7 +218,10 @@ gimap_annotate <- function(.data = NULL,
     }
     tpm_file <- getOption("tpm_file")
     if (is.null(tpm_file)) tpm_file <- tpm_setup(data_dir = annot_dir)
-    if (!file.exists(tpm_file)) stop("Could not download TPM file")
+    if (is.null(tpm_file) || !file.exists(tpm_file)) {
+      message("Could not download TPM file. Returning dataset without cell line annotation.")
+      return(gimap_dataset)
+    }
 
     op <- options("VROOM_CONNECTION_SIZE" = 500072)
     on.exit(options(op))
@@ -200,7 +237,10 @@ gimap_annotate <- function(.data = NULL,
 
     if (is.null(cn_file)) cn_file <- cn_setup(data_dir = annot_dir)
 
-    if (!file.exists(cn_file)) stop("Could not download CN file")
+    if (is.null(cn_file) || !file.exists(cn_file)) {
+      message("Could not download CN file. Returning dataset without cell line annotation.")
+      return(gimap_dataset)
+    }
     # Read in the CN data
     depmap_cn <- readr::read_csv(cn_file,
       show_col_types = FALSE,
@@ -343,10 +383,14 @@ tpm_setup <- function(overwrite = TRUE,
   options("tpm_file" = tpm_file)
   if (!file.exists(tpm_file) | overwrite) {
     if (!file.exists(file.path(data_dir, "CCLE_expression.csv.zip"))) {
-      get_figshare(
+      download_result <- get_figshare(
         file_name = "CCLE_expression.csv",
         output_dir = data_dir
       )
+      if (is.null(download_result)) {
+        message("Could not download TPM data from Figshare.")
+        return(NULL)
+      }
     } else {
       unzip(file.path(data_dir, "CCLE_expression.csv.zip"),
         exdir = data_dir, overwrite = TRUE
@@ -357,6 +401,11 @@ tpm_setup <- function(overwrite = TRUE,
     file.remove(file.path(data_dir, "__MACOSX"))
   }
 
+  # Check if file exists after download attempt
+  if (!file.exists(tpm_file)) {
+    message("TPM file not found after download attempt: ", tpm_file)
+    return(NULL)
+  }
 
   data_df <- readr::read_csv(tpm_file,
     show_col_types = FALSE,
@@ -401,10 +450,14 @@ cn_setup <- function(overwrite = TRUE,
 
   if (!file.exists(cn_file) | overwrite) {
     if (!file.exists(file.path(data_dir, "CCLE_gene_cn.csv.zip"))) {
-      get_figshare(
+      download_result <- get_figshare(
         file_name = "CCLE_gene_cn.csv",
         output_dir = data_dir
       )
+      if (is.null(download_result)) {
+        message("Could not download CN data from Figshare.")
+        return(NULL)
+      }
     } else {
       unzip(file.path(data_dir, "CCLE_gene_cn.csv.zip"),
         exdir = data_dir, overwrite = TRUE
@@ -413,6 +466,12 @@ cn_setup <- function(overwrite = TRUE,
   }
   if (dir.exists(file.path(data_dir, "__MACOSX"))) {
     file.remove(file.path(data_dir, "__MACOSX"))
+  }
+
+  # Check if file exists after download attempt
+  if (!file.exists(cn_file)) {
+    message("CN file not found after download attempt: ", cn_file)
+    return(NULL)
   }
 
   data_df <- readr::read_csv(cn_file,
@@ -457,10 +516,14 @@ ctrl_genes <- function(overwrite = TRUE,
       data_dir,
       "Achilles_common_essentials.csv.zip"
     ))) {
-      get_figshare(
+      download_result <- get_figshare(
         file_name = "Achilles_common_essentials.csv",
         output_dir = data_dir
       )
+      if (is.null(download_result)) {
+        message("Could not download control genes data from Figshare.")
+        return(NULL)
+      }
     } else {
       unzip(file.path(data_dir, "Achilles_common_essentials.csv.zip"),
         exdir = data_dir,
@@ -471,6 +534,13 @@ ctrl_genes <- function(overwrite = TRUE,
       }
     }
   }
+
+  # Check if file exists after download attempt
+  if (!file.exists(ctrl_genes_file)) {
+    message("Control genes file not found after download attempt: ", ctrl_genes_file)
+    return(NULL)
+  }
+
   ctrl_genes <- readr::read_csv(ctrl_genes_file, show_col_types = FALSE) %>%
     tidyr::separate(
       col = gene, into = c("gene_symbol", "entrez_id"),
@@ -492,10 +562,34 @@ ctrl_genes <- function(overwrite = TRUE,
 #' cell_lines <- supported_cell_lines()
 #' }
 supported_cell_lines <- function() {
-  depmap_metadata <- readr::read_csv(
-    "https://figshare.com/ndownloader/files/35020903",
-    show_col_types = FALSE
+  depmap_metadata <- tryCatch(
+    {
+      readr::read_csv(
+        "https://figshare.com/ndownloader/files/35020903",
+        show_col_types = FALSE
+      )
+    },
+    error = function(e) {
+      message(
+        "Could not download DepMap metadata to retrieve supported cell lines. ",
+        "Please check your internet connection and try again later.\n",
+        "Error: ", e$message
+      )
+      return(NULL)
+    }
   )
+
+  if (is.null(depmap_metadata)) {
+    return(character(0))
+  }
+
+  # Check if expected column exists
+  if (!("stripped_cell_line_name" %in% colnames(depmap_metadata))) {
+    message(
+      "DepMap metadata format has changed - expected column 'stripped_cell_line_name' not found."
+    )
+    return(character(0))
+  }
 
   return(sort(depmap_metadata$stripped_cell_line_name))
 }

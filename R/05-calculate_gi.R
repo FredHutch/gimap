@@ -39,7 +39,10 @@
 #' `setup_data()` function.
 #' @param use_lfc Should Log fold change be used to calculate GI scores instead
 #' of CRISPR scores? If you do not have negative controls or CRISPR scores you
-#' will need to set this to TRUE. Then 0 will be used as the comparison value. 
+#' will need to set this to TRUE.
+#' @param use_ntc If you do not have negative controls or do not want them to be
+#' used set this to FALSE and then 0 will be used as the comparison value. Default
+#' is that use_ntc = TRUE and looks for negative control genes.
 #' @return A gimap dataset with statistics and genetic interaction scores
 #' calculated. Overall results in the returned object can be obtained using
 #' gimap_dataset$overall_results Whereas target level genetic interaction
@@ -67,13 +70,15 @@
 #' }
 calc_gi <- function(.data = NULL,
                     gimap_dataset,
-                    use_lfc = FALSE) {
+                    use_lfc = FALSE,
+                    use_ntc = TRUE) {
   # Summary the calculation
   # single_target_crispr_1 = geneA_nt1, geneA_nt2...
   # single_target_crispr_2 = nt1_geneB, nt2_geneB...
   # double_crispr_score = geneA_geneBpg1, geneA_geneBpg2...
 
   # mean_double_control_crispr = mean for the same control sequence
+  # Unless use_ntc is set to FALSE
 
   # expected_crispr_double=single_target_crispr_1 + single_target_crispr_2
   # expected_crispr_single_1=single_target_crispr_1 + mean_double_control_crispr
@@ -152,7 +157,14 @@ calc_gi <- function(.data = NULL,
 
   # Add this check after creating control_target_df
   if (nrow(control_target_df) == 0) {
-    message("No ctrl_ctrl controls found. Using mean_double_control_crispr = 0 for calculations.")
+    message("No ctrl_ctrl controls found. Using mean_double_control_crispr = 0 for calculations.",
+            "\n If ctrl_ctrl's are expected then re-evaluate your annotations.")
+  }
+
+  # Add this check after creating control_target_df
+  if (!use_ntc) {
+    message("use_ntc = FALSE so ctrl_ctrl values either do not exist or will be ignored.",
+            "Using mean_double_control_crispr = 0 for calculations")
   }
 
   # Calculate expected and mean CRISPR scores for single targets
@@ -198,6 +210,8 @@ calc_gi <- function(.data = NULL,
     dplyr::mutate(
       ## Replace NA values in mean_double control_crispr with 0 when there are no ctrl_ctrl controls
       mean_double_control_crispr = ifelse(is.na(mean_double_control_crispr), 0, mean_double_control_crispr),
+      # OR if use_ntc == FALSE then it will still be set to 0
+      mean_double_control_crispr = if_else(rep(use_ntc, times=n()), mean_double_control_crispr, 0),
       expected_single_crispr = mean_single_crispr + mean_double_control_crispr,
     )
 
@@ -290,7 +304,8 @@ calc_gi <- function(.data = NULL,
   #### STEP 3: RUN THE TESTS
   target_results_df <- gimap_stats(
     gi_calc_single = gi_calc_single,
-    gi_calc_double = gi_calc_double
+    gi_calc_double = gi_calc_double,
+    use_ntc = use_ntc
   )
 
   #### STEP 4: FORMATTING DATA FOR EASY STORING
@@ -369,22 +384,35 @@ calc_gi <- function(.data = NULL,
 #' @description Create results table that has t test p values
 #' @param gi_calc_single a data.frame with adjusted single gi scores
 #' @param gi_calc_double a data.frame with adjusted double gi scores
+#' @param use_ntc Logical. If TRUE, uses a two-sample t-test comparing double
+#' target GI scores against single target GI scores. If FALSE, uses a one-sample
+#' t-test against mu=0 since single target GI scores have zero variance when
+#' negative controls are not used.
 #' @param replicate a name of a replicate to filter out from gi_calc_adj Optional
 #' @importFrom stats p.adjust t.test wilcox.test
-gimap_stats <- function(gi_calc_double, gi_calc_single, replicate = NULL) {
+gimap_stats <- function(gi_calc_double, gi_calc_single, use_ntc = TRUE, replicate = NULL) {
   ## get a vector of GI scores for all single-targeting ("control") pgRNAs
   ## for each rep
   ## get double-targeting pgRNAs for this rep, do a t-test to compare the
   ## double-targeting GI scores for each paralog pair to the control vector
   ## adjust for multiple testing using the Benjamini-Hochberg method
 
-  gi_scores <- gi_calc_double %>%
-    group_by(pgRNA_target) %>%
-    mutate(p_val = t.test(
-      x = gi_calc_single$gi_score,
-      y = gi_score, # all construct guides here
-      paired = FALSE
-    )$p.value)
+  if (use_ntc) {
+    # Two-sample t-test: compare double target GI scores against single target GI scores
+    gi_scores <- gi_calc_double %>%
+      group_by(pgRNA_target) %>%
+      mutate(p_val = t.test(
+        x = gi_calc_single$gi_score,
+        y = gi_score, # all construct guides here
+        paired = FALSE
+      )$p.value)
+  } else {
+    # One-sample t-test: test if double target GI scores differ from 0
+    # Used when use_ntc=FALSE because single target GI scores are all ~0
+    gi_scores <- gi_calc_double %>%
+      group_by(pgRNA_target) %>%
+      mutate(p_val = t.test(gi_score, mu = 0)$p.value)
+  }
 
 
   ## adjust for multiple testing using the Benjamini-Hochberg method

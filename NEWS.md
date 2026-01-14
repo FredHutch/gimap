@@ -1,3 +1,14 @@
+# gimap 1.1.2
+
+* Fixed vignettes to properly include pre-built images using `knitr::include_graphics()`
+* Improved test skipping pattern to use proper testthat skip functions
+* All internet resource accesses fail gracefully with informative messages (CRAN policy compliance)
+* Added `"id"` to `utils::globalVariables()` to fix compatibility with dplyr 1.2.0+ (which removed the defunct `dplyr::id()`)
+* Added validation for DepMap metadata column names to handle changes in external data format gracefully
+
+# gimap 1.1.1
+
+* Minor bug fixes and documentation improvements
 
 # gimap 1.1.0
 
