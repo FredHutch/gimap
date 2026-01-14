@@ -186,6 +186,6 @@ The authors declare no conflicts of interest.
 
 # AI Usage Disclosure
 
-No generative AI tools were used in the development of this software or the preparation of this manuscript.
+No generative AI tools were used in the development of this software. AI was used for minor polishing in the preparation of this manuscript.
 
 # References
