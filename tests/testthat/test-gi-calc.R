@@ -1,5 +1,6 @@
 test_that("Test Genetic Interaction score calculations", {
   skip_if_figshare_unavailable()
+  skip_if_depmap_changed()
 
   gimap_dataset <- get_example_data("gimap") %>%
     gimap_filter() %>%
@@ -41,6 +42,7 @@ test_that("Test Genetic Interaction score calculations", {
 
 test_that("Test Genetic Interaction score calculations using LFC", {
   skip_if_figshare_unavailable()
+  skip_if_depmap_changed()
 
   gimap_dataset <- get_example_data("gimap") %>%
     gimap_filter() %>%
@@ -58,6 +60,7 @@ test_that("Test Genetic Interaction score calculations using LFC", {
 
 test_that("Test Genetic Interaction score without normalization", {
   skip_if_figshare_unavailable()
+  skip_if_depmap_changed()
 
   gimap_dataset_wo <- get_example_data("gimap") %>%
     gimap_filter() %>%
@@ -103,6 +106,7 @@ test_that("Test Genetic Interaction score without normalization", {
 
 test_that("Test Genetic Interaction score calculations without ctrl_ctrl controls", {
   skip_if_figshare_unavailable()
+  skip_if_depmap_changed()
 
   # Get the example data and modify it to remove ctrl_ctrl controls
   gimap_dataset <- get_example_data("gimap") %>%
@@ -176,6 +180,7 @@ test_that("Test Genetic Interaction score calculations without ctrl_ctrl control
 
 test_that("Test proper error messages for incompatible settings", {
   skip_if_figshare_unavailable()
+  skip_if_depmap_changed()
 
   # Get the example data and modify it to remove ctrl_ctrl controls
   gimap_dataset <- get_example_data("gimap") %>%

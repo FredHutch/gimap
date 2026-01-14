@@ -1,5 +1,6 @@
 test_that("Test normalization", {
   skip_if_figshare_unavailable()
+  skip_if_depmap_changed()
 
   gimap_dataset <- get_example_data("gimap") %>%
     gimap_filter() %>%
@@ -39,6 +40,7 @@ test_that("Test normalization", {
 
 test_that("Test normalization without expression cutoff", {
   skip_if_figshare_unavailable()
+  skip_if_depmap_changed()
 
   gimap_dataset_true <- get_example_data("gimap") %>%
     gimap_filter() %>%

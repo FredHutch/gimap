@@ -195,6 +195,15 @@ gimap_annotate <- function(.data = NULL,
       return(gimap_dataset)
     }
 
+    # Check if expected columns exist in the downloaded data
+    if (!("stripped_cell_line_name" %in% colnames(depmap_metadata))) {
+      message(
+        "DepMap metadata format has changed - expected column 'stripped_cell_line_name' not found. ",
+        "Returning dataset without cell line annotation."
+      )
+      return(gimap_dataset)
+    }
+
     my_depmap_id <- depmap_metadata %>%
       dplyr::filter(stripped_cell_line_name == toupper(cell_line)) %>%
       dplyr::pull(DepMap_ID)
@@ -571,6 +580,14 @@ supported_cell_lines <- function() {
   )
 
   if (is.null(depmap_metadata)) {
+    return(character(0))
+  }
+
+  # Check if expected column exists
+  if (!("stripped_cell_line_name" %in% colnames(depmap_metadata))) {
+    message(
+      "DepMap metadata format has changed - expected column 'stripped_cell_line_name' not found."
+    )
     return(character(0))
   }
 

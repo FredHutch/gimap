@@ -1,5 +1,6 @@
 test_that("Annotation options", {
   skip_if_figshare_unavailable()
+  skip_if_depmap_changed()
 
   gimap_dataset <- get_example_data("gimap") %>%
     gimap_filter() %>%
