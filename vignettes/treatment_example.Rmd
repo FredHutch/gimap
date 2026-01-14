@@ -263,7 +263,9 @@ plot_exp_v_obs_scatter(gimap_dataset)
 ggsave(file.path(output_dir, "exp_v_obs_scatter.png"))
 ```
 
-![](output_treatment/exp_v_obs_scatter.png)
+```{r echo = FALSE, out.width = "100%"}
+knitr::include_graphics("output_treatment/exp_v_obs_scatter.png")
+```
 
 ```{r eval = FALSE}
 plot_rank_scatter(gimap_dataset)
@@ -272,7 +274,9 @@ plot_rank_scatter(gimap_dataset)
 ggsave(file.path(output_dir, "plot_rank_scatter.png"))
 ```
 
-![](output_treatment/plot_rank_scatter.png)
+```{r echo = FALSE, out.width = "100%"}
+knitr::include_graphics("output_treatment/plot_rank_scatter.png")
+```
 
 ```{r eval = FALSE}
 plot_volcano(gimap_dataset)
@@ -280,7 +284,10 @@ plot_volcano(gimap_dataset)
 # Save it to a file
 ggsave(file.path(output_dir, "volcano_plot.png"))
 ```
-![](output_treatment/volcano_plot.png)
+
+```{r echo = FALSE, out.width = "100%"}
+knitr::include_graphics("output_treatment/plot_volcano.png")
+```
 
 ### Plot specific target pair
 
@@ -293,7 +300,10 @@ plot_targets(gimap_dataset, target1 = "DUSP21", target2 = "DUSP18")
 # Save it to a file
 ggsave(file.path(output_dir, "DUSP21_DUSP18.png"))
 ```
-![](output_treatment/DUSP21_DUSP18.png)
+
+```{r echo = FALSE, out.width = "100%"}
+knitr::include_graphics("output_treatment/DUSP21_DUSP18.png")
+```
 
 ## Saving results to files
 

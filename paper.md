@@ -44,7 +44,7 @@ The gimap (Genetic Interaction MAPping) R package addresses a fundamental challe
 
 When multiple genes have the same function, a common result of evolutionary processes, it becomes challenging to isolate their true functions. This redundancy means that many possible therapeutic targets are missed by traditional methods that disable just one gene at a time [@parrish_discovery_2021; @dekegel2019paralog]. A more complementary approach involves disabling two genes simultaneously to reveal these backup relationships [@thompson_combinatorial_2021].
 
-Recent advances in CRISPR technology now allow researchers to knock out gene pairs at once, offering a powerful solution to this problem (https://pubmed.ncbi.nlm.nih.gov/31911676/). Although software solutions exist for single knockout CRISPR, such as MAGeCK, there is no standardized software solution for paired gene CRISPR studies [@mageck].
+Recent advances in CRISPR technology now allow researchers to knock out gene pairs at once, offering a powerful solution to this problem [@gonatopoulos2020genetic]. Although software solutions exist for single knockout CRISPR, such as MAGeCK, there is no standardized software solution for paired gene CRISPR studies [@mageck].
 
 The R package, called `gimap` (Genetic Interaction MAPping), was developed specifically for analyzing these dual-target CRISPR experiments. It helps researchers identify important relationships between genes, such as when two genes work together or when disabling both creates a dramatic effect that wouldn't occur by disabling either one alone.
 
@@ -168,5 +168,17 @@ _Example applications include:_
 # Acknowledgements
 
 This work is funded by NCI grant R01CA262556 and the Translational Data Science Integrated Research Center of Fred Hutchinson Cancer Center. SO is a Washington Research Foundation postdoctoral fellow.
+
+# Related Publications
+
+This software implements methods originally described in @parrish_discovery_2021. The current submission focuses on the software implementation and its accessibility to the research community.
+
+# Conflict of Interest
+
+The authors declare no conflicts of interest.
+
+# AI Usage Disclosure
+
+No generative AI tools were used in the development of this software or the preparation of this manuscript.
 
 # References
