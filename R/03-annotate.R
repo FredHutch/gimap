@@ -27,8 +27,8 @@
 #' Note that you can use custom_tpm with cell_line_annotate but your custom_tpm
 #' will be used instead of the tpm data from DepMap. However other data from
 #' DepMap like CN will be added.
-#' @param annot_dir Where should the annotation files be saved? default is a
-#' temporary directory.
+#' @param annot_dir Where should the annotation files be saved? Default is a
+#' user data directory.
 #' @param refresh_annot Should the annotation file paths saved as options be reset
 #' and the files redownloaded? TRUE or FALSE.
 #' @return A gimap_dataset with annotation data frame that can be retrieve by using
@@ -97,7 +97,7 @@ gimap_annotate <- function(.data = NULL,
                            cell_line_annotate = TRUE,
                            custom_tpm = NULL,
                            cell_line = NULL,
-                           annot_dir = system.file("extdata", package = "gimap"),
+                           annot_dir = gimap_data_dir(),
                            refresh_annot = FALSE) {
   if (!is.null(.data)) gimap_dataset <- .data
 
@@ -140,7 +140,10 @@ gimap_annotate <- function(.data = NULL,
   } else {
     annotation_df <- get_example_data("annotation")
     if (is.null(annotation_df)) {
-      message("Could not retrieve annotation data. Returning dataset without annotation.")
+      warning(
+        "Could not retrieve annotation data. Returning dataset without annotation. ",
+        figshare_manual_download_message("28264271", "pgPEN_annotations.txt")
+      )
       return(gimap_dataset)
     }
   }
@@ -164,7 +167,10 @@ gimap_annotate <- function(.data = NULL,
     # inst/extdata/Achilles_common_essentials.csv
     control_genes <- ctrl_genes()
     if (is.null(control_genes)) {
-      message("Could not retrieve control genes. Returning dataset without annotation.")
+      warning(
+        "Could not retrieve control genes. Returning dataset without annotation. ",
+        figshare_manual_download_message("19700056", "Achilles_common_essentials.csv")
+      )
       return(gimap_dataset)
     }
   }
@@ -373,11 +379,11 @@ gimap_annotate <- function(.data = NULL,
 #' @description  This function sets up the tpm data from DepMap is
 #' called by the `gimap_annotate()` function
 #' @param overwrite should the files be re downloaded
-#' @param data_dir What directory should this be saved to? Default is with package
-#' files
+#' @param data_dir What directory should this be saved to? Default is a user data
+#' directory.
 #' @importFrom utils download.file unzip
 tpm_setup <- function(overwrite = TRUE,
-                      data_dir = system.file("extdata", package = "gimap")) {
+                      data_dir = gimap_data_dir()) {
   tpm_file <- file.path(data_dir, "CCLE_expression.csv")
 
   options("tpm_file" = tpm_file)
@@ -388,7 +394,10 @@ tpm_setup <- function(overwrite = TRUE,
         output_dir = data_dir
       )
       if (is.null(download_result)) {
-        message("Could not download TPM data from Figshare.")
+        warning(
+          "Could not download TPM data from Figshare. ",
+          figshare_manual_download_message("19700056", "CCLE_expression.csv")
+        )
         return(NULL)
       }
     } else {
@@ -403,7 +412,10 @@ tpm_setup <- function(overwrite = TRUE,
 
   # Check if file exists after download attempt
   if (!file.exists(tpm_file)) {
-    message("TPM file not found after download attempt: ", tpm_file)
+    warning(
+      "TPM file not found after download attempt: ", tpm_file, ". ",
+      figshare_manual_download_message("19700056", "CCLE_expression.csv")
+    )
     return(NULL)
   }
 
@@ -434,11 +446,11 @@ tpm_setup <- function(overwrite = TRUE,
 #' @description This function sets up the tpm data from DepMap is called
 #' by the `gimap_annotate()` function if the cn_annotate = TRUE
 #' @param overwrite Should the files be redownloaded?
-#' @param data_dir What directory should this be saved to? Default is with package
-#' files
+#' @param data_dir What directory should this be saved to? Default is a user data
+#' directory.
 #' @importFrom utils download.file unzip
 cn_setup <- function(overwrite = TRUE,
-                     data_dir = system.file("extdata", package = "gimap")) {
+                     data_dir = gimap_data_dir()) {
   options(timeout = 1000)
 
   cn_file <- file.path(
@@ -455,7 +467,10 @@ cn_setup <- function(overwrite = TRUE,
         output_dir = data_dir
       )
       if (is.null(download_result)) {
-        message("Could not download CN data from Figshare.")
+        warning(
+          "Could not download CN data from Figshare. ",
+          figshare_manual_download_message("19700056", "CCLE_gene_cn.csv")
+        )
         return(NULL)
       }
     } else {
@@ -470,7 +485,10 @@ cn_setup <- function(overwrite = TRUE,
 
   # Check if file exists after download attempt
   if (!file.exists(cn_file)) {
-    message("CN file not found after download attempt: ", cn_file)
+    warning(
+      "CN file not found after download attempt: ", cn_file, ". ",
+      figshare_manual_download_message("19700056", "CCLE_gene_cn.csv")
+    )
     return(NULL)
   }
 
@@ -501,11 +519,11 @@ cn_setup <- function(overwrite = TRUE,
 #' @description This function sets up the control genes file from DepMap is
 #' called by the `gimap_annotate()`
 #' @param overwrite Should the file be redownloaded and reset up?
-#' @param data_dir What directory should this be saved to? Default is with package
-#' files
+#' @param data_dir What directory should this be saved to? Default is a user data
+#' directory.
 #' @importFrom utils download.file unzip
 ctrl_genes <- function(overwrite = TRUE,
-                       data_dir = system.file("extdata", package = "gimap")) {
+                       data_dir = gimap_data_dir()) {
   ctrl_genes_file <- file.path(data_dir, "Achilles_common_essentials.csv")
 
   options("ctrl_genes_file" = ctrl_genes_file)
@@ -521,7 +539,10 @@ ctrl_genes <- function(overwrite = TRUE,
         output_dir = data_dir
       )
       if (is.null(download_result)) {
-        message("Could not download control genes data from Figshare.")
+        warning(
+          "Could not download control genes data from Figshare. ",
+          figshare_manual_download_message("19700056", "Achilles_common_essentials.csv")
+        )
         return(NULL)
       }
     } else {
@@ -537,7 +558,11 @@ ctrl_genes <- function(overwrite = TRUE,
 
   # Check if file exists after download attempt
   if (!file.exists(ctrl_genes_file)) {
-    message("Control genes file not found after download attempt: ", ctrl_genes_file)
+    warning(
+      "Control genes file not found after download attempt: ",
+      ctrl_genes_file, ". ",
+      figshare_manual_download_message("19700056", "Achilles_common_essentials.csv")
+    )
     return(NULL)
   }
 

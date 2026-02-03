@@ -19,6 +19,15 @@ skip_if_figshare_unavailable <- function() {
   }
 }
 
+# Helper function to create a writable example data directory for tests
+test_example_data_dir <- function() {
+  data_dir <- file.path(tempdir(), "gimap_example_data")
+  if (!dir.exists(data_dir)) {
+    dir.create(data_dir, recursive = TRUE, showWarnings = FALSE)
+  }
+  return(data_dir)
+}
+
 # Helper function to skip tests when DepMap metadata format has changed
 skip_if_depmap_changed <- function() {
   # Skip on CRAN since these tests require external resources

@@ -43,13 +43,49 @@ check_internet_available <- function(url = "https://api.figshare.com",
   )
 }
 
+#' Build manual download instructions for Figshare files
+#' @description Internal helper to build a warning message for manual downloads.
+#' @param item Figshare item ID.
+#' @param files Character vector of file names.
+#' @return A formatted message string.
+#' @keywords internal
+figshare_manual_download_message <- function(item, files) {
+  files_text <- paste0(files, collapse = ", ")
+  paste0(
+    "You can manually download these files from Figshare item ", item, ": ",
+    files_text, ". ",
+    "Use `gimap::get_figshare(file_name = ..., item = \"", item,
+    "\", output_dir = <data_dir>)` or see README \"Manual data download (Figshare)\"."
+  )
+}
+
+#' Resolve and create data directory
+#' @description Internal helper to resolve a writable data directory for downloads.
+#' @param data_dir Optional data directory. If NULL or empty, uses a user data dir.
+#' @return A normalized, existing directory path.
+#' @keywords internal
+gimap_data_dir <- function(data_dir = NULL) {
+  if (is.null(data_dir) || length(data_dir) == 0) {
+    data_dir <- tools::R_user_dir("gimap", "data")
+  } else if (is.na(data_dir) || !nzchar(data_dir)) {
+    data_dir <- tools::R_user_dir("gimap", "data")
+  }
+
+  data_dir <- normalizePath(data_dir, winslash = "/", mustWork = FALSE)
+  if (!dir.exists(data_dir)) {
+    dir.create(data_dir, recursive = TRUE, showWarnings = FALSE)
+  }
+  return(data_dir)
+}
+
 
 #' Returns example data for package
 #' @description This function loads and returns example data for the package.
 #' Which dataset is returned must be specified. Data will be downloaded from Figshare
 #' the first time it is used.
 #' @param which_data options are "count" or "meta"; specifies which example dataset should be returned
-#' @param data_dir Where should the data be saved if applicable?
+#' @param data_dir Where should the data be saved if applicable? If NULL, a user data
+#' directory will be used.
 #' @param refresh_data should the example data that's been downloaded be deleted
 #' and redownloaded?
 #' @export
@@ -66,8 +102,9 @@ check_internet_available <- function(url = "https://api.figshare.com",
 #' annotation <- get_example_data("annotation")
 #' }
 get_example_data <- function(which_data,
-                             data_dir = system.file("extdata", package = "gimap"),
+                             data_dir = NULL,
                              refresh_data = FALSE) {
+  data_dir <- gimap_data_dir(data_dir)
   file_name <- switch(which_data,
     "count" = "PP_pgPEN_HeLa_counts.txt",
     "count_treatment" = "counts_pgPEN_PC9_example.tsv",
@@ -84,12 +121,12 @@ get_example_data <- function(which_data,
 
   file_path <- file.path(data_dir, file_name)
 
-  if (!grepl("RDS$", file_name)) {
-    # Save file path in the options
-    file_path_list <- list(file_path)
-    names(file_path_list) <- which_data
-    options(file_path_list)
+  # Save file path in the options
+  file_path_list <- list(file_path)
+  names(file_path_list) <- which_data
+  options(file_path_list)
 
+  if (!grepl("RDS$", file_name)) {
     if (!file.exists(file_path)) {
       download_result <- get_figshare(
         file_name = file_name,
@@ -98,9 +135,10 @@ get_example_data <- function(which_data,
       )
       # Handle case where download failed
       if (is.null(download_result)) {
-        message(
+        warning(
           "Could not download example data '", which_data, "'. ",
-          "The file is not available locally and could not be fetched from Figshare."
+          "The file is not available locally and could not be fetched from Figshare. ",
+          figshare_manual_download_message("28264271", file_name)
         )
         return(NULL)
       }
@@ -109,8 +147,8 @@ get_example_data <- function(which_data,
     # For RDS files, check if underlying data can be obtained
     result <- tryCatch(
       {
-        save_example_timepoint_data()
-        save_example_treatment_data()
+        save_example_timepoint_data(data_dir = data_dir)
+        save_example_treatment_data(data_dir = data_dir)
         TRUE
       },
       error = function(e) {
@@ -127,9 +165,10 @@ get_example_data <- function(which_data,
 
   # Check if file exists before trying to read
   if (!file.exists(file_path)) {
-    message(
+    warning(
       "Example data file not found: ", file_path, "\n",
-      "The data could not be downloaded. Please check your internet connection."
+      "The data could not be downloaded. Please check your internet connection.\n",
+      figshare_manual_download_message("28264271", file_name)
     )
     return(NULL)
   }
@@ -154,26 +193,23 @@ get_example_data <- function(which_data,
 
 
 #' Get file path to an default credentials RDS
+#' @param data_dir Optional data directory override.
 #' @export
 #' @return Returns the file path to folder where the example data is stored
-example_data_folder <- function() {
-  file <- list.files(
-    pattern = "example_data.md",
-    recursive = TRUE,
-    system.file("extdata", package = "gimap"),
-    full.names = TRUE
-  )
-  dirname(file)
+example_data_folder <- function(data_dir = NULL) {
+  gimap_data_dir(data_dir)
 }
 
 #' Set up example count data
+#' @param data_dir Optional data directory override.
 #' @export
 #' @return Returns the file path to folder where the example data is stored
-save_example_timepoint_data <- function() {
-  example_data <- get_example_data("count") %>%
+save_example_timepoint_data <- function(data_dir = NULL) {
+  data_dir <- gimap_data_dir(data_dir)
+  example_data <- get_example_data("count", data_dir = data_dir) %>%
     dplyr::select(!Day05_RepA)
 
-  example_pg_metadata <- get_example_data("meta")
+  example_pg_metadata <- get_example_data("meta", data_dir = data_dir)
 
   example_counts <- example_data %>%
     dplyr::select(c("Day00_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC")) %>%
@@ -197,23 +233,18 @@ save_example_timepoint_data <- function() {
     sample_metadata = example_sample_metadata
   )
 
-  example_folder <- list.files(
-    pattern = "PP_pgPEN_HeLa_counts.txt",
-    recursive = TRUE,
-    system.file("extdata", package = "gimap"),
-    full.names = TRUE
-  )
-
-  saveRDS(gimap_dataset, file.path(dirname(example_folder), "gimap_dataset_timepoint.RDS"))
+  saveRDS(gimap_dataset, file.path(data_dir, "gimap_dataset_timepoint.RDS"))
 }
 
 #' Set up example count data
+#' @param data_dir Optional data directory override.
 #' @export
 #' @return Returns the file path to folder where the example data is stored
-save_example_treatment_data <- function() {
-  example_data <- get_example_data("count_treatment")
+save_example_treatment_data <- function(data_dir = NULL) {
+  data_dir <- gimap_data_dir(data_dir)
+  example_data <- get_example_data("count_treatment", data_dir = data_dir)
 
-  example_pg_metadata <- get_example_data("meta")
+  example_pg_metadata <- get_example_data("meta", data_dir = data_dir)
 
   example_counts <- example_data %>%
     select(c("pretreatment", "dmsoA", "dmsoB", "drug1A", "drug1B")) %>%
@@ -236,14 +267,7 @@ save_example_treatment_data <- function() {
     sample_metadata = example_sample_metadata
   )
 
-  example_folder <- list.files(
-    pattern = "counts_pgPEN_PC9_example.tsv",
-    recursive = TRUE,
-    system.file("extdata", package = "gimap"),
-    full.names = TRUE
-  )
-
-  saveRDS(gimap_dataset, file.path(dirname(example_folder), "gimap_dataset_treatment.RDS"))
+  saveRDS(gimap_dataset, file.path(data_dir, "gimap_dataset_treatment.RDS"))
 }
 
 plot_options <- function() {

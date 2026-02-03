@@ -4,7 +4,10 @@
 \alias{example_data_folder}
 \title{Get file path to an default credentials RDS}
 \usage{
-example_data_folder()
+example_data_folder(data_dir = NULL)
+}
+\arguments{
+\item{data_dir}{Optional data directory override.}
 }
 \value{
 Returns the file path to folder where the example data is stored
