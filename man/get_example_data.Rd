@@ -6,14 +6,15 @@
 \usage{
 get_example_data(
   which_data,
-  data_dir = system.file("extdata", package = "gimap"),
+  data_dir = NULL,
   refresh_data = FALSE
 )
 }
 \arguments{
 \item{which_data}{options are "count" or "meta"; specifies which example dataset should be returned}
 
-\item{data_dir}{Where should the data be saved if applicable?}
+\item{data_dir}{Where should the data be saved if applicable? If NULL, a user data
+directory will be used.}
 
 \item{refresh_data}{should the example data that's been downloaded be deleted
 and redownloaded?}

@@ -1,8 +1,9 @@
 test_that("Test Genetic Interaction score calculations", {
   skip_if_figshare_unavailable()
   skip_if_depmap_changed()
+  data_dir <- test_example_data_dir()
 
-  gimap_dataset <- get_example_data("gimap") %>%
+  gimap_dataset <- get_example_data("gimap", data_dir = data_dir) %>%
     gimap_filter() %>%
     gimap_annotate(cell_line = "HELA") %>%
     gimap_normalize(
@@ -43,8 +44,9 @@ test_that("Test Genetic Interaction score calculations", {
 test_that("Test Genetic Interaction score calculations using LFC", {
   skip_if_figshare_unavailable()
   skip_if_depmap_changed()
+  data_dir <- test_example_data_dir()
 
-  gimap_dataset <- get_example_data("gimap") %>%
+  gimap_dataset <- get_example_data("gimap", data_dir = data_dir) %>%
     gimap_filter() %>%
     gimap_annotate(cell_line = "HELA") %>%
     gimap_normalize(
@@ -61,8 +63,9 @@ test_that("Test Genetic Interaction score calculations using LFC", {
 test_that("Test Genetic Interaction score without normalization", {
   skip_if_figshare_unavailable()
   skip_if_depmap_changed()
+  data_dir <- test_example_data_dir()
 
-  gimap_dataset_wo <- get_example_data("gimap") %>%
+  gimap_dataset_wo <- get_example_data("gimap", data_dir = data_dir) %>%
     gimap_filter() %>%
     gimap_annotate(cell_line = "HELA") %>%
     gimap_normalize(
@@ -72,7 +75,7 @@ test_that("Test Genetic Interaction score without normalization", {
     ) %>%
     calc_gi()
 
-  gimap_dataset_w <- get_example_data("gimap") %>%
+  gimap_dataset_w <- get_example_data("gimap", data_dir = data_dir) %>%
     gimap_filter() %>%
     gimap_annotate(cell_line = "HELA") %>%
     gimap_normalize(
@@ -107,9 +110,10 @@ test_that("Test Genetic Interaction score without normalization", {
 test_that("Test Genetic Interaction score calculations without ctrl_ctrl controls", {
   skip_if_figshare_unavailable()
   skip_if_depmap_changed()
+  data_dir <- test_example_data_dir()
 
   # Get the example data and modify it to remove ctrl_ctrl controls
-  gimap_dataset <- get_example_data("gimap") %>%
+  gimap_dataset <- get_example_data("gimap", data_dir = data_dir) %>%
     gimap_filter() %>%
     gimap_annotate(cell_line = "HELA")
 
@@ -152,7 +156,7 @@ test_that("Test Genetic Interaction score calculations without ctrl_ctrl control
   testthat::expect_true("double_lfc" %in% names(gimap_dataset_no_ctrl$lfc))
 
   # This should work without error when using use_ntc = TRUE
-  gimap_dataset_no_ntc <- get_example_data("gimap") %>%
+  gimap_dataset_no_ntc <- get_example_data("gimap", data_dir = data_dir) %>%
     gimap_filter() %>%
     gimap_annotate(cell_line = "HELA") %>%
     gimap_normalize(
@@ -181,9 +185,10 @@ test_that("Test Genetic Interaction score calculations without ctrl_ctrl control
 test_that("Test proper error messages for incompatible settings", {
   skip_if_figshare_unavailable()
   skip_if_depmap_changed()
+  data_dir <- test_example_data_dir()
 
   # Get the example data and modify it to remove ctrl_ctrl controls
-  gimap_dataset <- get_example_data("gimap") %>%
+  gimap_dataset <- get_example_data("gimap", data_dir = data_dir) %>%
     gimap_filter() %>%
     gimap_annotate(cell_line = "HELA")
 

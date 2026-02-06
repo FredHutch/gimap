@@ -12,7 +12,7 @@ gimap_annotate(
   cell_line_annotate = TRUE,
   custom_tpm = NULL,
   cell_line = NULL,
-  annot_dir = system.file("extdata", package = "gimap"),
+  annot_dir = gimap_data_dir(),
   refresh_annot = FALSE
 )
 }
@@ -50,8 +50,8 @@ DepMap like CN will be added.}
 \item{cell_line}{which cell line are you using? (e.g., HELA, PC9, etc.).
 Required argument if cell_line_annotate is TRUE.}
 
-\item{annot_dir}{Where should the annotation files be saved? default is a
-temporary directory.}
+\item{annot_dir}{Where should the annotation files be saved? Default is a
+user data directory.}
 
 \item{refresh_annot}{Should the annotation file paths saved as options be reset
 and the files redownloaded? TRUE or FALSE.}

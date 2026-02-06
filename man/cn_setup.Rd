@@ -6,14 +6,14 @@
 \usage{
 cn_setup(
   overwrite = TRUE,
-  data_dir = system.file("extdata", package = "gimap")
+  data_dir = gimap_data_dir()
 )
 }
 \arguments{
 \item{overwrite}{Should the files be redownloaded?}
 
-\item{data_dir}{What directory should this be saved to? Default is with package
-files}
+\item{data_dir}{What directory should this be saved to? Default is a user data
+directory.}
 }
 \description{
 This function sets up the tpm data from DepMap is called

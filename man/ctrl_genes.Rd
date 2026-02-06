@@ -6,14 +6,14 @@
 \usage{
 ctrl_genes(
   overwrite = TRUE,
-  data_dir = system.file("extdata", package = "gimap")
+  data_dir = gimap_data_dir()
 )
 }
 \arguments{
 \item{overwrite}{Should the file be redownloaded and reset up?}
 
-\item{data_dir}{What directory should this be saved to? Default is with package
-files}
+\item{data_dir}{What directory should this be saved to? Default is a user data
+directory.}
 }
 \description{
 This function sets up the control genes file from DepMap is

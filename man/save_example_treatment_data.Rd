@@ -4,7 +4,10 @@
 \alias{save_example_treatment_data}
 \title{Set up example count data}
 \usage{
-save_example_treatment_data()
+save_example_treatment_data(data_dir = NULL)
+}
+\arguments{
+\item{data_dir}{Optional data directory override.}
 }
 \value{
 Returns the file path to folder where the example data is stored

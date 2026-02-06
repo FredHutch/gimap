@@ -24,6 +24,13 @@ Besides installing the gimap package, you will also need to install wget if you 
 
 [How to install wget](https://phoenixnap.com/kb/wget-command-with-examples#How_to_Install_wget)
 
+## Data download requirements
+
+Example data are hosted on Figshare and are not bundled with the package to keep
+the CRAN tarball small. `get_example_data()` will download the files on first use
+to a user data directory. For manual download instructions, see the README section
+"Manual data download (Figshare)".
+
 To install this package you will need to run:
 ```
 install.packages("gimap")
@@ -65,7 +72,7 @@ Let's examine this example pgPEN counts table. It's divided into columns contain
 - `Day22_RepA`: Gene Counts from Day 22 for Replicate A
 - `Day22_RepB`: Gene Counts from Day 22 for Replicate B
 
-For the purposes of this tutorial, we can grab example data from the package.
+For the purposes of this tutorial, we can download example data from Figshare.
 
 ```{r eval = FALSE}
 example_data <- get_example_data("count") %>%

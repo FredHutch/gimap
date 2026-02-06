@@ -13,6 +13,7 @@
       - [Expected CRISPR scores](#expected-crispr-scores)
     - [Normalization](#normalization)
   - [Prerequisites](#prerequisites)
+  - [Manual data download (Figshare)](#manual-data-download-figshare)
   - [Getting Started Tutorial](#getting-started-tutorial)
   - [Docker image](#docker-image)
   - [Citations:](#citations)
@@ -167,6 +168,58 @@ In order to run this pipeline you will need R and to install the `gimap` package
 install.packages("remotes")
 remotes::install_github("FredHutch/gimap")
 ```
+
+## Manual data download (Figshare)
+
+To keep the package size minimal for CRAN, example and annotation files are not bundled.
+You can download the files manually from Figshare and place them in a writable data
+directory. The package will also download these files automatically on first use.
+
+### Where to put files
+
+```
+example_dir <- gimap::example_data_folder()
+dir.create(example_dir, recursive = TRUE, showWarnings = FALSE)
+```
+
+### Example data (Figshare item 28264271)
+
+These files are used by `get_example_data()`:
+
+- `PP_pgPEN_HeLa_counts.txt`
+- `counts_pgPEN_PC9_example.tsv`
+- `pgRNA_ID_pgPEN_library_comp.csv`
+- `pgPEN_annotations.txt`
+
+Download with:
+
+```
+gimap::get_figshare(return_list = TRUE, item = "28264271")
+gimap::get_figshare(file_name = "PP_pgPEN_HeLa_counts.txt", item = "28264271", output_dir = example_dir)
+gimap::get_figshare(file_name = "counts_pgPEN_PC9_example.tsv", item = "28264271", output_dir = example_dir)
+gimap::get_figshare(file_name = "pgRNA_ID_pgPEN_library_comp.csv", item = "28264271", output_dir = example_dir)
+gimap::get_figshare(file_name = "pgPEN_annotations.txt", item = "28264271", output_dir = example_dir)
+```
+
+### DepMap/CCLE annotation data (Figshare item 19700056)
+
+These files are used by `gimap_annotate()` when cell line annotation is enabled:
+
+- `CCLE_expression.csv`
+- `CCLE_gene_cn.csv`
+- `Achilles_common_essentials.csv`
+
+Download with:
+
+```
+gimap::get_figshare(return_list = TRUE, item = "19700056")
+gimap::get_figshare(file_name = "CCLE_expression.csv", item = "19700056", output_dir = example_dir)
+gimap::get_figshare(file_name = "CCLE_gene_cn.csv", item = "19700056", output_dir = example_dir)
+gimap::get_figshare(file_name = "Achilles_common_essentials.csv", item = "19700056", output_dir = example_dir)
+```
+
+Note: The DepMap files can be large (hundreds of MB to several GB). Check the
+Figshare listing for exact sizes before downloading.
 
 ## Getting Started Tutorial
 
