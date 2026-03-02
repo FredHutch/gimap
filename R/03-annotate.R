@@ -90,6 +90,31 @@
 #'     missing_ids_file = tempfile()
 #'   )
 #' }
+normalize_depmap_metadata <- function(depmap_metadata) {
+  # Accept alternative column names used in different DepMap/Figshare releases
+  cols <- colnames(depmap_metadata)
+  # Standardize DepMap ID column (e.g. depmap_id -> DepMap_ID)
+  if (!("DepMap_ID" %in% cols) && ("depmap_id" %in% cols)) {
+    depmap_metadata <- depmap_metadata %>%
+      dplyr::rename(DepMap_ID = depmap_id)
+  }
+  # Standardize stripped cell line name column
+  if (!("stripped_cell_line_name" %in% cols)) {
+    if ("cell_line" %in% cols) {
+      # Derive stripped name: part before first underscore, uppercased
+      depmap_metadata <- depmap_metadata %>%
+        dplyr::mutate(stripped_cell_line_name = toupper(gsub("_.*$", "", .data$cell_line)))
+    } else if ("cell_line_name" %in% cols) {
+      # Use cell_line_name with non-alphanumeric stripped
+      depmap_metadata <- depmap_metadata %>%
+        dplyr::mutate(stripped_cell_line_name = toupper(gsub("[^A-Za-z0-9]", "", .data$cell_line_name)))
+    } else {
+      return(NULL)
+    }
+  }
+  depmap_metadata
+}
+
 gimap_annotate <- function(.data = NULL,
                            gimap_dataset,
                            annotation_file = NULL,
@@ -179,33 +204,46 @@ gimap_annotate <- function(.data = NULL,
   if (cell_line_annotate) {
     # This is used to flag things
     ## get TPM and CN information (w/ option for user to upload their own info)
-    depmap_metadata <- tryCatch(
-      {
-        readr::read_csv(
-          "https://figshare.com/ndownloader/files/35020903",
-          show_col_types = FALSE
-        )
-      },
-      error = function(e) {
-        message(
-          "Could not download DepMap metadata. ",
-          "Please check your internet connection and try again later.\n",
-          "Error: ", e$message
-        )
-        return(NULL)
-      }
-    )
+    metadata_file <- getOption("gimap_depmap_metadata_file")
+    if (!is.null(metadata_file) && file.exists(metadata_file)) {
+      depmap_metadata <- tryCatch(
+        readr::read_csv(metadata_file, show_col_types = FALSE),
+        error = function(e) {
+          message("Could not read DepMap metadata from ", metadata_file, ": ", e$message)
+          return(NULL)
+        }
+      )
+    } else {
+      depmap_metadata <- tryCatch(
+        {
+          readr::read_csv(
+            "https://figshare.com/ndownloader/files/35020903",
+            show_col_types = FALSE
+          )
+        },
+        error = function(e) {
+          message(
+            "Could not download DepMap metadata. ",
+            "Please check your internet connection and try again later.\n",
+            "Error: ", e$message
+          )
+          return(NULL)
+        }
+      )
+    }
 
     if (is.null(depmap_metadata)) {
       message("Returning dataset without cell line annotation due to network error.")
       return(gimap_dataset)
     }
 
-    # Check if expected columns exist in the downloaded data
-    if (!("stripped_cell_line_name" %in% colnames(depmap_metadata))) {
+    depmap_metadata <- normalize_depmap_metadata(depmap_metadata)
+    if (is.null(depmap_metadata) ||
+        !("stripped_cell_line_name" %in% colnames(depmap_metadata)) ||
+        !("DepMap_ID" %in% colnames(depmap_metadata))) {
       message(
-        "DepMap metadata format has changed - expected column 'stripped_cell_line_name' not found. ",
-        "Returning dataset without cell line annotation."
+        "DepMap metadata format has changed - expected column 'stripped_cell_line_name' (or 'cell_line') ",
+        "and 'DepMap_ID' (or 'depmap_id') not found. Returning dataset without cell line annotation."
       )
       return(gimap_dataset)
     }
@@ -587,31 +625,44 @@ ctrl_genes <- function(overwrite = TRUE,
 #' cell_lines <- supported_cell_lines()
 #' }
 supported_cell_lines <- function() {
-  depmap_metadata <- tryCatch(
-    {
-      readr::read_csv(
-        "https://figshare.com/ndownloader/files/35020903",
-        show_col_types = FALSE
-      )
-    },
-    error = function(e) {
-      message(
-        "Could not download DepMap metadata to retrieve supported cell lines. ",
-        "Please check your internet connection and try again later.\n",
-        "Error: ", e$message
-      )
-      return(NULL)
-    }
-  )
+  metadata_file <- getOption("gimap_depmap_metadata_file")
+  if (!is.null(metadata_file) && file.exists(metadata_file)) {
+    depmap_metadata <- tryCatch(
+      readr::read_csv(metadata_file, show_col_types = FALSE),
+      error = function(e) {
+        message("Could not read DepMap metadata from ", metadata_file, ": ", e$message)
+        return(NULL)
+      }
+    )
+  } else {
+    depmap_metadata <- tryCatch(
+      {
+        readr::read_csv(
+          "https://figshare.com/ndownloader/files/35020903",
+          show_col_types = FALSE
+        )
+      },
+      error = function(e) {
+        message(
+          "Could not download DepMap metadata to retrieve supported cell lines. ",
+          "Please check your internet connection and try again later.\n",
+          "Error: ", e$message
+        )
+        return(NULL)
+      }
+    )
+  }
 
   if (is.null(depmap_metadata)) {
     return(character(0))
   }
 
-  # Check if expected column exists
-  if (!("stripped_cell_line_name" %in% colnames(depmap_metadata))) {
+  depmap_metadata <- normalize_depmap_metadata(depmap_metadata)
+  if (is.null(depmap_metadata) ||
+      !("stripped_cell_line_name" %in% colnames(depmap_metadata))) {
     message(
-      "DepMap metadata format has changed - expected column 'stripped_cell_line_name' not found."
+      "DepMap metadata format has changed - expected column 'stripped_cell_line_name' ",
+      "(or 'cell_line' / 'cell_line_name') not found."
     )
     return(character(0))
   }

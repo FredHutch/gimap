@@ -28,25 +28,40 @@ test_example_data_dir <- function() {
   return(data_dir)
 }
 
-# Helper function to skip tests when DepMap metadata format has changed
+# Helper function to skip tests when DepMap metadata format has changed.
+# When remote metadata is unavailable or has wrong format, uses bundled fixture
+# so tests can run without depending on external DepMap/Figshare format.
 skip_if_depmap_changed <- function() {
   # Skip on CRAN since these tests require external resources
   testthat::skip_on_cran()
 
-  # Check if DepMap metadata has expected structure
+  # Try remote DepMap metadata first
   depmap_valid <- tryCatch(
     {
       depmap_metadata <- readr::read_csv(
         "https://figshare.com/ndownloader/files/35020903",
         show_col_types = FALSE,
-        n_max = 1  # Only read first row to check columns
+        n_max = 1
       )
-      "stripped_cell_line_name" %in% colnames(depmap_metadata)
+      depmap_metadata <- gimap:::normalize_depmap_metadata(depmap_metadata)
+      !is.null(depmap_metadata) &&
+        nrow(depmap_metadata) > 0 &&
+        "stripped_cell_line_name" %in% colnames(depmap_metadata) &&
+        "DepMap_ID" %in% colnames(depmap_metadata)
     },
     error = function(e) FALSE
   )
 
   if (!depmap_valid) {
-    testthat::skip("DepMap metadata format has changed or is unavailable")
+    # Use bundled fixture so tests still run when external format changes
+    fixture_path <- system.file(
+      "extdata", "depmap_metadata_fixture.csv",
+      package = "gimap", mustWork = FALSE
+    )
+    if (nzchar(fixture_path) && file.exists(fixture_path)) {
+      options(gimap_depmap_metadata_file = fixture_path)
+    } else {
+      testthat::skip("DepMap metadata format has changed or is unavailable")
+    }
   }
 }
