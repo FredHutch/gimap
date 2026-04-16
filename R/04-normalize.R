@@ -29,7 +29,8 @@
 #' @param normalize_by_unexpressed TRUE/FALSE crispr data should be normalized
 #' so that the median of unexpressed controls is 0. For this to happen set this
 #' to TRUE but you need to have added TPM data in the gimap_annotate step using
-#' cell_line_annotation or custom_tpm.
+#' cell_line_annotation or custom_tpm. If `unexpressed_ctrl_flag` is not present
+#' (for example DepMap download failed), this is coerced to `FALSE` with a message.
 #' @param timepoints Specifies the column name of the metadata set up in
 #' `$metadata$sample_metadata`
 #' that has a factor that represents the timepoints.
@@ -209,6 +210,15 @@ gimap_normalize <- function(.data = NULL,
       "Please run gimap_annotate() function on your gimap_dataset and then",
       " retry this function."
     )
+  }
+
+  if (isTRUE(normalize_by_unexpressed) &&
+    !("unexpressed_ctrl_flag" %in% colnames(gimap_dataset$annotation))) {
+    message(
+      "TPM-based unexpressed flags are not present (DepMap annotation may have been skipped). ",
+      "Using normalize_by_unexpressed = FALSE."
+    )
+    normalize_by_unexpressed <- FALSE
   }
 
   message("Normalizing Log Fold Change")

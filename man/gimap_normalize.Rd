@@ -28,7 +28,8 @@ function. But the data must still be a gimap_dataset}
 \item{normalize_by_unexpressed}{TRUE/FALSE crispr data should be normalized
 so that the median of unexpressed controls is 0. For this to happen set this
 to TRUE but you need to have added TPM data in the gimap_annotate step using
-cell_line_annotation or custom_tpm.}
+cell_line_annotation or custom_tpm. If `unexpressed_ctrl_flag` is not present
+(for example DepMap download failed), this is coerced to `FALSE` with a message.}
 
 \item{timepoints}{Specifies the column name of the metadata set up in
 `$metadata$sample_metadata`

@@ -117,6 +117,12 @@ run_qc(gimap_dataset,
 
 You can take a look at an [example QC report here](http://htmlpreview.github.io/?https://raw.githubusercontent.com/FredHutch/gimap/main/inst/example_qc_report.html).
 
+`gimap_annotate()` adds pgPEN design metadata and, when DepMap downloads succeed,
+expression and copy-number columns for your `cell_line`. If the bundled DepMap
+metadata URL is blocked or the file format changes, annotation still completes
+with design + control-gene flags; `gimap_normalize()` then turns off
+`normalize_by_unexpressed` automatically when TPM-based flags are missing.
+
 ```{r   eval = FALSE}
 gimap_dataset <- gimap_dataset %>%
   gimap_filter() %>%

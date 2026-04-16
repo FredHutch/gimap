@@ -1,23 +1,43 @@
 #' Normalize DepMap metadata for downstream joins
 #' @keywords internal
 normalize_depmap_metadata <- function(depmap_metadata) {
-  # Accept alternative column names used in different DepMap/Figshare releases
+  if (is.null(depmap_metadata) || nrow(depmap_metadata) < 1L) {
+    return(NULL)
+  }
   cols <- colnames(depmap_metadata)
-  # Standardize DepMap ID column (e.g. depmap_id -> DepMap_ID)
+  # Strip UTF-8 BOM from the first column name if present (bad CSV export / download)
+  if (length(cols) > 0L) {
+    cols[1] <- sub("^\ufeff", "", cols[1])
+    colnames(depmap_metadata) <- cols
+    cols <- colnames(depmap_metadata)
+  }
+  # Standardize DepMap ID column across releases (Figshare / portal naming)
   if (!("DepMap_ID" %in% cols) && ("depmap_id" %in% cols)) {
     depmap_metadata <- depmap_metadata %>%
       dplyr::rename(DepMap_ID = depmap_id)
   }
+  cols <- colnames(depmap_metadata)
+  if (!("DepMap_ID" %in% cols) && ("ModelID" %in% cols)) {
+    depmap_metadata <- depmap_metadata %>%
+      dplyr::rename(DepMap_ID = ModelID)
+  }
+  cols <- colnames(depmap_metadata)
+  if (!("DepMap_ID" %in% cols) && ("model_id" %in% cols)) {
+    depmap_metadata <- depmap_metadata %>%
+      dplyr::rename(DepMap_ID = model_id)
+  }
+  cols <- colnames(depmap_metadata)
   # Standardize stripped cell line name column
   if (!("stripped_cell_line_name" %in% cols)) {
     if ("cell_line" %in% cols) {
-      # Derive stripped name: part before first underscore, uppercased
       depmap_metadata <- depmap_metadata %>%
         dplyr::mutate(stripped_cell_line_name = toupper(gsub("_.*$", "", .data$cell_line)))
     } else if ("cell_line_name" %in% cols) {
-      # Use cell_line_name with non-alphanumeric stripped
       depmap_metadata <- depmap_metadata %>%
         dplyr::mutate(stripped_cell_line_name = toupper(gsub("[^A-Za-z0-9]", "", .data$cell_line_name)))
+    } else if ("Cell_Line_Name" %in% cols) {
+      depmap_metadata <- depmap_metadata %>%
+        dplyr::mutate(stripped_cell_line_name = toupper(gsub("[^A-Za-z0-9]", "", .data$Cell_Line_Name)))
     } else {
       return(NULL)
     }
@@ -203,9 +223,8 @@ gimap_annotate <- function(.data = NULL,
   }
 
   ############################ Get TPM data ####################################
+  depmap_annotation_ok <- isTRUE(cell_line_annotate)
   if (cell_line_annotate) {
-    # This is used to flag things
-    ## get TPM and CN information (w/ option for user to upload their own info)
     metadata_file <- getOption("gimap_depmap_metadata_file")
     if (!is.null(metadata_file) && file.exists(metadata_file)) {
       depmap_metadata <- tryCatch(
@@ -235,71 +254,99 @@ gimap_annotate <- function(.data = NULL,
     }
 
     if (is.null(depmap_metadata)) {
-      message("Returning dataset without cell line annotation due to network error.")
-      return(gimap_dataset)
-    }
-
-    depmap_metadata <- normalize_depmap_metadata(depmap_metadata)
-    if (is.null(depmap_metadata) ||
+      message(
+        "DepMap metadata could not be loaded. ",
+        "Continuing with pgPEN design + control-gene flags only (no DepMap expression/CN). ",
+        "Use gimap_normalize(..., normalize_by_unexpressed = FALSE) unless you pass custom_tpm to gimap_annotate()."
+      )
+      depmap_annotation_ok <- FALSE
+    } else if (ncol(depmap_metadata) < 2L) {
+      message(
+        "DepMap metadata appears invalid (too few columns; blocked download or stale URL?). ",
+        "Continuing with pgPEN design + control-gene flags only. ",
+        "Use gimap_normalize(..., normalize_by_unexpressed = FALSE) unless you pass custom_tpm to gimap_annotate()."
+      )
+      depmap_annotation_ok <- FALSE
+    } else {
+      depmap_metadata <- normalize_depmap_metadata(depmap_metadata)
+      if (is.null(depmap_metadata) ||
         !("stripped_cell_line_name" %in% colnames(depmap_metadata)) ||
         !("DepMap_ID" %in% colnames(depmap_metadata))) {
-      message(
-        "DepMap metadata format has changed - expected column 'stripped_cell_line_name' (or 'cell_line') ",
-        "and 'DepMap_ID' (or 'depmap_id') not found. Returning dataset without cell line annotation."
-      )
-      return(gimap_dataset)
+        message(
+          "DepMap metadata columns were not recognized (need model id + cell line name). ",
+          "Continuing with pgPEN design + control-gene flags only. ",
+          "Use gimap_normalize(..., normalize_by_unexpressed = FALSE) unless you pass custom_tpm to gimap_annotate()."
+        )
+        depmap_annotation_ok <- FALSE
+      }
     }
 
-    my_depmap_id <- depmap_metadata %>%
-      dplyr::filter(stripped_cell_line_name == toupper(cell_line)) %>%
-      dplyr::pull(DepMap_ID)
+    my_depmap_id <- NULL
+    tpm_file <- NULL
 
-    if (length(my_depmap_id) == 0) {
-      stop(
-        "The cell line specified, ",
-        cell_line,
-        "was not found in the DepMap data.",
-        "Run supported_cell_lines() to see the full list"
-      )
+    if (isTRUE(depmap_annotation_ok)) {
+      my_depmap_id <- depmap_metadata %>%
+        dplyr::filter(stripped_cell_line_name == toupper(cell_line)) %>%
+        dplyr::pull(DepMap_ID)
+
+      if (length(my_depmap_id) == 0) {
+        stop(
+          "The cell line specified, ",
+          cell_line,
+          " was not found in the DepMap data. ",
+          "Run supported_cell_lines() to see the full list.",
+          call. = FALSE
+        )
+      }
+
+      tpm_file <- getOption("tpm_file")
+      if (is.null(tpm_file)) tpm_file <- tpm_setup(data_dir = annot_dir)
+      if (is.null(tpm_file) || !file.exists(tpm_file)) {
+        message(
+          "Could not obtain TPM file for expression annotation. ",
+          "Continuing without DepMap expression. ",
+          "Use gimap_normalize(..., normalize_by_unexpressed = FALSE)."
+        )
+        depmap_annotation_ok <- FALSE
+      }
     }
-    tpm_file <- getOption("tpm_file")
-    if (is.null(tpm_file)) tpm_file <- tpm_setup(data_dir = annot_dir)
-    if (is.null(tpm_file) || !file.exists(tpm_file)) {
-      message("Could not download TPM file. Returning dataset without cell line annotation.")
-      return(gimap_dataset)
+
+    if (isTRUE(depmap_annotation_ok)) {
+      op <- options("VROOM_CONNECTION_SIZE" = 500072)
+      on.exit(options(op), add = TRUE)
+
+      tpm <- vroom::vroom(tpm_file,
+        show_col_types = FALSE,
+        col_select = c("genes", !!my_depmap_id)
+      ) %>%
+        dplyr::rename(log2_tpm = dplyr::all_of(!!my_depmap_id))
+
+      cn_file <- getOption("cn_file")
+      if (is.null(cn_file)) cn_file <- cn_setup(data_dir = annot_dir)
+
+      if (is.null(cn_file) || !file.exists(cn_file)) {
+        message(
+          "Could not obtain copy-number file; continuing without CN columns on annotations."
+        )
+      } else {
+        depmap_cn <- readr::read_csv(cn_file,
+          show_col_types = FALSE,
+          col_select = c("genes", dplyr::all_of(!!my_depmap_id))
+        ) %>%
+          dplyr::rename(log2_cn = dplyr::all_of(!!my_depmap_id))
+
+        annotation_df <- annotation_df %>%
+          dplyr::left_join(depmap_cn, by = c("gene1_symbol" = "genes")) %>%
+          dplyr::left_join(depmap_cn,
+            by = c("gene2_symbol" = "genes"),
+            suffix = c("_gene1", "_gene2")
+          )
+      }
     }
 
-    op <- options("VROOM_CONNECTION_SIZE" = 500072)
-    on.exit(options(op))
-
-    tpm <- vroom::vroom(tpm_file,
-      show_col_types = FALSE,
-      col_select = c("genes", !!my_depmap_id)
-    ) %>%
-      dplyr::rename(log2_tpm = dplyr::all_of(!!my_depmap_id))
-
-    ############################ COPY NUMBER ANNOTATION #######################
-    cn_file <- getOption("cn_file")
-
-    if (is.null(cn_file)) cn_file <- cn_setup(data_dir = annot_dir)
-
-    if (is.null(cn_file) || !file.exists(cn_file)) {
-      message("Could not download CN file. Returning dataset without cell line annotation.")
-      return(gimap_dataset)
+    if (!isTRUE(depmap_annotation_ok)) {
+      cell_line_annotate <- FALSE
     }
-    # Read in the CN data
-    depmap_cn <- readr::read_csv(cn_file,
-      show_col_types = FALSE,
-      col_select = c("genes", dplyr::all_of(!!my_depmap_id))
-    ) %>%
-      dplyr::rename(log2_cn = dplyr::all_of(!!my_depmap_id))
-
-    annotation_df <- annotation_df %>%
-      dplyr::left_join(depmap_cn, by = c("gene1_symbol" = "genes")) %>%
-      dplyr::left_join(depmap_cn,
-        by = c("gene2_symbol" = "genes"),
-        suffix = c("_gene1", "_gene2")
-      )
   }
 
   # If people supply their own tpm file we need to check it for stuff
