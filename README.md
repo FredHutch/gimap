@@ -208,6 +208,10 @@ example_dir <- gimap::example_data_folder()
 
 ### Example data (Figshare item 28264271)
 
+You can browse this item on Figshare here:
+[gimap example data (Figshare item 28264271)](https://figshare.com/articles/dataset/gimap_example_data/28264271)
+(DOI: [10.6084/m9.figshare.28264271](https://doi.org/10.6084/m9.figshare.28264271)).
+
 These files are used by `get_example_data()`:
 
 - `PP_pgPEN_HeLa_counts.txt`
@@ -226,6 +230,10 @@ gimap::get_figshare(file_name = "pgPEN_annotations.txt", item = "28264271", outp
 ```
 
 ### DepMap/CCLE annotation data (Figshare item 19700056)
+
+You can browse this item on Figshare here:
+[DepMap 22Q2 Public (Figshare item 19700056)](https://figshare.com/articles/dataset/DepMap_22Q2_Public/19700056)
+(DOI: [10.6084/m9.figshare.19700056](https://doi.org/10.6084/m9.figshare.19700056)).
 
 These files are used by `gimap_annotate()` when cell line annotation is enabled:
 
