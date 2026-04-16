@@ -4,20 +4,19 @@
 \alias{get_example_data}
 \title{Returns example data for package}
 \usage{
-get_example_data(
-  which_data,
-  data_dir = NULL,
-  refresh_data = FALSE
-)
+get_example_data(which_data, data_dir = NULL, refresh_data = FALSE)
 }
 \arguments{
-\item{which_data}{options are "count" or "meta"; specifies which example dataset should be returned}
+\item{which_data}{One of `"count"`, `"count_treatment"`, `"meta"`, `"gimap"`,
+`"gimap_treatment"`, or `"annotation"`; specifies which example dataset is returned.}
 
-\item{data_dir}{Where should the data be saved if applicable? If NULL, a user data
-directory will be used.}
+\item{data_dir}{Where files are stored. If `NULL` (default), example files are
+written under `file.path(tempdir(), "gimap-example-data")` for the current R
+session (they are not kept after the session ends). Pass an explicit directory
+if you want a persistent copy (for example to mirror files elsewhere).}
 
-\item{refresh_data}{should the example data that's been downloaded be deleted
-and redownloaded?}
+\item{refresh_data}{If `TRUE`, removes known example filenames from `data_dir`
+(only under safe locations; see [delete_example_data()]) before re-downloading.}
 }
 \value{
 the respective example data either as a data frame or a specialized

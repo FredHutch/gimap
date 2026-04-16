@@ -4,10 +4,7 @@
 \alias{ctrl_genes}
 \title{Download and set up control genes}
 \usage{
-ctrl_genes(
-  overwrite = TRUE,
-  data_dir = gimap_data_dir()
-)
+ctrl_genes(overwrite = TRUE, data_dir = gimap_data_dir())
 }
 \arguments{
 \item{overwrite}{Should the file be redownloaded and reset up?}

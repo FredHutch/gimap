@@ -2,11 +2,9 @@
 #' @description This function takes a `gimap_dataset` and creates a QC report
 #' @param gimap_dataset A special dataset structure that is setup using the
 #' `setup_data()` function.
-#' @param plots_dir directory to save plots created with this function,
-#' if it doesn't exist already it will be created
-#' @param overwrite default is FALSE; whether to overwrite the QC Report file
 #' @param output_file Needs to be a string that ends with ".Rmd" What the
 #' name of the output QC report file should be.
+#' @param overwrite default is FALSE; whether to overwrite the QC Report file
 #' @param filter_zerocount_target_col default is NULL; Which sample column(s)
 #' should be
 #'  used to check for counts of 0?  If NULL and not specified, downstream
@@ -33,13 +31,11 @@
 #'
 #' run_qc(
 #'   gimap_dataset,
-#'   plots_dir = tempdir(),
 #'   output_file = paste0(tempfile(), "_QC_Report.Rmd")
 #' )
 #' }
 run_qc <- function(gimap_dataset,
                    output_file,
-                   plots_dir,
                    overwrite = FALSE,
                    filter_zerocount_target_col = NULL,
                    filter_plasmid_target_col = NULL,
@@ -82,14 +78,10 @@ run_qc <- function(gimap_dataset,
     )
   }
 
-  # Make a plots directory if it doesn't exist
-  if (!dir.exists(plots_dir)) dir.create(plots_dir, showWarnings = TRUE)
-
   # Send the data to render it!
   rmarkdown::render(output_file,
     params = list(
       dataset = gimap_dataset,
-      plots_dir = plots_dir,
       filter_zerocount_target_col = filter_zerocount_target_col,
       filter_plasmid_target_col = filter_plasmid_target_col,
       filter_replicates_target_col = filter_replicates_target_col

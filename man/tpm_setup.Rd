@@ -4,10 +4,7 @@
 \alias{tpm_setup}
 \title{Download and set up DepMap TPM data}
 \usage{
-tpm_setup(
-  overwrite = TRUE,
-  data_dir = gimap_data_dir()
-)
+tpm_setup(overwrite = TRUE, data_dir = gimap_data_dir())
 }
 \arguments{
 \item{overwrite}{should the files be re downloaded}

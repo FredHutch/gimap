@@ -193,14 +193,17 @@ To install from a specific branch or tag, pass the `ref` argument (for example `
 ## Manual data download (Figshare)
 
 To keep the package size minimal for CRAN, example and annotation files are not bundled.
-You can download the files manually from Figshare and place them in a writable data
-directory. The package will also download these files automatically on first use.
+`get_example_data()` downloads Figshare examples into a session-specific folder under
+`tempdir()` (see `example_data_folder()`). For a permanent copy, pass `data_dir` to
+`get_example_data()` or download manually into any directory you choose.
 
-### Where to put files
+### Where to put files (manual download)
+
+If you use `get_figshare()` yourself, pick a writable directory (or use the same path
+as `example_data_folder()` for consistency):
 
 ```
 example_dir <- gimap::example_data_folder()
-dir.create(example_dir, recursive = TRUE, showWarnings = FALSE)
 ```
 
 ### Example data (Figshare item 28264271)

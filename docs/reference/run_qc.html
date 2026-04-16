@@ -72,7 +72,6 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">run_qc</span><span class="op">(</span></span>
 <span>  <span class="va">gimap_dataset</span>,</span>
 <span>  <span class="va">output_file</span>,</span>
-<span>  <span class="va">plots_dir</span>,</span>
 <span>  overwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  filter_zerocount_target_col <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  filter_plasmid_target_col <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -94,11 +93,6 @@
 <dt id="arg-output-file">output_file<a class="anchor" aria-label="anchor" href="#arg-output-file"></a></dt>
 <dd><p>Needs to be a string that ends with ".Rmd" What the
 name of the output QC report file should be.</p></dd>
-
-
-<dt id="arg-plots-dir">plots_dir<a class="anchor" aria-label="anchor" href="#arg-plots-dir"></a></dt>
-<dd><p>directory to save plots created with this function,
-if it doesn't exist already it will be created</p></dd>
 
 
 <dt id="arg-overwrite">overwrite<a class="anchor" aria-label="anchor" href="#arg-overwrite"></a></dt>
@@ -147,7 +141,6 @@ automatically opened, choose FALSE.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">run_qc</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">gimap_dataset</span>,</span></span>
-<span class="r-in"><span>  plots_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  output_file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"_QC_Report.Rmd"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>

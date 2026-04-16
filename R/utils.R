@@ -78,16 +78,75 @@ gimap_data_dir <- function(data_dir = NULL) {
   return(data_dir)
 }
 
+#' Session cache for Figshare example files (under [tempdir()])
+#' @description Not exported; avoids persisting example downloads outside the session
+#' temp directory unless the caller passes an explicit `data_dir`.
+#' @return Normalized path to an existing directory.
+#' @keywords internal
+.gimap_example_cache_dir <- function() {
+  d <- file.path(tempdir(), "gimap-example-data")
+  d <- normalizePath(d, winslash = "/", mustWork = FALSE)
+  if (!dir.exists(d)) {
+    dir.create(d, recursive = TRUE, showWarnings = FALSE)
+  }
+  normalizePath(d, winslash = "/", mustWork = TRUE)
+}
+
+#' Default directory for [get_example_data()] and related helpers
+#' @keywords internal
+resolve_example_data_dir <- function(data_dir) {
+  if (is.null(data_dir) || length(data_dir) == 0L ||
+    (length(data_dir) == 1L && (is.na(data_dir) || !nzchar(data_dir)))) {
+    .gimap_example_cache_dir()
+  } else {
+    gimap_data_dir(data_dir)
+  }
+}
+
+#' Basenames of all files managed by [get_example_data()]
+#' @keywords internal
+.gimap_example_filenames <- function() {
+  c(
+    "PP_pgPEN_HeLa_counts.txt",
+    "counts_pgPEN_PC9_example.tsv",
+    "pgRNA_ID_pgPEN_library_comp.csv",
+    "gimap_dataset_timepoint.RDS",
+    "gimap_dataset_treatment.RDS",
+    "pgPEN_annotations.txt"
+  )
+}
+
+#' Whether `dir` is allowed as a root for [delete_example_data()]
+#' @keywords internal
+.is_safe_example_data_delete_root <- function(dir) {
+  dir <- normalizePath(dir, winslash = "/", mustWork = FALSE)
+  legacy <- normalizePath(
+    tools::R_user_dir("gimap", "data"),
+    winslash = "/", mustWork = FALSE
+  )
+  td <- normalizePath(tempdir(), winslash = "/", mustWork = FALSE)
+  cache <- normalizePath(
+    file.path(tempdir(), "gimap-example-data"),
+    winslash = "/", mustWork = FALSE
+  )
+  dir == legacy ||
+    dir == cache ||
+    startsWith(dir, paste0(td, .Platform$file.sep))
+}
+
 
 #' Returns example data for package
 #' @description This function loads and returns example data for the package.
 #' Which dataset is returned must be specified. Data will be downloaded from Figshare
 #' the first time it is used.
-#' @param which_data options are "count" or "meta"; specifies which example dataset should be returned
-#' @param data_dir Where should the data be saved if applicable? If NULL, a user data
-#' directory will be used.
-#' @param refresh_data should the example data that's been downloaded be deleted
-#' and redownloaded?
+#' @param which_data One of `"count"`, `"count_treatment"`, `"meta"`, `"gimap"`,
+#' `"gimap_treatment"`, or `"annotation"`; specifies which example dataset is returned.
+#' @param data_dir Where files are stored. If `NULL` (default), example files are
+#' written under `file.path(tempdir(), "gimap-example-data")` for the current R
+#' session (they are not kept after the session ends). Pass an explicit directory
+#' if you want a persistent copy (for example to mirror files elsewhere).
+#' @param refresh_data If `TRUE`, removes known example filenames from `data_dir`
+#' (only under safe locations; see [delete_example_data()]) before re-downloading.
 #' @export
 #' @returns the respective example data either as a data frame or a specialized
 #' gimap_dataset depending on what was requested.
@@ -104,7 +163,8 @@ gimap_data_dir <- function(data_dir = NULL) {
 get_example_data <- function(which_data,
                              data_dir = NULL,
                              refresh_data = FALSE) {
-  data_dir <- gimap_data_dir(data_dir)
+  data_dir <- resolve_example_data_dir(data_dir)
+
   file_name <- switch(which_data,
     "count" = "PP_pgPEN_HeLa_counts.txt",
     "count_treatment" = "counts_pgPEN_PC9_example.tsv",
@@ -114,17 +174,20 @@ get_example_data <- function(which_data,
     "annotation" = "pgPEN_annotations.txt"
   )
 
+  if (is.null(file_name)) {
+    stop(
+      "`which_data` must be one of: count, count_treatment, meta, gimap, ",
+      "gimap_treatment, annotation",
+      call. = FALSE
+    )
+  }
+
   # If data is to be refreshed delete old data
-  if (refresh_data) {
-    delete_example_data()
+  if (isTRUE(refresh_data)) {
+    delete_example_data(data_dir = data_dir)
   }
 
   file_path <- file.path(data_dir, file_name)
-
-  # Save file path in the options
-  file_path_list <- list(file_path)
-  names(file_path_list) <- which_data
-  options(file_path_list)
 
   if (!grepl("RDS$", file_name)) {
     if (!file.exists(file_path)) {
@@ -192,12 +255,14 @@ get_example_data <- function(which_data,
 }
 
 
-#' Get file path to an default credentials RDS
-#' @param data_dir Optional data directory override.
+#' Folder used for Figshare example data
+#' @param data_dir Optional directory. If `NULL`, returns the session example
+#' cache under [tempdir()] (same default as [get_example_data()]). Otherwise
+#' resolves via [gimap_data_dir()].
 #' @export
-#' @return Returns the file path to folder where the example data is stored
+#' @return Normalized path to the folder where example files are stored.
 example_data_folder <- function(data_dir = NULL) {
-  gimap_data_dir(data_dir)
+  resolve_example_data_dir(data_dir)
 }
 
 #' Set up example count data
@@ -205,7 +270,7 @@ example_data_folder <- function(data_dir = NULL) {
 #' @export
 #' @return Returns the file path to folder where the example data is stored
 save_example_timepoint_data <- function(data_dir = NULL) {
-  data_dir <- gimap_data_dir(data_dir)
+  data_dir <- resolve_example_data_dir(data_dir)
   example_data <- get_example_data("count", data_dir = data_dir) %>%
     dplyr::select(!Day05_RepA)
 
@@ -241,7 +306,7 @@ save_example_timepoint_data <- function(data_dir = NULL) {
 #' @export
 #' @return Returns the file path to folder where the example data is stored
 save_example_treatment_data <- function(data_dir = NULL) {
-  data_dir <- gimap_data_dir(data_dir)
+  data_dir <- resolve_example_data_dir(data_dir)
   example_data <- get_example_data("count_treatment", data_dir = data_dir)
 
   example_pg_metadata <- get_example_data("meta", data_dir = data_dir)
@@ -456,28 +521,48 @@ get_figshare <- function(file_name = NA,
 NULL
 
 
-#' Refresh the example data files by redownloading them
-#' @description This function will set example data file options to NULL so files
-#' will be re-downloaded
+#' Delete cached Figshare example files
+#' @description Removes only the known example filenames produced by
+#' [get_example_data()] under `data_dir`. Paths are never taken from [options()],
+#' so unrelated files cannot be deleted by mistake. Deletion is only allowed when
+#' `data_dir` is the session example cache ([example_data_folder()]), the legacy
+#' per-user `tools::R_user_dir("gimap", "data")`, or any directory under
+#' [tempdir()] (for example test directories).
+#' @param data_dir Directory whose example files should be removed. The default
+#' (`NULL`) uses the same session cache as [get_example_data()].
 #' @export
-#' @return options for example data are are set to NULL.
+#' @return Invisibly, the character vector of file paths that were removed (may
+#' be length zero if nothing existed).
 #' @examples
-#'
 #' delete_example_data()
 #'
-delete_example_data <- function() {
-  data_list <- list(
-    "count" = NULL,
-    "count_treatment" = NULL,
-    "meta" = NULL,
-    "gimap" = NULL,
-    "gimap_treatment" = NULL,
-    "annotation" = NULL
+delete_example_data <- function(data_dir = NULL) {
+  data_dir <- resolve_example_data_dir(data_dir)
+  data_dir <- normalizePath(data_dir, winslash = "/", mustWork = TRUE)
+
+  if (!.is_safe_example_data_delete_root(data_dir)) {
+    stop(
+      "Refusing to delete: `data_dir` must be the gimap example cache ",
+      "(see ?example_data_folder), a directory under tempdir(), or the ",
+      "legacy per-user gimap data directory from tools::R_user_dir(\"gimap\", \"data\").",
+      call. = FALSE
+    )
+  }
+
+  files <- file.path(data_dir, .gimap_example_filenames())
+  existed <- file.exists(files)
+  to_remove <- files[existed]
+
+  if (length(to_remove) == 0L) {
+    message("No gimap example data files found under:\n  ", data_dir)
+    return(invisible(character(0)))
+  }
+
+  unlink(to_remove)
+  message(
+    "Removed ", length(to_remove), " gimap example file(s) from:\n  ",
+    data_dir, "\n",
+    paste0("  - ", basename(to_remove), collapse = "\n")
   )
-
-  message("Deleting the example data files listed in options")
-  unlink(options(names(data_list)))
-
-  # Set options as NULL
-  options(data_list)
+  invisible(to_remove)
 }

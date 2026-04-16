@@ -2,16 +2,18 @@
 % Please edit documentation in R/utils.R
 \name{example_data_folder}
 \alias{example_data_folder}
-\title{Get file path to an default credentials RDS}
+\title{Folder used for Figshare example data}
 \usage{
 example_data_folder(data_dir = NULL)
 }
 \arguments{
-\item{data_dir}{Optional data directory override.}
+\item{data_dir}{Optional directory. If `NULL`, returns the session example
+cache under [tempdir()] (same default as [get_example_data()]). Otherwise
+resolves via [gimap_data_dir()].}
 }
 \value{
-Returns the file path to folder where the example data is stored
+Normalized path to the folder where example files are stored.
 }
 \description{
-Get file path to an default credentials RDS
+Folder used for Figshare example data
 }

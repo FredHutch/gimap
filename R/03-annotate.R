@@ -1,3 +1,30 @@
+#' Normalize DepMap metadata for downstream joins
+#' @keywords internal
+normalize_depmap_metadata <- function(depmap_metadata) {
+  # Accept alternative column names used in different DepMap/Figshare releases
+  cols <- colnames(depmap_metadata)
+  # Standardize DepMap ID column (e.g. depmap_id -> DepMap_ID)
+  if (!("DepMap_ID" %in% cols) && ("depmap_id" %in% cols)) {
+    depmap_metadata <- depmap_metadata %>%
+      dplyr::rename(DepMap_ID = depmap_id)
+  }
+  # Standardize stripped cell line name column
+  if (!("stripped_cell_line_name" %in% cols)) {
+    if ("cell_line" %in% cols) {
+      # Derive stripped name: part before first underscore, uppercased
+      depmap_metadata <- depmap_metadata %>%
+        dplyr::mutate(stripped_cell_line_name = toupper(gsub("_.*$", "", .data$cell_line)))
+    } else if ("cell_line_name" %in% cols) {
+      # Use cell_line_name with non-alphanumeric stripped
+      depmap_metadata <- depmap_metadata %>%
+        dplyr::mutate(stripped_cell_line_name = toupper(gsub("[^A-Za-z0-9]", "", .data$cell_line_name)))
+    } else {
+      return(NULL)
+    }
+  }
+  depmap_metadata
+}
+
 #' Annotate gimap data
 #' @description In this function, a `gimap_dataset` is annotated as far as which
 #' genes should be used as controls.
@@ -90,31 +117,6 @@
 #'     missing_ids_file = tempfile()
 #'   )
 #' }
-normalize_depmap_metadata <- function(depmap_metadata) {
-  # Accept alternative column names used in different DepMap/Figshare releases
-  cols <- colnames(depmap_metadata)
-  # Standardize DepMap ID column (e.g. depmap_id -> DepMap_ID)
-  if (!("DepMap_ID" %in% cols) && ("depmap_id" %in% cols)) {
-    depmap_metadata <- depmap_metadata %>%
-      dplyr::rename(DepMap_ID = depmap_id)
-  }
-  # Standardize stripped cell line name column
-  if (!("stripped_cell_line_name" %in% cols)) {
-    if ("cell_line" %in% cols) {
-      # Derive stripped name: part before first underscore, uppercased
-      depmap_metadata <- depmap_metadata %>%
-        dplyr::mutate(stripped_cell_line_name = toupper(gsub("_.*$", "", .data$cell_line)))
-    } else if ("cell_line_name" %in% cols) {
-      # Use cell_line_name with non-alphanumeric stripped
-      depmap_metadata <- depmap_metadata %>%
-        dplyr::mutate(stripped_cell_line_name = toupper(gsub("[^A-Za-z0-9]", "", .data$cell_line_name)))
-    } else {
-      return(NULL)
-    }
-  }
-  depmap_metadata
-}
-
 gimap_annotate <- function(.data = NULL,
                            gimap_dataset,
                            annotation_file = NULL,

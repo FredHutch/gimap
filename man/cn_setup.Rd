@@ -4,10 +4,7 @@
 \alias{cn_setup}
 \title{Download and set up DepMap CN}
 \usage{
-cn_setup(
-  overwrite = TRUE,
-  data_dir = gimap_data_dir()
-)
+cn_setup(overwrite = TRUE, data_dir = gimap_data_dir())
 }
 \arguments{
 \item{overwrite}{Should the files be redownloaded?}

@@ -2,19 +2,27 @@
 % Please edit documentation in R/utils.R
 \name{delete_example_data}
 \alias{delete_example_data}
-\title{Refresh the example data files by redownloading them}
+\title{Delete cached Figshare example files}
 \usage{
-delete_example_data()
+delete_example_data(data_dir = NULL)
+}
+\arguments{
+\item{data_dir}{Directory whose example files should be removed. The default
+(`NULL`) uses the same session cache as [get_example_data()].}
 }
 \value{
-options for example data are are set to NULL.
+Invisibly, the character vector of file paths that were removed (may
+be length zero if nothing existed).
 }
 \description{
-This function will set example data file options to NULL so files
-will be re-downloaded
+Removes only the known example filenames produced by
+[get_example_data()] under `data_dir`. Paths are never taken from [options()],
+so unrelated files cannot be deleted by mistake. Deletion is only allowed when
+`data_dir` is the session example cache ([example_data_folder()]), the legacy
+per-user `tools::R_user_dir("gimap", "data")`, or any directory under
+[tempdir()] (for example test directories).
 }
 \examples{
-
 delete_example_data()
 
 }

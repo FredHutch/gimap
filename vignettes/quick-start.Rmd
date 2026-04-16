@@ -111,7 +111,6 @@ It's ideal to run quality checks first. The `run_qc()` function will create a re
 run_qc(gimap_dataset,
   output_file = file.path(output_dir, "example_qc_report.Rmd"),
   overwrite = TRUE,
-  plots_dir = "plots",
   quiet = TRUE
 )
 ```

@@ -7,7 +7,6 @@ test_that("HTML file is created and content is correct", {
 
   html_file <- run_qc(gimap_dataset,
     output_file = tempfile(),
-    plots_dir = tempdir(),
     open_results = FALSE,
     overwrite = TRUE
   )
@@ -19,7 +18,6 @@ test_that("HTML file is created and content is correct", {
 
   html_file <- run_qc(gimap_dataset,
     output_file = tempfile(),
-    plots_dir = tempdir(),
     open_results = FALSE,
     overwrite = TRUE
   )

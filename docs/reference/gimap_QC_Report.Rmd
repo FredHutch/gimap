@@ -4,7 +4,6 @@ date: "`r Sys.Date()`"
 author: "`r paste0('gimap (v', utils::packageVersion('gimap'), ')')`"
 params:
   dataset: NULL
-  plots_dir: ./plots
   filter_zerocount_target_col: NULL
   filter_plasmid_target_col: NULL
   filter_replicates_target_col: NULL
