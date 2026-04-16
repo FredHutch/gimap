@@ -16,14 +16,15 @@ test_that("Annotation options", {
   ) %in%
     colnames(gimap_dataset$annotation)))
 
-  # It should warn you if you try to say FALSE for cell line_annotate but
-  # don't provide a custom_tpm or use normalize_by_unexpressed = FALSE
-  testthat::expect_error(
+  # Without DepMap TPM, normalize_by_unexpressed is coerced to FALSE with a message
+  testthat::expect_message(
     gimap_dataset <- get_example_data("gimap", data_dir = data_dir) %>%
       gimap_filter() %>%
       gimap_annotate(cell_line_annotate = FALSE) %>%
-      gimap_normalize(timepoints = "day")
+      gimap_normalize(timepoints = "day"),
+    "normalize_by_unexpressed = FALSE"
   )
+  testthat::expect_true(!is.null(gimap_dataset$normalized_log_fc))
 
   gimap_dataset <- get_example_data("gimap", data_dir = data_dir) %>%
     gimap_filter() %>%

@@ -1,5 +1,9 @@
 test_that("HTML file is created and content is correct", {
   skip_if_figshare_unavailable()
+  testthat::skip_if_not(
+    rmarkdown::pandoc_available(),
+    "Pandoc is required to render the QC report (install pandoc or skip this test)"
+  )
   data_dir <- test_example_data_dir()
 
   # Does the thing run?
