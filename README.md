@@ -42,7 +42,7 @@ It's particularly useful for understanding:
 gimap - is a software tool that helps make sense of paired CRISPR screening data. Here's what it does:
 
 1. Takes data from paired CRISPR screens that has been pre-processed by the pgmap software, or any counts table of paired gRNA reads
-2. The input data will have cell counts for how well cells grow (or don't grow) when different genes or pairs of genes are disabled
+2. The input data will have a count of paired gRNA reads which is one per cell, representing cell counts for how well cells grow (or don't grow) when different genes or pairs of genes are disabled
 3. gimap can take this data and helps identify interesting patterns, like:
    - When disabling two genes together is more devastating than you'd expect from disabling them individually (called synthetic lethality)
    - When genes work together cooperatively
