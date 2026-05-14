@@ -17,7 +17,7 @@ authors:
   - name: Kate Isaac
     orcid: 0000-0001-8701-4197
     affiliation: 1
-  - name: Daniel Groso
+  - name: Daniel Grosso
     affiliation: 1
   - name: Marissa Fujimoto
     affiliation: 1
