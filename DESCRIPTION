@@ -23,6 +23,8 @@ Description: Helps find meaningful patterns in complex genetic experiments. Firs
 License: file LICENSE
 URL: https://github.com/FredHutch/gimap
 BugReports: https://github.com/FredHutch/gimap/issues
+Depends:
+    R (>= 3.5.0)
 Imports:
     readr,
     dplyr,
