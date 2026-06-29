@@ -1,0 +1,33 @@
+citHeader("To cite gimap in publications use:")
+
+bibentry(
+  bibtype = "Manual",
+  title = "gimap: An R Package for Genetic Interaction Mapping in Dual-Target CRISPR Screens",
+  author = c(
+    person(
+      "Candace", "Savonen",
+      comment = c(ORCID = "0000-0001-6331-7070")
+    ),
+    person(
+      "Phoebe", "Parrish",
+      comment = c(ORCID = "0000-0002-3530-0105")
+    ),
+    person(
+      "Kate", "Isaac",
+      comment = c(ORCID = "0000-0001-8701-4197")
+    ),
+    person("Daniel", "Grosso"),
+    person("Marissa", "Fujimoto"),
+    person(
+      "Siobhan", "O'Brien",
+      comment = c(ORCID = "0000-0003-4958-1080")
+    ),
+    person(
+      "Alice", "Berger",
+      comment = c(ORCID = "0000-0002-6538-2658")
+    )
+  ),
+  year = "2026",
+  note = "R package version 1.1.2",
+  url = "https://github.com/FredHutch/gimap"
+)
