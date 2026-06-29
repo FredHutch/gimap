@@ -1,29 +1,27 @@
 ## R CMD check results
 
-0 errors | 0 warnings | 0 notes
+0 errors | 0 warnings | 1 note
+
+The remaining note is from CRAN incoming URL checks:
+
+* Two Figshare URLs return HTTP 202 Accepted during CRAN URL checks. These are
+  valid public Figshare dataset pages and are used only for manual data download
+  instructions.
 
 ## Changes in this version
 
-This release addresses CRAN policy compliance for internet resource handling:
+This release updates package metadata for the JOSS software release:
 
-* Fixed vignettes to properly include pre-built images using `knitr::include_graphics()` 
-  instead of markdown syntax. The image directories (`output_timepoints/` and 
-  `output_treatment/`) are now included in the package tarball.
+* Added ORCIDs to `Authors@R` where available.
 
-* Improved test skipping pattern to use proper testthat `skip_on_cran()` and 
-  `skip()` functions inside `test_that()` blocks, rather than conditional 
-  execution at the top level of test files.
+* Aligned package author and citation metadata with the JOSS paper.
 
-* All internet resource accesses (Figshare API, DepMap data downloads) are wrapped 
-  in `tryCatch()` and fail gracefully with informative messages when resources 
-  are unavailable. Functions return `NULL` or the dataset without additional 
-  annotation when network resources cannot be reached.
+* Added `inst/CITATION` for the software citation.
 
-* Added `"id"` to `utils::globalVariables()` to fix compatibility with upcoming 
-  dplyr 1.2.0 which removes the defunct `dplyr::id()` export.
+* Declared the BSD 3-Clause license using CRAN's standard license expression.
+
+* Incremented the version from 1.1.2 to 1.1.3 because 1.1.2 is already on CRAN.
 
 ## Test environments
 
 * local macOS (aarch64-apple-darwin20), R 4.5.0
-* GitHub Actions (ubuntu-latest): R-release
-* win-builder: R-devel

@@ -1,3 +1,9 @@
+# gimap 1.1.3
+
+* Updated package metadata for the JOSS software release.
+* Added ORCIDs and aligned package citation metadata with the JOSS paper.
+* Declared the BSD 3-Clause license using CRAN's standard license expression.
+
 # gimap 1.1.2
 
 * Fixed vignettes to properly include pre-built images using `knitr::include_graphics()`
