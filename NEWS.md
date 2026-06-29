@@ -1,3 +1,5 @@
+# gimap 1.1.3
+
 # gimap 1.1.2
 
 * Fixed vignettes to properly include pre-built images using `knitr::include_graphics()`
