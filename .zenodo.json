@@ -1,0 +1,57 @@
+{
+  "title": "gimap: An R Package for Genetic Interaction Mapping in Dual-Target CRISPR Screens",
+  "description": "gimap is an R package for genetic interaction mapping in dual-target CRISPR screens.",
+  "license": "bsd-3-clause",
+  "upload_type": "software",
+  "access_right": "open",
+  "creators": [
+    {
+      "name": "Savonen, Candace",
+      "affiliation": "Fred Hutchinson Cancer Center, United States; Synthesize Bio, United States",
+      "orcid": "0000-0001-6331-7070"
+    },
+    {
+      "name": "Parrish, Phoebe",
+      "affiliation": "Fred Hutchinson Cancer Center, United States",
+      "orcid": "0000-0002-3530-0105"
+    },
+    {
+      "name": "Isaac, Kate",
+      "affiliation": "Fred Hutchinson Cancer Center, United States",
+      "orcid": "0000-0001-8701-4197"
+    },
+    {
+      "name": "Grosso, Daniel",
+      "affiliation": "Fred Hutchinson Cancer Center, United States"
+    },
+    {
+      "name": "Fujimoto, Marissa",
+      "affiliation": "Fred Hutchinson Cancer Center, United States"
+    },
+    {
+      "name": "O'Brien, Siobhan",
+      "affiliation": "Fred Hutchinson Cancer Center, United States",
+      "orcid": "0000-0003-4958-1080"
+    },
+    {
+      "name": "Berger, Alice",
+      "affiliation": "Fred Hutchinson Cancer Center, United States",
+      "orcid": "0000-0002-6538-2658"
+    }
+  ],
+  "keywords": [
+    "R",
+    "CRISPR",
+    "genetic interactions",
+    "paralogs",
+    "synthetic lethality",
+    "bioinformatics"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/FredHutch/gimap",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ]
+}
