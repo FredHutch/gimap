@@ -13,7 +13,7 @@ Authors@R: c(
   person("Kate", "Isaac",
          email = "kisaac@fredhutch.org", role = c("aut"),
          comment = c(ORCID = "0000-0001-8701-4197")),
-  person("Daniel", "Grosso", role = c("aut")),
+  person("Daniel", "Groso", role = c("aut")),
   person("Marissa", "Fujimoto", role = c("aut")),
   person("Siobhan", "O'Brien", role = c("aut"),
          comment = c(ORCID = "0000-0003-4958-1080")),
