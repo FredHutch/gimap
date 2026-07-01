@@ -285,6 +285,6 @@ And then putting "rstudio" for both the username and password.
 ![See metrics about this repository here](https://cauldron.io/project/8779/stats.svg)
 
 
-\* This work is funded by NCI grant R01CA262556 as well as funding from the Translational Data Science IRC of Fred Hutchinson Cancer Center.
+\* This work was funded in part by the Translational Data Science Integrated Research Center (TDS-IRC) of Fred Hutchinson Cancer Center, NIH/NCI R01CA262556 to A.H.B., the American Cancer Society to A.H.B., NIH/NHGRI R25HG012337 to M.F., and a Washington Research Foundation postdoctoral fellowship to S.O.
 
 Email csavonen@fredhutch.org with any questions!

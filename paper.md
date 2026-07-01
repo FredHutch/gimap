@@ -11,20 +11,20 @@ authors:
   - name: Candace Savonen
     orcid: 0000-0001-6331-7070
     affiliation: "1, 2"
-  - name: Phoebe Parrish
+  - name: Phoebe C.R. Parrish
     orcid: 0000-0002-3530-0105
     affiliation: 1
-  - name: Kate Isaac
+  - name: Kathryn J. Isaac
     orcid: 0000-0001-8701-4197
     affiliation: 1
-  - name: Daniel Grosso
+  - name: Daniel Groso
     affiliation: 1
   - name: Marissa Fujimoto
     affiliation: 1
   - name: Siobhan O'Brien
     orcid: 0000-0003-4958-1080
     affiliation: 1
-  - name: Alice Berger
+  - name: Alice H. Berger
     orcid: 0000-0002-6538-2658
     affiliation: 1
 affiliations:
@@ -174,7 +174,7 @@ _Example applications include:_
 
 # Acknowledgements
 
-This work is funded by NCI grant R01CA262556 and the Translational Data Science Integrated Research Center of Fred Hutchinson Cancer Center. SO is a Washington Research Foundation postdoctoral fellow.
+This work was funded in part by the Translational Data Science Integrated Research Center (TDS-IRC) of Fred Hutchinson Cancer Center, NIH/NCI R01CA262556 to A.H.B., the American Cancer Society to A.H.B., NIH/NHGRI R25HG012337 to M.F., and a Washington Research Foundation postdoctoral fellowship to S.O.
 
 # Related Publications
 
