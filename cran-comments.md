@@ -12,6 +12,10 @@ The remaining note is from CRAN incoming URL checks:
 
 This release updates package metadata for the JOSS software release:
 
+* Addressed CRAN feedback about the license by declaring
+  `BSD_3_clause + file LICENSE` in `DESCRIPTION` and using the CRAN-standard
+  BSD license stub in `LICENSE`.
+
 * Added ORCIDs to `Authors@R` where available.
 
 * Aligned package author and citation metadata with the JOSS paper.

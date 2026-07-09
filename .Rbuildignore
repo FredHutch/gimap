@@ -1,6 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^\.git$
+^\.git(/|$)
 .github
 ^doc$
 ^Meta$
@@ -29,7 +29,7 @@ make_it_noisy.R$
 poc_notebooks/*
 make_it_noisy.R
 Dockerfile
-^LICENSE\.md$
+^COPYING$
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
 SECURITY.md
