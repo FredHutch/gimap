@@ -56,9 +56,9 @@ The R package, called `gimap` (Genetic Interaction MAPping), was developed speci
 
 ## Overall design philosophy
 
-In order to ensure usability for the research community we built `gimap` using the following design philosophy.
+In order to ensure usability for the research community, we built `gimap` using the following design philosophy:
 
-1. Making best practices as default options and including warning messages for when alternative options are chosen (e.g. if filtering has not been applied).
+1. Making best practices the default options and including warning messages for when alternative options are chosen (e.g. if filtering has not been applied).
 2. Using elements from familiar packages such as fastqc reports (our `run_qc()` function creates such a report) [@fastqc].
 3. Trying to document and inform users of the statistics and decisions that have been made by the software clearly.
 
@@ -68,93 +68,23 @@ In order to ensure usability for the research community we built `gimap` using t
 
 ![gimap workflow completes 3 main steps. Part A, B, and C of the figure show the major steps of the workflow which are to normalize the data through a multi step process, score genetic interactions based on the expected versus observed CRISPR scores, and finally to calculate statistics to identify statistically significant genetic interactions.](./figure.png)
 
-1. **Normalize Data**: Raw count data is transformed into log2 counts per million (CPM) and adjusted by subtracting pre-treatment values to obtain log2 fold changes. These are further normalized based on the distribution of negative (e.g. safe-targeting or non-targeting controls) and positive controls (pgRNAs targeting known essential genes). This scaling normalization is analogous to the normalization methods employed by the Cancer Dependency Map (depmap.org) [@depmap2025; @arafeh2025depmap].
+### Normalize data
 
-a. _Log2 Counts Per Million (CPM) Transformation_:
+Raw count data is transformed into log2 counts per million (CPM) and adjusted by subtracting pre-treatment values to obtain log2 fold changes. These are further normalized based on the distribution of negative controls (e.g. safe-targeting or non-targeting) and positive controls (pgRNAs targeting known essential genes), analogous to the normalization methods employed by the Cancer Dependency Map (depmap.org) [@depmap2025; @arafeh2025depmap]. Full equations for this normalization procedure are provided in the package documentation.
 
-- Let $C_{i,j}$ be the raw count for gene $i$ in sample $j$
-- Let $N_j$ be the total number of counts in sample $j$
+### Score genetic interactions
 
-$$L_{i,j} = \log_2\left(\frac{C_{i,j} \times 10^6}{N_j} + 1\right)$$
-(The +1 is often included to avoid log(0) issues)
+The goal of this step is to quantify deviations from expected additive effects when two genes are simultaneously targeted, which allows us to identify true genetic interactions beyond what would be predicted from single-gene effects alone. We model a control distribution for non-interacting genes by assuming that, in the absence of genetic interactions, the effect of simultaneously targeting two genes should be additive (i.e., the sum of their individual effects). We further assume that the observed genetic interaction (GI) score is a linear transformation of the expected GI score plus a consistent error term sampled from an approximately normal, homoscedastic distribution, allowing us to use linear modeling approaches to account for systematic biases.
 
-b. _Adjustment by Pre-treatment Values_:
+For double-targeting constructs, expected CRISPR scores are calculated as the sum of the corresponding single-targeting scores. For single-targeting constructs, the expected score combines the single-target effect with the mean effect of control constructs. Interaction scores represent the difference between observed and expected CRISPR scores, adjusted using a linear model to account for systematic biases:
 
-- Let $L_{i,j}^{post}$ be the log2 CPM value post-treatment
-- Let $L_{i,j}^{pre}$ be the log2 CPM value pre-treatment
+$$I_{i,j} = S_{i,j}^{\mathrm{obs}} - (\beta_0 + \beta_1 \cdot S_{i,j}^{\mathrm{exp}})$$
 
-$$LFC_{i,j} = L_{i,j}^{post} - L_{i,j}^{pre}$$
+where $S_{i,j}^{\mathrm{obs}}$ and $S_{i,j}^{\mathrm{exp}}$ are the observed and expected CRISPR scores for genes $i$ and $j$, and $\beta_0$ and $\beta_1$ are the intercept and slope from a linear regression of observed vs. expected scores. Full derivations for expected-score calculation and bias adjustment are available in the package documentation.
 
-c. _Normalization Based on Controls_:
+### Calculate statistics
 
-- Let $LFC_{i,j}$ be the log2 fold change calculated above
-- Let $\mu_{neg}$ and $\sigma_{neg}$ be the mean and standard deviation of negative controls (safe-targeting or non-targeting)
-- Let $\mu_{pos}$ and $\sigma_{pos}$ be the mean and standard deviation of positive controls (pgRNAs targeting essential genes)
-
-$$Z_{i,j} = \frac{LFC_{i,j} - \mu_{neg}}{\mu_{neg} - \mu_{pos}}$$
-
-Or alternatively, using a more complex normalization that accounts for the distributions of both control types:
-$$Z_{i,j} = \frac{LFC_{i,j} - \mu_{neg}}{\sigma_{neg}} \times \frac{\sigma_{pos}}{\mu_{neg} - \mu_{pos}}$$
-
-This equation represents the transformation from raw count data to normalized log2 fold changes, calibrated against both negative and positive control distributions.
-
-2. **Score Genetic Interactions**: The goal of this step is to quantify deviations from expected additive effects when two genes are simultaneously targeted, which allows us to identify true genetic interactions beyond what would be predicted from single-gene effects alone.
-
-We model a control distribution for non-interacting genes by assuming that in the absence of genetic interactions, the effect of simultaneously targeting two genes should be additive (i.e., the sum of their individual effects). We further assume that the observed genetic interaction (GI) score is a linear transformation of the expected GI score plus a consistent error term sampled from an approximately normal distribution. This error distribution is shared across all genes and is homoscedastic (constant variance) across expected GI scores, allowing us to use linear modeling approaches to account for systematic biases.
-
-For double-targeting constructs, expected CRISPR scores are calculated as the sum of the corresponding single-targeting scores. For single-targeting constructs, the expected score combines the single-target effect with the mean effect of control constructs. Interaction scores represent the difference between observed and expected CRISPR scores, adjusted using a linear model to account for systematic biases.
-
-For double-targeting constructs:
-
-- Let $S_{i,j}^{obs}$ be the observed CRISPR score for a construct targeting genes $i$ and $j$
-- Let $S_i$ be the single-targeting score for gene $i$
-- Let $S_j$ be the single-targeting score for gene $j$
-
-The expected score for a double-targeting construct is:
-$$S_{i,j}^{exp} = S_i + S_j$$
-
-For single-targeting constructs:
-
-- Let $S_i^{obs}$ be the observed CRISPR score for a construct targeting gene $i$
-- Let $\mu_{control}$ be the mean effect of control constructs
-
-The expected score for a single-targeting construct is:
-$$S_i^{exp} = S_i + \mu_{control}$$
-
-The interaction score calculation, with adjustment for systematic biases:
-
-- Let $I_{i,j}$ be the interaction score for genes $i$ and $j$
-- Let $S_{i,j}^{obs}$ be the observed score
-- Let $S_{i,j}^{exp}$ be the expected score
-- Let $\beta_0$ and $\beta_1$ be the intercept and slope from a linear regression of observed vs expected scores
-
-The interaction score calculation:
-$$I_{i,j} = S_{i,j}^{obs} - (\beta_0 + \beta_1 \cdot S_{i,j}^{exp})$$
-
-Where the genetic interaction score is the difference between the observed score and the linear model prediction based on the expected score, accounting for systematic deviations between observed and expected values.
-
-3. **Calculate Statistics**: T-tests compare the distribution of double-targeting genetic interaction scores for one pair against the background distribution of single-targeting scores, with false discovery rate correction for multiple hypothesis testing.
-
-- $S_{double}$ as the set of double-targeting genetic interaction scores
-- $S_{single}$ as the set of single-targeting scores (background distribution)
-- $\mu_{double}$ as the mean of double-targeting scores
-- $\mu_{single}$ as the mean of single-targeting scores
-- $\sigma_{double}$ as the standard deviation of double-targeting scores
-- $\sigma_{single}$ as the standard deviation of single-targeting scores
-- $n_{double}$ and $n_{single}$ as the sample size of the paired guides
-
-The t-test statistic would be:
-
-$$t = \frac{\mu_{double} - \mu_{single}}{\sqrt{\frac{\sigma_{double}^2}{n_{double}} + \frac{\sigma_{single}^2}{n_{single}}}}$$
-
-For each comparison, we calculate a p-value from this t-statistic.
-
-Then, to account for multiple hypothesis testing, we apply false discovery rate (FDR) correction using Benjamini Hochberg procedure [@benjamini1995controlling]:
-
-1. Order all p-values: $p_{(1)} \leq p_{(2)} \leq ... \leq p_{(m)}$
-2. For a given FDR threshold $\alpha$ (e.g., 0.05), find the largest $k$ such that:
-   $$p_{(k)} \leq \frac{k}{m} \cdot \alpha$$
-3. Reject the null hypothesis for all tests with p-values $\leq p_{(k)}$
+T-tests compare the distribution of double-targeting genetic interaction scores for one pair against the background distribution of single-targeting scores, with false discovery rate correction using the Benjamini-Hochberg procedure for multiple hypothesis testing [@benjamini1995controlling]. Full statistical formulas are provided in the package documentation.
 
 The package also provides comprehensive visualization tools including volcano plots to highlight significant genetic interactions and detailed result tables for further analysis.
 
@@ -162,7 +92,7 @@ The package also provides comprehensive visualization tools including volcano pl
 
 `gimap` has been successfully used to identify synthetic lethal interactions among paralog genes in cancer cell lines, revealing potential therapeutic targets that single-gene approaches have missed. The package accommodates various experimental designs, including time-course studies and treatment comparisons, offering flexibility for diverse research questions.
 
-_Example applications include:_
+Example applications include:
 
 - Identification of genes that provide functional redundancy in critical cellular pathways
 - Discovery of context-dependent genetic interactions that emerge under specific conditions or treatments

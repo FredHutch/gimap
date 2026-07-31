@@ -1,4 +1,3 @@
-
 # gimap - Genetic Interaction MAPping for dual target CRISPR screens
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
@@ -108,6 +107,12 @@ single_target_gi_score = observed single crispr - (intercept + slope * expected 
 double_target_gi_score = double crispr score - (intercept + slope * expected double crispr)
 ```
 
+More formally, for a construct targeting genes $i$ and $j$, let $S_{i,j}^{\mathrm{obs}}$ be the observed CRISPR score and $S_{i,j}^{\mathrm{exp}}$ be the expected CRISPR score (see [Expected CRISPR scores](#expected-crispr-scores) below), and let $\beta_0$ and $\beta_1$ be the intercept and slope from the linear regression of observed vs. expected scores for that sample. The genetic interaction score $I_{i,j}$ is:
+
+$$I_{i,j} = S_{i,j}^{\mathrm{obs}} - (\beta_0 + \beta_1 \cdot S_{i,j}^{\mathrm{exp}})$$
+
+This is the same calculation as the pseudocode above -- it's the residual left over once the expected additive relationship between observed and expected scores (fit per-sample, to absorb systematic bias) has been subtracted out.
+
 These single and double target genetic interaction scores are calculated at the construct level and are then summarized using a t-test to see if the the distribution of the set of double targeting constructs is significantly different than the overall distribution of single targeting constructs. After multiple testing correction, FDR values are reported. Low FDR value for a double construct means high likelihood of paralog redundancy, also known as synthetic lethality.
 
 #### Expected CRISPR scores
@@ -121,12 +126,20 @@ expected crispr double = single target crispr 1 + single target crispr 2
 
 So in the instance of the double construct `GSN_SCIN_pg1` we would expect its CRISPR score to be the same as `GSN_ctrl` + `ctrl_SCIN` where the pgRNA used to target GSN and SCIN respectively are the same.
 
+Formally, if $S_i$ and $S_j$ are the single-targeting scores for genes $i$ and $j$, the expected score for the double-targeting construct is:
+
+$$S_{i,j}^{\mathrm{exp}} = S_i + S_j$$
+
 For `single_targeting` constructs we would expect the CRISPR score to be the sum of a single target plus the mean of the control pgRNAs from the `negative control constructs` (or double non-targeting CRISPR constructs).
 
 ```
 expected crispr single = single target crispr 1 + mean negative control for the pgRNA
 ```
 So for `TRPC5_nt1` single target we would take its CRISPR score + the mean of the `nt1` sequence across the constructs where it is included in a double non targeting construct.
+
+Formally, if $S_i$ is the single-targeting score for gene $i$ and $\mu_{\mathrm{control}}$ is the mean effect of the relevant control constructs, the expected score for a single-targeting construct is:
+
+$$S_i^{\mathrm{exp}} = S_i + \mu_{\mathrm{control}}$$
 
 ### t-tests
 
@@ -138,7 +151,20 @@ A t-test compares:
 1) The distribution of all single target GI scores
 2) The distribution of the data from the 16 double targeting constructs for the particular gene pair
 
-These t-tests can be performed with all samples combined or for each sample using the `stat_by_rep` argument in `calc_gi()`. False discovery rate is then applied after the p values are obtained to account for multiple testing correction.
+These t-tests can be performed with all samples combined or for each sample using the `stat_by_rep` argument in `calc_gi()`.
+
+Formally, let $S_{\mathrm{double}}$ be the set of double-targeting GI scores for the gene pair and $S_{\mathrm{single}}$ be the background set of single-targeting GI scores, with means $\mu_{\mathrm{double}}$, $\mu_{\mathrm{single}}$, standard deviations $\sigma_{\mathrm{double}}$, $\sigma_{\mathrm{single}}$, and sample sizes $n_{\mathrm{double}}$, $n_{\mathrm{single}}$ (i.e. number of paired guides in each set). The t-statistic is:
+
+$$t = \frac{\mu_{\mathrm{double}} - \mu_{\mathrm{single}}}{\sqrt{\dfrac{\sigma_{\mathrm{double}}^2}{n_{\mathrm{double}}} + \dfrac{\sigma_{\mathrm{single}}^2}{n_{\mathrm{single}}}}}$$
+
+A p-value is calculated from this t-statistic for each gene pair comparison.
+
+False discovery rate is then applied after the p values are obtained to account for multiple testing correction, using the Benjamini-Hochberg (BH) procedure:
+
+1. Order all $m$ p-values across all gene pairs tested: $p_{(1)} \leq p_{(2)} \leq \dots \leq p_{(m)}$
+2. For a chosen FDR threshold $\alpha$ (e.g., 0.05), find the largest $k$ such that:
+   $$p_{(k)} \leq \frac{k}{m} \cdot \alpha$$
+3. Call the interaction significant (i.e. reject the null hypothesis of no interaction) for all tests with p-values $\leq p_{(k)}$
 
 ### Normalization
 
@@ -149,11 +175,19 @@ There are four steps of normalization.
 ```
 log2((counts / total counts for sample)) * 1 million) + 1)
 ```
+Formally, if $C_{i,j}$ is the raw count for gene $i$ in sample $j$ and $N_j$ is the total counts in sample $j$:
+
+$$L_{i,j} = \log_2\left(\frac{C_{i,j} \times 10^6}{N_j} + 1\right)$$
+
+The $+1$ is included to avoid taking the log of zero.
 
 2. `Calculate log2 fold change` - This is done by subtracting the log2CPM for the pre-treatment from each sample.  control is what is highlighted. The pretreatment is the day 0 of CRISPR treatment, before CRISPR pgRNAs have taken effect.
 ```
 log2FC = log2CPM for each sample - pretreament log2CPM
 ```
+Formally, with $L_{i,j}^{\mathrm{post}}$ and $L_{i,j}^{\mathrm{pre}}$ as the post- and pre-treatment log2 CPM values:
+
+$$LFC_{i,j} = L_{i,j}^{\mathrm{post}} - L_{i,j}^{\mathrm{pre}}$$
 
 Since the pgPEN library uses non-targeting controls, we adjust for the fact that single-targeting pgRNAs generate only two double-strand breaks (1 per allele), whereas the double-targeting pgRNAs generate four DSBs. To do this, we set the median LFC of each group to zero.
 
@@ -166,6 +200,15 @@ log2FC adjusted =
 (log2FC - log2FC median negative control) /
 (log2FC median negative control - median log2FC positive control)
 ```
+Formally, with $\mu_{\mathrm{neg}}$ and $\mu_{\mathrm{pos}}$ as the mean (or median, as used above) of the negative controls (safe-targeting or non-targeting) and positive controls (pgRNAs targeting known essential genes) respectively:
+
+$$Z_{i,j} = \frac{LFC_{i,j} - \mu_{\mathrm{neg}}}{\mu_{\mathrm{neg}} - \mu_{\mathrm{pos}}}$$
+
+A more complete version of this normalization also accounts for the spread of each control distribution, using $\sigma_{\mathrm{neg}}$ and $\sigma_{\mathrm{pos}}$ as the standard deviations of the negative and positive controls:
+
+$$Z_{i,j} = \frac{LFC_{i,j} - \mu_{\mathrm{neg}}}{\sigma_{\mathrm{neg}}} \times \frac{\sigma_{\mathrm{pos}}}{\mu_{\mathrm{neg}} - \mu_{\mathrm{pos}}}$$
+
+Together, these describe the transformation from raw count data to normalized log2 fold changes, calibrated against both negative and positive control distributions. This is analogous to the normalization approach used by the Cancer Dependency Map (depmap.org).
 
 ## Prerequisites
 
@@ -286,5 +329,3 @@ And then putting "rstudio" for both the username and password.
 
 
 \* This work was funded in part by the Translational Data Science Integrated Research Center (TDS-IRC) of Fred Hutchinson Cancer Center, NIH/NCI R01CA262556 to A.H.B., the American Cancer Society to A.H.B., NIH/NHGRI R25HG012337 to M.F., and a Washington Research Foundation postdoctoral fellowship to S.O.
-
-Email csavonen@fredhutch.org with any questions!
